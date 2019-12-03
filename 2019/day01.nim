@@ -1,6 +1,6 @@
 import strutils, sequtils, math
 
-let input = "day01.txt".readFile.splitLines.map parseInt
+let input = "2019/day01.txt".readFile.splitLines.map parseInt
 
 proc computeFuel(mass: int): int = max(mass div 3 - 2, 0)
 
