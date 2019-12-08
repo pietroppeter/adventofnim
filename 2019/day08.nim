@@ -68,7 +68,7 @@ proc toString(s: openArray[char]): string =
 proc `$`(l: Layer): string =
   var rows = newSeqOfCap[string](height)
   for i in 1 .. height:
-    rows.add l[width*(i - 1) ..< width*i].toString
+    rows.add l[width*(i - 1) ..< width*i].toString.replace("0", ".").replace("1", "*")
   rows.join("\n")
 
 let image = layers.parseImage
