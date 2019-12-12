@@ -71,6 +71,26 @@ proc parseParameter(p: Program, i: int): Parameter =
     else:
       result.mode = parInvalidMode
 
+proc getVal(p: Parameter, q: Program): IntType =
+  case p.mode:
+    of parImm:
+      return p.val
+    of parPos:
+      return q.mem[p.pos]
+    of parRel:
+      return q.mem[q.rel + p.pos]
+    of parInvalidMode:
+      raise ValueError.newException "Invalid parameter"
+
+proc getPos(p: Parameter, q: Program): int =
+  case p.mode:
+    of parImm, parInvalidMode:
+      raise ValueError.newException "Invalid or Immediate parameter"
+    of parPos:
+      return p.pos
+    of parRel:
+      return q.rel + p.pos
+
 proc parseInstruction(p: Program): Instruction =
   var
     opcode: int
@@ -151,8 +171,85 @@ proc `$`(p: Program): string =
     if i.op == opHalt:
       halted = true
 
+proc exec(p: var Program, i: Instruction, verbose = false): bool =
+  # returns false if halted or waiting for input
+  assert p.pos == i.pos
+  if verbose: echo $i
+  case i.op:
+    of opAdd:
+      p.mem[i.par[2].getPos(p)] = i.par[0].getVal(p) + i.par[1].getVal(p)
+      if verbose: echo fmt"p.mem[{i.par[2].getPos(p)}] <- {i.par[0].getVal(p)} + {i.par[1].getVal(p)} = {i.par[0].getVal(p) + i.par[1].getVal(p)}"
+    of opMul:
+      p.mem[i.par[2].getPos(p)] = i.par[0].getVal(p) * i.par[1].getVal(p)
+      if verbose: echo fmt"p.mem[{i.par[2].getPos(p)}] <- {i.par[0].getVal(p)} * {i.par[1].getVal(p)} = {i.par[0].getVal(p) * i.par[1].getVal(p)}"
+    of opIn:
+      try:
+        p.mem[i.par[0].getPos(p)] = p.inQ.pop
+        if verbose: echo fmt"p.mem[{i.par[0].getPos(p)}] <- {p.mem[i.par[0].getPos(p)]}"
+      except IndexError:
+        return false
+    of opOut:
+      p.outQ.push p.mem[i.par[0].getVal(p)]
+      if verbose: echo fmt"p.mem[{i.par[0].getVal(p)}] -> {p.mem[i.par[0].getVal(p)]}"
+    of opJumpIfTrue:
+      if i.par[0].getVal(p) != 0:
+        p.pos = i.par[1].getPos(p)
+        if verbose: echo fmt"p.pos <- {i.par[1].getPos(p)}"
+        return true
+    of opJumpIfFalse:
+      if i.par[0].getVal(p) == 0:
+        p.pos = i.par[1].getPos(p)
+        return true
+    of opLessThan:
+      if i.par[0].getVal(p) < i.par[1].getVal(p):
+        p.mem[i.par[2].getPos(p)] = 1
+      else:
+        p.mem[i.par[2].getPos(p)] = 0
+    of opIsEqual:
+      if i.par[0].getVal(p) == i.par[1].getVal(p):
+        p.mem[i.par[2].getPos(p)] = 1
+      else:
+        p.mem[i.par[2].getPos(p)] = 0
+    of opAdjRelBase:
+      p.rel += i.par[0].getVal(p)
+    of opInvalid:
+      raise ValueError.newException "Invalid instruction: " & $i
+    of opHalt:
+      return false
+  p.pos += i.jump
+  return true
+
+proc step(p: var Program, n = 1, verbose=false): int =
+  var
+    i: Instruction
+    n = n
+  if n <= 0:
+    n = int.high
+  for s in 1 .. n:
+    i = p.parseInstruction
+    if not p.exec(i, verbose):
+      break
+    inc result
+
+proc run(p: var Program, verbose=false): int =
+  p.step 0, verbose
+
+proc repr(p: Program): string =
+  result &= fmt"pos: {p.pos}, rel: {p.rel}" & "\n"
+  result &= fmt"mem: {p.mem}" & "\n"
+  result &= fmt"inQ: {p.inQ}" & "\n"
+  result &= fmt"outQ: {p.outQ}"
+
 when isMainModule:
+  var p: Program
   let testProg = (
     day2ex1: "1,9,10,3,2,3,11,0,99,30,40,50".parseProgram
   )
-  echo $testProg.day2ex1
+  
+  echo "\n\n*DAY2EX1*"
+  p = testProg.day2ex1
+  echo $p
+  echo "n steps: ", p.run(verbose=true)
+  echo p.repr
+
+
