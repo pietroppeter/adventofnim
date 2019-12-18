@@ -1,4 +1,5 @@
 import strutils, deques, sequtils, math, strformat
+export deques
 
 type IntType = int  
 let parseIntType: proc(x: string): IntType = parseInt
