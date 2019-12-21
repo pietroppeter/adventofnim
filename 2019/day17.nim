@@ -6,11 +6,7 @@ var p = p17
 
 discard p.run
 
-proc toString(q: var Queue): string =
-  while q.len > 0:
-      result.add chr(q.pop)
-
-let initialView = p.outQ.toString
+let initialView = p.printAsciiOutput
 
 echo initialView
 
@@ -137,11 +133,10 @@ p = p17
 dump p.mem[0]
 p.mem[0] = 2
 
-proc loadInput(p: var Program, s: string) =
-  for c in s:
-    p.inQ.push c.ord
+p.asciiCapable = true
 
-p.loadInput(input2)
+p.loadAsciiInput(input2)
 
 discard p.run
-echo "part 2: ", p.outQ.popLast
+
+echo "part 2:\n", p.printAsciiOutput
