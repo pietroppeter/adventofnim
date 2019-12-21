@@ -12,6 +12,7 @@ type
     rel*: int
     inQ*: Queue
     outQ*: Queue
+    asciiCapable*: bool
   OpCode* = enum
     opAdd = (1, "add")
     opMul = "mul"
@@ -194,8 +195,13 @@ proc exec*(p: var Program, i: Instruction, verbose = false): bool =
       p.setMem(i.par[2].getPos(p), i.par[0].getVal(p) * i.par[1].getVal(p))
       if verbose: echo fmt"p.mem[{i.par[2].getPos(p)}] <- {i.par[0].getVal(p)} * {i.par[1].getVal(p)} = {i.par[0].getVal(p) * i.par[1].getVal(p)}"
     of opIn:
-      try:
-        p.setMem(i.par[0].getPos(p), p.inQ.pop)
+      try:        
+        if p.asciiCapable:
+          let c = p.inQ.pop
+          p.outQ.push c
+          p.setMem(i.par[0].getPos(p), c)
+        else:
+          p.setMem(i.par[0].getPos(p), p.inQ.pop)
         if verbose: echo fmt"p.mem[{i.par[0].getPos(p)}] <- {i.par[0].getVal(p)}"
       except IndexError:
         return false
@@ -250,6 +256,19 @@ proc repr*(p: Program): string =
   result &= fmt"mem: {p.mem}" & "\n"
   result &= fmt"inQ: {p.inQ}" & "\n"
   result &= fmt"outQ: {p.outQ}"
+
+proc loadAsciiInput*(p: var Program, s: string) =
+  for c in s:
+    p.inQ.push c.ord
+  
+proc printAsciiOutput*(p: var Program): string =
+  var i: int
+  while p.outQ.len > 0:
+    i = p.outQ.pop
+    if i in 0 .. 255:
+      result.add chr(i)
+    else:
+      result &= $i
 
 when isMainModule:
   var p: Program
