@@ -270,6 +270,19 @@ proc printAsciiOutput*(p: var Program): string =
     else:
       result &= $i
 
+proc runAsciiCapable*(p: Program, input: string): string =
+  var p = p
+  p.asciiCapable = true
+  p.loadAsciiInput(input)
+  discard p.run
+  p.printAsciiOutput
+
+proc isWaitingForInput*(p: Program): bool =
+  (p.mem[p.pos] mod 100) == opIn.ord and p.inQ.len == 0
+
+proc isHalted*(p: Program): bool =
+  (p.mem[p.pos] mod 100) == opHalt.ord
+
 when isMainModule:
   var p: Program
   let testProg = (
