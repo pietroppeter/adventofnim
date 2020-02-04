@@ -251,6 +251,12 @@ proc step*(p: var Program, n = 1, verbose=false): int =
 proc run*(p: var Program, verbose=false): int =
   p.step 0, verbose
 
+proc runForOutput*(p: var Program, outLen=1) =
+  ## run until an output of given length is produced or when program is halted or waiting for input
+  while p.outQ.len < outLen:
+    if p.step == 0:
+      break
+
 proc repr*(p: Program): string =
   result &= fmt"pos: {p.pos}, rel: {p.rel}" & "\n"
   result &= fmt"mem: {p.mem}" & "\n"
