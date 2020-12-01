@@ -26,7 +26,7 @@ h1, h2, h3, h4, h5, h6, strong {
 
 }
 
-pre code.nim {
+pre code {
   background: #10101a;
   color: #cccccc;
   border-radius: 0px;
@@ -37,20 +37,14 @@ pre code.nim {
   left: -2px;
 }
 
-code {
-  background: #10101a;
-  color: #cccccc;
-
-}
-
-code, samp {
+samp {
   position: relative;
   display: inline-block;
   margin: 0;
   padding: 0;
 }
 
-code:before, samp:before {
+samp:before {
   z-index: -1;
   content: "";
   position: absolute;
@@ -61,18 +55,6 @@ code:before, samp:before {
   bottom: 0px;
   border: 1px solid #333340;
   background: #10101a;
-}
-
-code.nim {
-    border-radius: 0px;
-    border-left: 1px solid #ffc200;
-}
-
-pre code.nim {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    position: relative;
-    left: -2px;
 }
 
 a {
@@ -94,6 +76,18 @@ em.star {
     color: #ffff66;
     text-shadow: 0 0 5px #ffff66;
 }
+
+code {
+    border-radius: 0px;
+    border-left: 1px solid #ffc200;
+}
+
+pre code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    left: -2px;
+}
   </style>
 </head>
 <body>
@@ -101,7 +95,7 @@ em.star {
 <h1>🎄👑 adventofnim</h1>
 <p>nim solutions for advent of code</p>
 <p>I am starting to port all solutions to use https://github.com/pietroppeter/nimib</p>
-<p><code>nim all.nims</code> to rebuild docs</p>
+<p><samp>nim all.nims</samp> to rebuild docs</p>
 <ul>
 <li>repo: https://pietroppeter.github.io/adventofnim/</li>
 <li>docs: https://pietroppeter.github.io/adventofnim/</li>
