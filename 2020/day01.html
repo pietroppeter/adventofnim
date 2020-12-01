@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>c:\Users\ppeterlongo\repos\adventofnim\2020\day01.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  <style>
+body, code, samp {
+  font-family: "Source Code Pro", monospace;
+}
+
+body {
+  background: #0f0f23;
+  color: #cccccc;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: normal;
+
+}
+
+pre code {
+  background: #10101a;
+  color: #cccccc;
+  border-radius: 0px;
+  border-left: 1px solid #ffc200;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  position: relative;
+  left: -2px;
+}
+
+:not(pre) > code, samp {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+(:not(pre) > code):before, samp:before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  display: block;
+  left: -2px;
+  right: -2px;
+  top: 3px;
+  bottom: 0px;
+  border: 1px solid #333340;
+  background: #10101a;
+}
+
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+    color: #ffff66;
+    text-shadow: 0 0 5px #ffff66;
+}
+
+code {
+    border-radius: 0px;
+    border-left: 1px solid #ffc200;
+}
+
+pre code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    left: -2px;
+}
+  </style>
+</head>
+<body>
+<main>
+<h1>--- Day 1: Report Repair ---</h1>
+<h2>imports</h2>
+<pre><code class="nim">include
+  prelude
+
+import
+  sequtils, algorithm</code></pre>
+<h2>input</h2>
+<pre><code class="nim">let input: seq[int] = toSeq("2020/input01.txt".lines).map(parseInt)
+echo input.len
+echo input[0 .. 10]
+echo input[^10 .. ^1]</code></pre>
+<pre><samp>200
+@[1583, 1295, 1747, 1628, 1756, 1992, 1984, 1990, 2006, 1626, 1292]
+@[1743, 1909, 1451, 2000, 1978, 1938, 1707, 1337, 1362, 1263]</samp></pre>
+<h2>-- Part 1 --</h2>
+<p>solution to parse 1 does not necessarily even needs to parse the whole input.
+this solution is correct also for the edge case 2010 + 2010</p>
+<pre><code class="nim">var s, t: seq[int]
+for n in input:
+  if n < 1010:
+    t.add n
+  if 2020 - n in s:
+    echo "part 1: ", n * (2020 - n)
+  s.add n</code></pre>
+<pre><samp>part 1: 538464</samp></pre>
+<p>The solution is correct! <em class="star">*</em></p>
+<h2>-- Part 2 --</h2>
+<pre><code class="nim">s.sort()
+t.sort()
+block outer:
+  for i, n in s:
+    for m in s[(i + 1) .. ^1]:
+      for k in t:
+        if n + m + k == 2020:
+          echo "part 2: ", n * m * k
+          break outer
+        if n + m + k > 2020:
+          break</code></pre>
+<pre><samp>part 2: 278783190</samp></pre>
+<p>The solution is correct! <em class="star">*</em></p>
+
+</main>
+</body>
+</html>
