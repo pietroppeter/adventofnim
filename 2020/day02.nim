@@ -4,12 +4,6 @@ nbInit
 
 nbText: "# --- Day 2: Password Philosophy ---"
 
-nbCode:
-  let example = """1-3 a: abcde
-1-3 b: cdefg
-2-9 c: ccccccccc
-"""
-
 nbText: """from [original text](https://adventofcode.com/2020/day/2)
 
 a list (your puzzle input) of _passwords_
@@ -19,7 +13,12 @@ _the corporate policy when that password was set_.
 For example, suppose you have the following list:
 """
 
-nbCode: echo example
+nbCode:
+  let example = """1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc
+"""
+  echo example
 
 nbText: """
 Each line gives the password policy and then the password.
