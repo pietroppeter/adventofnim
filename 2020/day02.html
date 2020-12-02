@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day02.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  <style>
+body, code, samp {
+  font-family: "Source Code Pro", monospace;
+}
+
+body {
+  background: #0f0f23;
+  color: #cccccc;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: normal;
+
+}
+
+pre code {
+  background: #10101a;
+  color: #cccccc;
+  border-radius: 0px;
+  border-left: 1px solid #ffc200;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  position: relative;
+  left: -2px;
+}
+
+samp {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+samp:before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  display: block;
+  left: -2px;
+  right: -2px;
+  top: 3px;
+  bottom: 0px;
+  border: 1px solid #333340;
+  background: #10101a;
+}
+
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+    color: #ffff66;
+    text-shadow: 0 0 5px #ffff66;
+}
+
+code {
+    border-radius: 0px;
+    border-left: 1px solid #ffc200;
+}
+
+pre code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    left: -2px;
+}
+  </style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header><main>
+<h1>--- Day 2: Password Philosophy ---</h1>
+<pre><code class="nim">let example = """1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc
+"""</code></pre>
+<p>from <a href="https://adventofcode.com/2020/day/2">original text</a></p>
+<p>a list (your puzzle input) of <em>passwords</em>
+(according to the corrupted database) and
+<em>the corporate policy when that password was set</em>.</p>
+<p>For example, suppose you have the following list:</p>
+<pre><code class="nim">echo example</code></pre>
+<pre><samp>1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc</samp></pre>
+<p>Each line gives the password policy and then the password.
+The password policy indicates the lowest and highest number of times
+a given letter must appear for the password to be valid.
+For example, 1-3 a means that the password must contain
+a at least 1 time and at most 3 times.</p>
+<p>In the above example, 2 passwords are valid.
+The middle password, cdefg, is not;
+it contains no instances of b, but needs at least 1.
+The first and third passwords are valid:
+they contain one a or nine c,
+both within the limits of their respective policies.</p>
+<p><em>How many passwords are valid</em> according to their policies?</p>
+<h2>structure the data</h2>
+<p>something I love about Nim (wrt to my usual language Python)
+is that the first thing you do is structure your data (i.e. deciding types)
+and that is solving half of the problem.</p>
+<pre><code class="nim">type
+  Policy = object
+    min, max: Natural
+    ch: char
+
+  Row = tuple[policy: Policy, password: string]
+  Db = seq[Row]</code></pre>
+<p>and also that helps in naming.
+how do I call the parse function? well, <em>parse</em>!</p>
+<p>Do I want to extract parsing for the first row?
+easy and I do not have to pick a new name!</p>
+<pre><code class="nim">func parse(line: string): Row =
+  var
+    i, j: int
+    s, t: string
+  if not scanf(line, "$i-$i $w: $w", i, j, s, t):
+    debugEcho "error while parsing: " & line
+  if s.len != 1:
+    debugEcho "error in s.len. s: ", s, "; line: ", line
+  result.policy.min = i
+  result.policy.max = j
+  result.policy.ch = s[0]
+  result.password = t
+
+proc parse(lines: seq[string]): Db =
+  for i, line in lines:
+    result.add parse(line)</code></pre>
+<p>Also I love the fact that strscans prevents me to learn regular expressions.</p>
+<p>Let's see how parsing work on base example:</p>
+<pre><code class="nim">echo (parse example.strip.splitLines).join("\n")</code></pre>
+<pre><samp>(policy: (min: 1, max: 3, ch: 'a'), password: "abcde")
+(policy: (min: 1, max: 3, ch: 'b'), password: "cdefg")
+(policy: (min: 2, max: 9, ch: 'c'), password: "ccccccccc")</samp></pre>
+<p>ok, good. Now let's solve part1 (for this example)</p>
+<h2>part 1</h2>
+<pre><code class="nim">func isValid(r: Row): bool =
+  var count: int
+  for c in r.password:
+    if c == r.policy.ch:
+      inc count
+  if count >= r.policy.min and count <= r.policy.max:
+    true
+  else:
+    false
+
+func part1(input: string): int =
+  for row in parse(input.strip.splitLines):
+    if row.isValid:
+      inc result
+
+echo part1 example
+assert example.part1 == 2</code></pre>
+<pre><samp>2</samp></pre>
+<p>now it's time to get the <em class="star">*</em>!</p>
+<pre><code class="nim">echo part1 "2020/input02.txt".readFile</code></pre>
+<pre><samp>445</samp></pre>
+<p><em>ok, I did spend a bit of time debugging here, just to find out that I forgot to past content in file...</em></p>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h2>--- Part 2 ---</h2>
+<p>from <a href="https://adventofcode.com/2020/day/2">original text</a></p>
+<p>Each policy actually describes <em>two positions in the password</em>,
+where 1 means the first character, 2 means the second character,
+and so on. (Be careful; Toboggan Corporate Policies have no
+concept of &quot;index zero&quot;!)
+<em>Exactly one of these positions</em> must contain the given letter.
+Other occurrences of the letter are irrelevant
+for the purposes of policy enforcement.</p>
+<pre><code class="nim">func isValid2(r: Row): bool =
+  var count: int
+  if r.password[r.policy.min - 1] == r.policy.ch:
+    inc count
+  if r.password[r.policy.max - 1] == r.policy.ch:
+    inc count
+  count == 1
+
+func part2(input: string): int =
+  for row in parse(input.strip.splitLines):
+    if row.isValid2:
+      inc result
+
+echo "example: ":
+  part2 example
+echo "part2: ":
+  part2 "2020/input02.txt".readFile</code></pre>
+<pre><samp>example: 1
+part2: 491</samp></pre>
+
+</main>
+</body>
+</html>
