@@ -1,16 +1,8 @@
-import nimib
-
-template gotTheStar = nbText: "The solution is correct! <em class=\"star\">*</em>"
+import nimib, animu
 
 nbInit
 
 nbText : "# --- Day 1: Report Repair ---"
-
-nbText: "## imports"
-
-nbCode:
-  include prelude
-  import sequtils, algorithm
 
 nbText: "## input"
 
