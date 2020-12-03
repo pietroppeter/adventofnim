@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>c:\Users\ppeterlongo\repos\adventofnim\2020\day03.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  <style>
+body, code, samp {
+  font-family: "Source Code Pro", monospace;
+}
+
+body {
+  background: #0f0f23;
+  color: #cccccc;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: normal;
+
+}
+
+pre code {
+  background: #10101a;
+  color: #cccccc;
+  border-radius: 0px;
+  border-left: 1px solid #ffc200;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  position: relative;
+  left: -2px;
+}
+
+samp {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+samp:before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  display: block;
+  left: -2px;
+  right: -2px;
+  top: 3px;
+  bottom: 0px;
+  border: 1px solid #333340;
+  background: #10101a;
+}
+
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+    color: #ffff66;
+    text-shadow: 0 0 5px #ffff66;
+}
+
+code {
+    border-radius: 0px;
+    border-left: 1px solid #ffc200;
+}
+
+pre code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    left: -2px;
+}
+  </style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header><main>
+<h1>--- Example ---</h1>
+<pre><code class="nim">let example = """..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#""".strip
+echo example</code></pre>
+<pre><samp>..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#</samp></pre>
+<pre><code class="nim">type
+  StrideMap = object
+    data: seq[char]
+    stride: int
+    height: int
+
+  Shape = tuple[stride, height: int]
+proc parse(text: string): StrideMap =
+  for line in text.splitLines:
+    inc result.height
+    result.data.add toSeq(line)
+    if result.stride > 0 and line.len != result.stride:
+      echo "ParseError: line does not matches stride"
+    result.stride = line.len
+
+let map0 = parse example
+func shape(m: StrideMap): Shape =
+  (m.stride, m.height)
+
+echo "shape:", map0.shape</code></pre>
+<pre><samp>shape:(stride: 11, height: 11)</samp></pre>
+<p>let's add coordinates:</p>
+<pre><code class="nim">type
+  Point = tuple[x, y: int]
+proc index(p: Point; m: StrideMap): int =
+  var x = p.x mod m.stride
+  if p.y >= m.height:
+    echo "ERROR: point too low!"
+  x + p.y * m.stride
+
+proc `[]`(m: StrideMap; p: Point): char =
+  m.data[p.index m]
+
+for p in [(3, 1), (6, 2)]:
+  echo p
+  echo "index: ", p.index(map0)
+  echo "on map: ", map0[p]</code></pre>
+<pre><samp>(3, 1)
+index: 14
+on map: .
+(6, 2)
+index: 28
+on map: #</samp></pre>
+<pre><code class="nim">type
+  Slope = tuple[dx, dy: int]
+  Path = seq[Point]
+  Ride = tuple[path: Path, ntrees: int]
+proc `+`(p: Point; s: Slope): Point =
+  result.x = p.x + s.dx
+  result.y = p.y + s.dy
+
+proc ride(m: StrideMap; s: Slope): Ride =
+  var p: Point
+  let ySteps = m.height div s.dy
+  for i in 1 ..< ySteps:
+    p = p + s
+    result.path.add p
+    if m[p] == '#':
+      inc result.ntrees
+
+let ride0 = ride(map0, (3, 1))
+echo "ntrees: ", ride0.ntrees</code></pre>
+<pre><samp>ntrees: 7</samp></pre>
+<h2>--- Part 1 ---</h2>
+<p>now we are equipped to solve part1:</p>
+<pre><code class="nim">let
+  input = "2020/input03.txt".readFile
+  map1 = parse input
+  ride1 = ride(map1, (3, 1))
+echo "part1: ", ride1.ntrees</code></pre>
+<pre><samp>part1: 205</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h2>--- Part 2 ---</h2>
+<p>easy second part</p>
+<p>tricky last slope made me discover my implementation bug!</p>
+<p>now onto part2 on my puzzle input</p>
+<pre><code class="nim">part2 = 1
+for slope in slopes:
+  part2 *= ride(map1, slope).ntrees
+echo "part2: ", part2</code></pre>
+<pre><samp>part2: 3952146825</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+
+</main>
+</body>
+</html>
