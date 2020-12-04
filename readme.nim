@@ -14,6 +14,7 @@ current content:
   * [2020/day01](2020/day01.html)
   * [2020/day02](2020/day02.html)
   * [2020/day03](2020/day03.html)
+  * [2020/day04](2020/day04.html)
 
 <samp>nim all.nims</samp> to rebuild docs
 
