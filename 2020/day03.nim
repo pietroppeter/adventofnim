@@ -121,4 +121,37 @@ nbCode:
 
 gotTheStar
 
+nbText: "# Visualizations"
+nbText: """I want to try to take advantage of the fact that I output html.
+
+I will reproduce the explantory design showing the ride through the example.
+"""
+
+nbCode:
+  proc show(m: StrideMap, r: Ride, repeat=6) =
+    var line = ""
+    var
+      i = 0
+      j = 0
+      p: Point = r.path[j]
+      c: char
+    for y in 0 ..< m.height:
+      for x in 0 ..< m.stride:
+        line.add m.data[i]
+        inc i
+
+      line = line.repeat(repeat)
+      if y == p.y:
+        c = if m[p] == '.': 'O' else: 'X'
+        line = line[0 ..< p.x] & "<em>" & $c & "</em>" & line[p.x + 1 .. ^1]
+        inc j
+        if j < r.path.len:
+          p = r.path[j]
+      echo line
+      line = ""
+  show(map0, ride0)
+  echo map1.shape
+# hey: nbBlock is not available! I need to inject it!!
+# nbBlock.output = "<span style=\"\">" & nbBlock.output & "</span>"
+
 nbSave

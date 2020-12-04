@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>c:\Users\ppeterlongo\repos\adventofnim\2020\day03.html</title>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day03.html</title>
   <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
@@ -198,6 +198,46 @@ for slope in slopes:
 echo "part2: ", part2</code></pre>
 <pre><samp>part2: 3952146825</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h1>Visualizations</h1>
+<p>I want to try to take advantage of the fact that I output html.</p>
+<p>I will reproduce the explantory design showing the ride through the example.</p>
+<pre><code class="nim">proc show(m: StrideMap; r: Ride; repeat = 6) =
+  var line = ""
+  var
+    i = 0
+    j = 0
+    p: Point = r.path[j]
+    c: char
+  for y in 0 ..< m.height:
+    for x in 0 ..< m.stride:
+      line.add m.data[i]
+      inc i
+    line = line.repeat(repeat)
+    if y == p.y:
+      c = if m[p] == '.':
+        'O' else:
+        'X'
+      line = line[0 ..< p.x] & "<em>" & $c & "</em>" & line[p.x + 1 .. ^1]
+      inc j
+      if j < r.path.len:
+        p = r.path[j]
+    echo line
+    line = ""
+
+show(map0, ride0)
+echo map1.shape</code></pre>
+<pre><samp>..##.........##.........##.........##.........##.........##.......
+#..<em>O</em>#...#..#...#...#..#...#...#..#...#...#..#...#...#..#...#...#..
+.#....<em>X</em>..#..#....#..#..#....#..#..#....#..#..#....#..#..#....#..#.
+..#.#...#<em>O</em>#..#.#...#.#..#.#...#.#..#.#...#.#..#.#...#.#..#.#...#.#
+.#...##..#..<em>X</em>...##..#..#...##..#..#...##..#..#...##..#..#...##..#.
+..#.##.......#.<em>X</em>#.......#.##.......#.##.......#.##.......#.##.....
+.#.#.#....#.#.#.#.<em>O</em>..#.#.#.#....#.#.#.#....#.#.#.#....#.#.#.#....#
+.#........#.#........<em>X</em>.#........#.#........#.#........#.#........#
+#.##...#...#.##...#...#.<em>X</em>#...#...#.##...#...#.##...#...#.##...#...
+#...##....##...##....##...#<em>X</em>....##...##....##...##....##...##....#
+.#..#...#.#.#..#...#.#.#..#...<em>X</em>.#.#..#...#.#.#..#...#.#.#..#...#.#
+(stride: 31, height: 323)</samp></pre>
 
 </main>
 </body>

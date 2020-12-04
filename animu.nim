@@ -17,3 +17,4 @@ const star* = emStar("*")
 template gotTheStar* =
   nbText: &"""That's the right answer! You are {emStar("one gold star")} closer to saving your vacation."""
 
+template nbOff*(body: untyped) = body
