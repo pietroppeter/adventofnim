@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day05.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  <style>
+body, code, samp {
+  font-family: "Source Code Pro", monospace;
+}
+
+body {
+  background: #0f0f23;
+  color: #cccccc;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: normal;
+
+}
+
+pre code {
+  background: #10101a;
+  color: #cccccc;
+  border-radius: 0px;
+  border-left: 1px solid #ffc200;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  position: relative;
+  left: -2px;
+}
+
+samp {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+samp:before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  display: block;
+  left: -2px;
+  right: -2px;
+  top: 3px;
+  bottom: 0px;
+  border: 1px solid #333340;
+  background: #10101a;
+}
+
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+    color: #ffff66;
+    text-shadow: 0 0 5px #ffff66;
+}
+
+code {
+    border-radius: 0px;
+    border-left: 1px solid #ffc200;
+}
+
+pre code {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    left: -2px;
+}
+  </style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header><main>
+<h1>--- Day 5: Binary Boarding ---</h1>
+<p>parsing is straightforward, considering that encoding is basically binary</p>
+<pre><code class="nim">type
+  Seat = int16
+proc parseSeat(s: string): Seat =
+  discard parseBin[int16](s.multiReplace(
+      [("F", "0"), ("B", "1"), ("R", "1"), ("L", "0")]), result)
+
+chk parseSeat("FBFBBFFRLR"), 357</code></pre>
+<pre><samp>[OK] parseSeat("FBFBBFFRLR") = 357; expected = 357</samp></pre>
+<p>if I want to get back row and col (I will use it for visualization at the end)</p>
+<pre><code class="nim">proc row(x: Seat): int =
+  x shr 3
+
+proc col(x: Seat): int =
+  result = x.int
+  result.mask(0b00000000000000000000000000000111)
+
+chk parseSeat("FBFBBFFRLR").row, 44
+chk parseSeat("FBFBBFFRLR").col, 5</code></pre>
+<pre><samp>[OK] parseSeat("FBFBBFFRLR").row = 44; expected = 44
+[OK] parseSeat("FBFBBFFRLR").col = 5; expected = 5</samp></pre>
+<p><em>part1</em> is solved during parsing input file</p>
+<pre><code class="nim">var
+  maxSeat = 0
+  seats: seq[Seat]
+for line in "2020/input05.txt".lines:
+  seats.add parseSeat(line)
+  if seats[^1] > maxSeat:
+    maxSeat = seats[^1]
+echo "part1: ", maxSeat
+chk(maxSeat, 947)</code></pre>
+<pre><samp>part1: 947
+[OK] maxSeat = 947; expected = 947</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p><em>part 2</em> is solved by sorting and finding the gap</p>
+<pre><code class="nim">var mySeat: Seat
+seats.sort()
+for x in 1 ..< seats.len:
+  if seats[x] != seats[x - 1] + 1:
+    mySeat = seats[x] - 1    ## first try I forgot the "- 1!
+    break
+echo "part2: ", mySeat
+chk(maxSeat, 636)</code></pre>
+<pre><samp>part2: 636
+[KO] maxSeat = 947; expected = 636</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p>what do we need to <em>visualize the plane</em>? I will convert Seat in (row, col)</p>
+<pre><code class="nim">type
+  RowCol = tuple[row, col: int]
+proc toPasses(s: seq[Seat]): HashSet[RowCol] =
+  for x in s:
+    result.incl (x.row, x.col).RowCol
+
+proc showAndTell(s: HashSet[RowCol]): RowCol =
+  var text = "____01234567\n"
+  for row in 0 .. 127:
+    text.add &"{row:03} "
+    for col in 0 .. 7:
+      if (row, col) in s:
+        text.add "X"
+      elif row < 30 or row > 100:
+        text.add "."
+      else:
+        text.add "<em>O</em>"
+        result = (row, col)
+    text.add "\n"
+  text.add "\n"
+  echo text
+
+let myRowCol = seats.toPasses.showAndTell</code></pre>
+<pre><samp>____01234567
+000 ........
+001 .......X
+002 XXXXXXXX
+003 XXXXXXXX
+004 XXXXXXXX
+005 XXXXXXXX
+006 XXXXXXXX
+007 XXXXXXXX
+008 XXXXXXXX
+009 XXXXXXXX
+010 XXXXXXXX
+011 XXXXXXXX
+012 XXXXXXXX
+013 XXXXXXXX
+014 XXXXXXXX
+015 XXXXXXXX
+016 XXXXXXXX
+017 XXXXXXXX
+018 XXXXXXXX
+019 XXXXXXXX
+020 XXXXXXXX
+021 XXXXXXXX
+022 XXXXXXXX
+023 XXXXXXXX
+024 XXXXXXXX
+025 XXXXXXXX
+026 XXXXXXXX
+027 XXXXXXXX
+028 XXXXXXXX
+029 XXXXXXXX
+030 XXXXXXXX
+031 XXXXXXXX
+032 XXXXXXXX
+033 XXXXXXXX
+034 XXXXXXXX
+035 XXXXXXXX
+036 XXXXXXXX
+037 XXXXXXXX
+038 XXXXXXXX
+039 XXXXXXXX
+040 XXXXXXXX
+041 XXXXXXXX
+042 XXXXXXXX
+043 XXXXXXXX
+044 XXXXXXXX
+045 XXXXXXXX
+046 XXXXXXXX
+047 XXXXXXXX
+048 XXXXXXXX
+049 XXXXXXXX
+050 XXXXXXXX
+051 XXXXXXXX
+052 XXXXXXXX
+053 XXXXXXXX
+054 XXXXXXXX
+055 XXXXXXXX
+056 XXXXXXXX
+057 XXXXXXXX
+058 XXXXXXXX
+059 XXXXXXXX
+060 XXXXXXXX
+061 XXXXXXXX
+062 XXXXXXXX
+063 XXXXXXXX
+064 XXXXXXXX
+065 XXXXXXXX
+066 XXXXXXXX
+067 XXXXXXXX
+068 XXXXXXXX
+069 XXXXXXXX
+070 XXXXXXXX
+071 XXXXXXXX
+072 XXXXXXXX
+073 XXXXXXXX
+074 XXXXXXXX
+075 XXXXXXXX
+076 XXXXXXXX
+077 XXXXXXXX
+078 XXXXXXXX
+079 XXXX<em>O</em>XXX
+080 XXXXXXXX
+081 XXXXXXXX
+082 XXXXXXXX
+083 XXXXXXXX
+084 XXXXXXXX
+085 XXXXXXXX
+086 XXXXXXXX
+087 XXXXXXXX
+088 XXXXXXXX
+089 XXXXXXXX
+090 XXXXXXXX
+091 XXXXXXXX
+092 XXXXXXXX
+093 XXXXXXXX
+094 XXXXXXXX
+095 XXXXXXXX
+096 XXXXXXXX
+097 XXXXXXXX
+098 XXXXXXXX
+099 XXXXXXXX
+100 XXXXXXXX
+101 XXXXXXXX
+102 XXXXXXXX
+103 XXXXXXXX
+104 XXXXXXXX
+105 XXXXXXXX
+106 XXXXXXXX
+107 XXXXXXXX
+108 XXXXXXXX
+109 XXXXXXXX
+110 XXXXXXXX
+111 XXXXXXXX
+112 XXXXXXXX
+113 XXXXXXXX
+114 XXXXXXXX
+115 XXXXXXXX
+116 XXXXXXXX
+117 XXXXXXXX
+118 XXXX....
+119 ........
+120 ........
+121 ........
+122 ........
+123 ........
+124 ........
+125 ........
+126 ........
+127 ........</samp></pre>
+<p>I can check back id</p>
+<pre><code class="nim">proc id(x: RowCol): int =
+  x.col + 8 * x.row
+
+chk id(myRowCol), mySeat</code></pre>
+<pre><samp>[OK] id(myRowCol) = 636; expected = 636</samp></pre>
+
+</main>
+</body>
+</html>
