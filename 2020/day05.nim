@@ -55,11 +55,13 @@ seats.findMine(minRow, maxRow) # 637: too high
 
 type
   Pass = tuple[row, col: int]
-  Passes = HashSet[Passes]
+  Passes = HashSet[Pass] # HashSet[Passes] shuts down compiler!
+
 
 proc toPasses(s: seq[Seat]): Passes =
   for x in s:
-    result.add (x.row, x.col)
+    result.incl (x.row, x.col).Pass
+
 
 proc show(s: Passes) =
   var text = "    01234567\n"
@@ -75,3 +77,7 @@ proc show(s: Passes) =
   echo text
 
 seats.toPasses.show
+# visually find 079, 4
+proc id(x: Pass): int = x.col + 8*x.row
+
+chk id((79, 4)), 636  # 637 was off by one!
