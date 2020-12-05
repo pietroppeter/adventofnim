@@ -101,7 +101,7 @@ proc parseSeat(s: string): Seat =
       [("F", "0"), ("B", "1"), ("R", "1"), ("L", "0")]), result)
 
 chk parseSeat("FBFBBFFRLR"), 357</code></pre>
-<pre><samp>[OK] parseSeat("FBFBBFFRLR") = 357; expected = 357</samp></pre>
+<pre><samp>[OK] parseSeat("FBFBBFFRLR") = 357</samp></pre>
 <p>if I want to get back row and col (I will use it for visualization at the end)</p>
 <pre><code class="nim">proc row(x: Seat): int =
   x shr 3
@@ -112,8 +112,8 @@ proc col(x: Seat): int =
 
 chk parseSeat("FBFBBFFRLR").row, 44
 chk parseSeat("FBFBBFFRLR").col, 5</code></pre>
-<pre><samp>[OK] parseSeat("FBFBBFFRLR").row = 44; expected = 44
-[OK] parseSeat("FBFBBFFRLR").col = 5; expected = 5</samp></pre>
+<pre><samp>[OK] parseSeat("FBFBBFFRLR").row = 44
+[OK] parseSeat("FBFBBFFRLR").col = 5</samp></pre>
 <p><em>part1</em> is solved during parsing input file</p>
 <pre><code class="nim">var
   maxSeat = 0
@@ -125,7 +125,7 @@ for line in "2020/input05.txt".lines:
 echo "part1: ", maxSeat
 chk(maxSeat, 947)</code></pre>
 <pre><samp>part1: 947
-[OK] maxSeat = 947; expected = 947</samp></pre>
+[OK] maxSeat = 947</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <p><em>part 2</em> is solved by sorting and finding the gap</p>
 <pre><code class="nim">var mySeat: Seat
@@ -297,7 +297,7 @@ let myRowCol = seats.toPasses.showAndTell</code></pre>
   x.col + 8 * x.row
 
 chk id(myRowCol), mySeat</code></pre>
-<pre><samp>[OK] id(myRowCol) = 636; expected = 636</samp></pre>
+<pre><samp>[OK] id(myRowCol) = 636</samp></pre>
 
 </main>
 </body>

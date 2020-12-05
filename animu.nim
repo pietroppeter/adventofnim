@@ -21,10 +21,18 @@ template gotTheStar* =
 
 template nbOff*(body: untyped) = body
 
-# make it colored, returns bool but discardable, debugEcho behind a compile switch
+# make it colored
 macro chk*(val, exp: untyped)  =
   let
     v = val.toStrLit
   quote do:
-    let outcome = if `val` == `exp`: "OK" else: "KO"
-    debugEcho "[", outcome, "] ", `v`, " = ", `val`, "; expected = ", `exp`
+    when defined(chkOk):
+      chkOk = (`val` == `exp`)
+    else:
+      var chkOk: bool = (`val` == `exp`)
+    when not defined(myChkEchoOff):
+      if chkOk:
+        #styledWrite does not work I guess because stdin is broken!
+        debugEcho "[OK] ", `v`, " = ", `val`
+      else:
+        debugEcho "[KO] ", `v`, " = ", `val`, "; expected = ", `exp`
