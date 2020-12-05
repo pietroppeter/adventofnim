@@ -9,8 +9,10 @@ when false:
 
 import os, strutils, times, parseutils, parseopt, hashes, tables, sets
 export os, strutils, times, parseutils, parseopt, hashes, tables, sets
-import sequtils, algorithm, strscans, strformat
-export sequtils, algorithm, strscans, strformat
+import sequtils, algorithm, strscans, strformat, bitops
+export sequtils, algorithm, strscans, strformat, bitops
+
+import macros
 
 func emStar*(text: string): string = &"<em class=\"star\">{text}</em>"
 const star* = emStar("*")
@@ -18,3 +20,11 @@ template gotTheStar* =
   nbText: &"""That's the right answer! You are {emStar("one gold star")} closer to saving your vacation."""
 
 template nbOff*(body: untyped) = body
+
+# make it colored, returns bool but discardable, debugEcho behind a compile switch
+macro chk*(val, exp: untyped)  =
+  let
+    v = val.toStrLit
+  quote do:
+    let outcome = if `val` == `exp`: "OK" else: "KO"
+    debugEcho "[", outcome, "] ", `v`, " = ", `val`, "; expected = ", `exp`
