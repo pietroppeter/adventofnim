@@ -32,7 +32,7 @@ macro chk*(val, exp: untyped)  =
       var chkOk: bool = (`val` == `exp`)
     when not defined(myChkEchoOff):
       if chkOk:
-        #styledWrite does not work I guess because stdin is broken!
+        #styledWrite does not work I guess because stdin is broken in nimib.nbCode!
         debugEcho "[OK] ", `v`, " = ", `val`
       else:
         debugEcho "[KO] ", `v`, " = ", `val`, "; expected = ", `exp`
