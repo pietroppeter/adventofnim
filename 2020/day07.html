@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day07.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='../static/atom-one-light.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+<main>
+<h1>🎄👑 adventofnim</h1>
+<h2>Day 7: Handy Haversacks</h2>
+<h3>General strategy</h3>
+<p>The solution will be in 5 parts:</p>
+<ol>
+<li>colors: I will use global variables</li>
+<li>parse a single rule: manual parsing (no regex, no npeg - tried but did not succeed at first try)</li>
+<li>reversing the rules: while parsing the rules I will also create the mapping
+from a color to its direct containers.</li>
+<li>solve part 1: recursive</li>
+<li>solve part 2: recursive</li>
+</ol>
+<h3>1. Colors</h3>
+<p>I am going to use two global variables names and colors. Here are the functions needed for them.</p>
+<p>I do not know why I set <code>Color = distinct int</code>, it is probably unnecessary and just complicates stuff.</p>
+<pre><code class="nim">type
+  Color = distinct int       ## # why not use a distinct type to make our life a little bit messier?
+  Names = seq[string]
+  Colors = OrderedTable[string, Color]
+var
+  names: Names
+  colors: Colors
+proc addColor(name: string) =
+  if name not_in names:
+    names.add name
+    let i = names.len - 1
+    colors[name] = i.Color
+
+proc `$`(c: Color): string =
+  names[c.int]               ## I take advantage that names is global
+  
+proc toColor(s: string): Color =
+  colors[s]
+
+template resetGlobals() =
+  ## to reset the globals (after solving for the example)
+  names = @[]
+  colors = initOrderedTable[string, Color]()
+  addColor "shiny gold"      ## always will be the 0.Color
+  
+resetGlobals
+dump 0.Color
+dump toColor("shiny gold")
+dump names
+## later on I will put Color in a table. You need this or you will get a rather cryptic error message
+proc `==`(a, b: Color): bool {.borrow.}</code></pre>
+<pre><samp>0.Color = shiny gold
+toColor("shiny gold") = shiny gold
+names = @["shiny gold"]</samp></pre>
+<h3>What is a Rule and how to parse it</h3>
+<p>note that parseRule does use the globals <code>names</code> and <code>colors</code>.</p>
+<p>I did try first with npeg, but I am still missing stuff,
+so for the moment I will keep to with manual parsing (<code>parseUntil</code> for the win!).</p>
+<pre><code class="nim">type
+  Rule = tuple[col: Color, cons: Contents]
+  Contents = seq[tuple[qty: int, col: Color]]
+proc parseRule(text: string): Rule =
+  var
+    col: string
+    cons: string
+    qty: int
+  let
+    i = parseUntil(text, col, " bags")
+    j = " bags contain ".len
+  discard parseUntil(text, cons, ".", start = i + j)
+  addColor col
+  result.col = col.toColor
+  for con in cons.split(", "):
+    if con == "no other bags":
+      break
+    let i = parseInt(con, qty)
+    discard parseUntil(con, col, " bag", start = i + 1)
+    addColor col
+    result.cons.add (qty, col.toColor)
+
+echo parseRule "light red bags contain 1 bright white bag, 2 muted yellow bags."
+echo parseRule "bright white bags contain 1 shiny gold bag."
+echo parseRule "faded blue bags contain no other bags."
+echo names
+echo colors</code></pre>
+<pre><samp>(col: light red, cons: @[(qty: 1, col: bright white), (qty: 2, col: muted yellow)])
+(col: bright white, cons: @[(qty: 1, col: shiny gold)])
+(col: faded blue, cons: @[])
+@["shiny gold", "light red", "bright white", "muted yellow", "faded blue"]
+{"shiny gold": shiny gold, "light red": light red, "bright white": bright white, "muted yellow": muted yellow, "faded blue": faded blue}</samp></pre>
+<h3>reversing the rules</h3>
+<p>while parsing the rules I will also create the mapping
+from a color to its direct containers.</p>
+<p>I do not know why I create a <code>PuzzleInput</code> type but I like how it looks in proc signatures.</p>
+<p>The parsing is finally applied to the example.</p>
+<p>I will reuse the variables <code>rs</code> and <code>dc</code>.</p>
+<pre><code class="nim">type
+  PuzzleInput = string
+  Rules = OrderedTable[Color, Contents]
+  DirContainers = OrderedTable[Color, seq[Color]]
+proc parse(p: PuzzleInput): (Rules, DirContainers) =
+  var
+    r: Rule
+    rs = initOrderedTable[Color, Contents]()
+    dc = initOrderedTable[Color, seq[Color]]()
+  for line in p.splitLines:
+    r = parseRule line
+    rs[r.col] = r.cons
+    for con in r.cons:
+      if con.col not_in dc:
+        dc[con.col] = @[r.col]
+      elif con.col not_in dc[con.col]:
+        dc[con.col].add r.col
+  for col in colors.keys:
+    if col.toColor not_in dc:
+      dc[col.toColor] = newSeq[Color]()
+  return (rs, dc)
+
+let example = """light red bags contain 1 bright white bag, 2 muted yellow bags.
+dark orange bags contain 3 bright white bags, 4 muted yellow bags.
+bright white bags contain 1 shiny gold bag.
+muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
+shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.
+dark olive bags contain 3 faded blue bags, 4 dotted black bags.
+vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
+faded blue bags contain no other bags.
+dotted black bags contain no other bags.""".PuzzleInput
+var (rs, dc) = parse example
+echo "Rules:"
+for k, v in rs:
+  echo k, ": ", v
+echo "DirContainers:"
+for k, v in dc:
+  echo k, ": ", v</code></pre>
+<pre><samp>Rules:
+light red: @[(qty: 1, col: bright white), (qty: 2, col: muted yellow)]
+dark orange: @[(qty: 3, col: bright white), (qty: 4, col: muted yellow)]
+bright white: @[(qty: 1, col: shiny gold)]
+muted yellow: @[(qty: 2, col: shiny gold), (qty: 9, col: faded blue)]
+shiny gold: @[(qty: 1, col: dark olive), (qty: 2, col: vibrant plum)]
+dark olive: @[(qty: 3, col: faded blue), (qty: 4, col: dotted black)]
+vibrant plum: @[(qty: 5, col: faded blue), (qty: 6, col: dotted black)]
+faded blue: @[]
+dotted black: @[]
+DirContainers:
+bright white: @[light red, dark orange]
+muted yellow: @[light red, dark orange]
+shiny gold: @[bright white, muted yellow]
+faded blue: @[muted yellow, dark olive, vibrant plum]
+dark olive: @[shiny gold]
+vibrant plum: @[shiny gold]
+dotted black: @[dark olive, vibrant plum]
+light red: @[]
+dark orange: @[]</samp></pre>
+<h3>Solve part 1</h3>
+<p>with a short and careful recursion (note I keep variable <code>ac</code> in each recursive call).</p>
+<p>output for real input will come later (so that I reset once the globals)</p>
+<pre><code class="nim">type
+  AllContainers = OrderedSet[Color]
+proc allContainers(c: Color; dc: DirContainers; ac: var AllContainers) =
+  for cx in dc[c]:
+    if cx in ac:
+      ac.incl cx
+    else:
+      ac.incl cx
+      allContainers(cx, dc, ac)
+
+var ac: AllContainers
+(0.Color).allContainers(dc, ac)
+echo ac</code></pre>
+<pre><samp>{bright white, light red, dark orange, muted yellow}</samp></pre>
+<h3>Solve part2</h3>
+<p>Showing first solving for the example.</p>
+<p>I like the indentation trick I used to debug the solution, so I leave it visible.</p>
+<pre><code class="nim">var ind = 0
+proc reqBags(c: Color; rs: Rules): int =
+  ind += 2
+  ## echo ("color: " & $c).indent(ind)
+          ## echo ("contents: " & $(rs[c])).indent(ind)
+  for con in rs[c]:
+    result += con.qty
+    result += con.qty * (reqBags(con.col, rs))
+  ## echo ("result: " & $result).indent(ind)
+  ind -= 2
+
+echo "reqBags(example): ", (0.Color).reqBags(rs)</code></pre>
+<pre><samp>reqBags(example): 32</samp></pre>
+<h3>Getting the stars</h3>
+<p>Solutions for my puzzle input</p>
+<pre><code class="nim">let input = "2020/input07.txt".readFile.PuzzleInput
+resetGlobals
+ac = initOrderedSet[Color]() ## I need to reset this one too.
+(rs, dc) = parse input
+(0.Color).allContainers(dc, ac)
+echo "part1: ", ac.len
+echo "part2: ", (0.Color).reqBags(rs)</code></pre>
+<pre><samp>part1: 124
+part2: 34862</samp></pre>
+
+</main>
+<hr>
+<p><small>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>;
+github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>.</small></p></body>
+</html>
