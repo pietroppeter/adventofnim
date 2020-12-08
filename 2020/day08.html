@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day08.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='../static/atom-one-light.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+<main>
+<h1>2020, Day 8: Handheld Halting</h1>
+<p>For a better solution than mine look at the solution shared
+by fxn on the forum (<a href="https://gist.github.com/fxn/bbd90877bcd27581ee5f7720495c3c3f">gist</a>).</p>
+<p>I use a inelegant global trace (instead of an <code>intsets</code> of visted indices).
+This solution is not that bad anyway.</p>
+<p>Listing the imports (usually I hide them from the document).</p>
+<pre><code class="nim">import
+  strutils, parseutils, strformat, std / enumerate</code></pre>
+<p>rather standard types. I regretted very soon naming instructions
+in the program as <code>instrs</code>, what a bad name!</p>
+<pre><code class="nim">type
+  OpCode = enum
+    opNop = "nop", opAcc = "acc", opJmp = "jmp"
+  Instruction = tuple[op: OpCode, val: int]
+  Program = object
+    tr: int                  ## p.tr: pointer
+    acc: int                 ## global register
+    instrs: seq[Instruction]
+
+  Trace = seq[seq[int]]</code></pre>
+<p>the parsing is clean, since opcodes are 3 letters do not even need scanf (enumerate is used for debugging)</p>
+<pre><code class="nim">proc parse(text: string): seq[Instruction] =
+  var
+    op: OpCode
+    val: int
+  for i, line in enumerate(text.splitLines):
+    try:
+      op = parseEnum[OpCode](line[0 .. 2])
+      discard parseInt(line[4 .. ^1], val)
+      result.add (op, val)
+    except:
+      echo "ERROR parsing ", i, " ", line</code></pre>
+<p>testing the first lines of code on the example</p>
+<pre><code class="nim">let example = """nop +0
+acc +1
+jmp +4
+acc +3
+jmp -3
+acc -99
+acc +1
+jmp -4
+acc +6"""
+var exp = Program(instrs: parse example)
+echo exp</code></pre>
+<pre><samp>(tr: 0, acc: 0, instrs: @[(op: nop, val: 0), (op: acc, val: 1), (op: jmp, val: 4), (op: acc, val: 3), (op: jmp, val: -3), (op: acc, val: -99), (op: acc, val: 1), (op: jmp, val: -4), (op: acc, val: 6)])</samp></pre>
+<p>as mentioned, I decided to go with a global trace variable for simplicty</p>
+<pre><code class="nim">proc initTrace(p: Program): Trace =
+  result.setlen(p.instrs.len)
+  result[p.tr].add 1
+
+var tr = initTrace(exp)
+echo tr
+template trace(): bool =
+  tr[p.tr].add(i + 1)
+  tr[p.tr].len == 1          ## somewhat cryptic. If you visited more than once length will be 2</code></pre>
+<pre><samp>@[@[1], @[], @[], @[], @[], @[], @[], @[], @[]]</samp></pre>
+<p>and here is the code for the execution of the program (single step)</p>
+<pre><code class="nim">proc op(p: Program): OpCode =
+  p.instrs[p.tr].op
+
+proc val(p: Program): int =
+  p.instrs[p.tr].val
+
+proc endd(p: Program): bool =
+  (p.tr == p.instrs.len)     ## end is keyword
+  
+proc exec(p: var Program): bool =
+  let i = tr[p.tr][^1]
+  case p.op
+  of opNop:
+    inc p.tr
+  of opAcc:
+    p.acc += p.val
+    inc p.tr
+  of opJmp:
+    inc p.tr, p.val
+  if p.endd:
+    return false
+  trace</code></pre>
+<p>this was a template at the beginning
+but I forgot strformat has known <a href="https://nim-lang.org/docs/strformat.html#limitations">limitations with template arguments</a>.</p>
+<p>Of this I do like the name <code>echoo</code> (this is throwaway stuff for debugging purposes).</p>
+<pre><code class="nim">proc echoo(p: Program; tr: Trace) =
+  echo p.op, " ", fmt"{p.val:3}", " | ", tr[p.tr]
+  discard
+
+echoo(exp, tr)
+while exec(exp):
+  echoo(exp, tr)
+echoo(exp, tr)
+echo "part1: ", exp.acc      ## 5, ok
+exp.acc = 0                  ## reset for part2</code></pre>
+<pre><samp>nop   0 | @[1]
+acc   1 | @[2]
+jmp   4 | @[3]
+acc   1 | @[4]
+jmp  -4 | @[5]
+acc   3 | @[6]
+jmp  -3 | @[7]
+acc   1 | @[2, 8]
+part1: 5</samp></pre>
+<p>part 2 appears first for the example. It is straightforward test of fixing iteratively all positions</p>
+<pre><code class="nim">var q: Program
+var k: int
+template fix(p: Program) =
+  k = 0
+  q = p
+  while not q.endd:
+    q = p
+    if q.acc != 0:
+      echo "ERROR it should be zero!"
+    while p.instrs[k].op == opAcc:
+      inc k
+    if p.instrs[k].op == opJmp:
+      q.instrs[k].op = opNop
+    elif p.instrs[k].op == opNop:
+      q.instrs[k].op = opJmp
+    else:
+      echo "ERROR should not be here"
+    ## echo "trying to fix instruction ", k
+    tr = initTrace(q)
+    ## echo "q.acc: ", q.acc
+    while exec(q):
+      discard
+    inc k
+  echo "part2: ", q.acc
+
+fix exp                      ## 8, ok</code></pre>
+<pre><samp>part2: 8</samp></pre>
+<p>Finally let's collect the stars!</p>
+<pre><code class="nim">let input = "2020/input08.txt".readFile
+var inp = Program(instrs: parse input)
+tr = initTrace(inp)
+while exec(inp):
+  discard
+echo "part1: ", inp.acc      ## 1810
+tr = initTrace(inp)
+inp.acc = 0
+inp.tr = 0
+fix inp                      ## 969</code></pre>
+<pre><samp>part1: 1810
+part2: 969</samp></pre>
+<p>you know your solution is bad when trying to publish it you incur in all sorts of bugs...</p>
+
+</main>
+<hr>
+<p><small>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>;
+github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>.</small></p></body>
+</html>
