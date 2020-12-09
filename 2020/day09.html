@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day09.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='../static/atom-one-light.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+<main>
+<h1>2020, Day 9: Encoding Error</h1>
+<p>This turned out be to nice and easy but it does give satisfaction.</p>
+<p>The strategy for first part is to use at the same time a <code>deque</code> and a <code>intset</code>
+(<em>hey, I did not know there is a new <a href="https://nim-lang.github.io/Nim/packedsets.html"><code>packedset</code></a> that will generalize and replace
+<code>intset</code></em>).</p>
+<p>The second part was rather straightforward with two nested for loops.</p>
+<p>I would say anyway the main technique here is a wise use of <code>break</code> statement,
+especially using named blocks.</p>
+<p>But first things first, parsing the input this time is a simple one-liner:</p>
+<pre><code class="nim">proc parse(text: string): seq[int] =
+  text.splitLines.map(parseInt)
+
+let
+  input = parse "2020/input09.txt".readFile
+  example = parse """35
+20
+15
+25
+47
+40
+62
+55
+65
+95
+102
+117
+150
+182
+127
+219
+299
+277
+309
+576"""
+echo input.len
+echo example.len</code></pre>
+<pre><samp>1000
+20</samp></pre>
+<p>and I can pack the solution in a single proc:</p>
+<pre><code class="nim">proc solve(s: seq[int]; l: int): (int, int) =
+  var
+    d = initDeque[int]()
+    p = initIntSet() ## p stands for packedsets, I tried to use it but I do not have it yet
+                     ## 
+                     ## d and p are synchronized to contain same stuff
+    n: int
+  for i in 0 ..< l:
+    d.addLast(s[i])
+    p.incl s[i]
+  block findInvalid:
+    for i in l ..< s.len:
+      n = s[i]
+      block findPair:
+        for m in d:
+          if n != m and n - m in p:
+            break findPair
+        ## if I get here it means I have not found a sum!
+        break findInvalid    ## n is answer for part1
+      p.incl n
+      p.excl d.popFirst
+      d.addLast n
+  ## part 2
+  var
+    nMin, nMax: int
+    cumSum = s[0]
+  block findSum:
+    for k in 0 ..< s.len:
+      cumSum = 0
+      nMin = int.high
+      nMax = 0
+      for l in k ..< s.len:
+        cumSum += s[l]
+        if s[l] < nMin:
+          nMin = s[l]
+        if s[l] > nMax:
+          nMax = s[l]
+        if cumSum == n:
+          break findSum
+        if cumSum > n:
+          break
+  return (n, nMin + nMax)
+
+echo solve(example, 5)       ## 127, 62
+echo solve(input, 25)        ## 133015568, 16107959</code></pre>
+<pre><samp>(127, 62)
+(133015568, 16107959)</samp></pre>
+
+</main>
+<hr>
+<p><small>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>;
+github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>.</small></p></body>
+</html>
