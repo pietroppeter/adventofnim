@@ -2,7 +2,6 @@ import nimib, animu, sugar
 
 nbInit
 
-nbText: "# 🎄👑 adventofnim"
 nbText: "## Day 7: Handy Haversacks"
 # I should recover in nimib the simple toc example, it is indeed useful.
 nbText: """### General strategy
