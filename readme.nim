@@ -6,7 +6,7 @@ nbInit
 
 let
   docs = "https://pietroppeter.github.io/adventofnim/"
-  repo = "https://pietroppeter.github.io/adventofnim/"
+  repo = "https://github.com/adventofnim/"
 
 nbText: """
 # :christmas_tree::crown: adventofnim
