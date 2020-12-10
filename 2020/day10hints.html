@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day10hints.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/light.min.css">
+  <link rel='stylesheet' href='../static/atom-one-light.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+<main>
+<h1>2020, Day 10, Part 2 - Hints</h1>
+<p>My background being in mathematics, I do suffer a bit parse-heavy days, while I enjoy thoroughly days like today.
+Below a sequence of micro-hints to help those who have the reciprocal suffering.
+Following them all the way should result in something similar to my implementation,
+but you might want to stop earlier and come up with your own version.</p>
+<h2>Problem</h2>
+<p>You have to implement a function <code>solve2</code> that counts all possible arrangements of a sequence of integers according to the constraints:</p>
+<ul>
+<li>start with 0</li>
+<li>any subsequent element should have a difference with the previous that is either 1, 2 or 3</li>
+<li>end with max element of the sequence + 3</li>
+</ul>
+<h2>(Advent of) Hints</h2>
+<p>I am not really using <a href="https://nim-lang.org/">nim</a> notation in the hints and they should be agnostic with respect to the programming language.</p>
+<details><summary>Hint 1</summary><p><p>Sort your input if you haven't already (you should have in part1) and realize there are no duplicates</p>
+</p></details>
+<details><summary>Hint 2</summary><p><p>Is there a way to split the problem from a big sequence into several subsequences?</p>
+</p></details>
+<details><summary>Hint 3</summary><p><p>In particular, are there elements in the sequence that <strong>cannot</strong> be skipped in any configuration (e.g. every configuration must contain them)?</p>
+</p></details>
+<details><summary>Hint 4</summary><p><p>I mean in the sequences <code>[0 3 4]</code> or <code>[0 1 4]</code> (or <code>[0 2 5]</code> or <code>[0 3 5]</code>) can I ever skip the middle element? How many configurations do those have?</p>
+</p></details>
+<details><summary>Hint 5</summary><p><p>yep, those sequences only have one conifguration possible</p>
+</p></details>
+<details><summary>Hint 6</summary><p><p>realize that you can in fact split your problem whenever you have an element that has a difference of <code>3</code> with either the preceding or subsequent element</p>
+</p></details>
+<details><summary>Hint 7</summary><p><p>in particular realize that the absolute values of the elements do not really matter, only their differences 🤯!</p>
+</p></details>
+<details><summary>Hint 8</summary><p><p>implement a <code>diff</code> function (output of the above sequences would be <code>(3 1)</code>, <code>(1 3)</code>, <code>(2 3)</code>, <code>(3 2)</code>; note that I changed the syle of parentheses: <code>[]</code> for original sequence and <code>()</code> for its differences.</p>
+</p></details>
+<details><summary>Hint 9</summary><p><p>the new function we need to implement we call it <code>numArr</code> and computs number of possible arrangements given the differences of a (sub)sequence (it assumes first and last elements <strong>must</strong> be in the sequence)</p>
+</p></details>
+<details><summary>Hint 10</summary><p><p>previous hints imply that <code>numArr (s 3 t) = numArr(s)*numArr(t)</code> where <code>s</code> and <code>t</code> are subsequence 😲</p>
+</p></details>
+<details><summary>Hint 11</summary><p><p>now you are starting to realize that you will use recursion 🐢🐢🐢</p>
+</p></details>
+<details><summary>Hint 12</summary><p><p>manually compute the result over all possible difference sequences of length 2 and 3 (without a <code>3</code> difference)</p>
+</p></details>
+<details><summary>Hint 13</summary><p><p>is there another difference configuration that will result in stuff you cannot skip, can you see it?</p>
+</p></details>
+<details><summary>Hint 14</summary><p><p><code>numArr (s 2 2 t) = ?</code></p>
+</p></details>
+<details><summary>Hint 15</summary><p><p><code>numArr (s 2 2 t) = numArr(s)*numArr(t)</code></p>
+</p></details>
+<details><summary>Hint 16</summary><p><p>you are almost there but not yet: now you can split problem from a big sequence into a subsequence for some special cases, how do I reduce the computation for a sequence that has none of this special cases? I need to be able to reduce the length of the sequence!</p>
+</p></details>
+<details><summary>Hint 17</summary><p><p>to count the number of arrangements start counting those which contain the second element (remember the first must be included) and then count those who do not</p>
+</p></details>
+<details><summary>Hint 18</summary><p><p>try with this sequence <code>(1 1 1 1)</code>, you can think of it as <code>[0 1 2 3 4]</code></p>
+</p></details>
+<details><summary>Hint 19</summary><p><p><code>numArr (x y s) = ?</code> where <code>x</code>, <code>y</code> are single differences and <code>s</code> is a subsequence</p>
+</p></details>
+<details><summary>Hint 20</summary><p><p>correct! <code>numArr (x y s) = numArr (y s) + numArr (x+y s)</code> 💪</p>
+</p></details>
+<details><summary>Hint 21</summary><p><p>(note that having excluded the special cases when one of the difference is <code>3</code> or two subsequent <code>2</code>s, now <code>x + y &lt;= 3</code>)</p>
+</p></details>
+<details><summary>Hint 22</summary><p><p>that's about it, you can implement a recursion using this, trying to take care first of the special cases (short lengths, diff sequences containg <code>3</code> or two <code>2</code>s)</p>
+</p></details>
+<details><summary>Hint 23</summary><p><p>(optional) ok, you want more? what does speed up recursion in case you need to recompute previously computed results?</p>
+</p></details>
+<details><summary>Hint 24</summary><p><p>that's right: <a href="https://en.wikipedia.org/wiki/Memoization">memoization</a>!</p>
+</p></details>
+<details><summary>Hint 25</summary><p><p>I am out of hints and you can just go and see my <a href="https://github.com/pietroppeter/adventofnim/blob/master/2020/day10.nim">implementation</a>! Hope you enjoyed!</p>
+</p></details>
+
+</main>
+<hr>
+<p><small>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>;
+github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>.</small></p></body>
+</html>
