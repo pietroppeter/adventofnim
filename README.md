@@ -1,3 +1,4 @@
+CC: readme.nim
 # 🎄👑 adventofnim
 
 nim solutions for advent of code
@@ -19,11 +20,11 @@ current content ([home](index.html)):
 
 how to:
 
-* generate README.md and index.html: `nim r readme index.html`
-* regenerate also all html documents: `nim -d: regendoc r readme index.html`
+* generate README.md and index.html: `nim r readme index.html > README.md`
+* regenerate also all html documents: `nim -d: regendoc r readme index.html > README.md`
 
 ---
 
-* [repo](https://github.com/adventofnim/)
+* [repo](https://github.com/pietroppeter/adventofnim/)
 * [docs](https://pietroppeter.github.io/adventofnim/)
 
