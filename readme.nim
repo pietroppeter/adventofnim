@@ -6,7 +6,7 @@ nbInit
 
 let
   docs = "https://pietroppeter.github.io/adventofnim/"
-  repo = "https://github.com/adventofnim/"
+  repo = "https://github.com/pietroppeter/adventofnim/"
 
 nbText: """
 # :christmas_tree::crown: adventofnim
@@ -33,8 +33,8 @@ nbText: content
 nbText: """
 how to:
 
-* generate README.md and index.html: `nim r readme index.html`
-* regenerate also all html documents: `nim -d: regendoc r readme index.html`
+* generate README.md and index.html: `nim r readme index.html > README.md`
+* regenerate also all html documents: `nim -d: regendoc r readme index.html > README.md`
 """
 
 nbText: &"""
