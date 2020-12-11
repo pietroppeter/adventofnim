@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2020/day11.html</title>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day11.html</title>
   <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
@@ -37,36 +37,407 @@ em.star {
 <body>
 <header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
 <hr><main>
-<h1>🎄👑 adventofnim</h1>
-<p>nim solutions for advent of code</p>
-<p>I am starting to port all solutions to use <a href="https://github.com/pietroppeter/nimib">nimib</a></p>
-<p>current content (<a href="index.html">home</a>):</p>
+<h2>2020, Day 11: Seating System</h2>
+<p>standard day with a grid. Highlights:</p>
 <ul>
-<li>2020
-<ul>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day01.html">day01.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day02.html">day02.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day03.html">day03.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day04.html">day04.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day05.html">day05.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day06.html">day06.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day07.html">day07.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day08.html">day08.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day09.html">day09.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day10hints.html">day10hints.html</a></li>
+<li>a clean refactoring after part1 to solve part2</li>
+<li>ran into an expected issue when copying a sequence inside a proc</li>
 </ul>
-</li>
-</ul>
-<p>how to:</p>
-<ul>
-<li>generate README.md and index.html: <code>nim r readme index.html &gt; README.md</code></li>
-<li>regenerate also all html documents: <code>nim -d: regendoc r readme index.html &gt; README.md</code></li>
-</ul>
-<hr />
-<ul>
-<li><a href="https://github.com/pietroppeter/adventofnim/">repo</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/">docs</a></li>
-</ul>
+<p>First we parse and show the example grid.</p>
+<pre><code class="nim">import
+  strutils
+
+type
+  SeatGridKind = enum
+    sgFloor = ".", sgEmpty = "L", sgOccupied = "#"
+  SeatGrid = object
+    data: seq[SeatGridKind]
+    ncols: int
+
+let example = """L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL""".replace(
+    "\c", "")
+proc parse(text: string): SeatGrid =
+  for i, c in text:
+    case c
+    of '.':
+      result.data.add sgFloor
+    of 'L':
+      result.data.add sgEmpty
+    of '\n':
+      if result.ncols == 0:
+        result.ncols = result.data.len
+      elif result.data.len mod result.ncols != 0:
+        echo "ERROR expect same number of columns ", i, " ", c
+    else:
+      echo "ERROR cannot parse ", i, " ", c
+
+proc `$`(g: SeatGrid): string =
+  for i, d in g.data:
+    result.add:
+      case d
+      of sgFloor:
+        "."
+      of sgEmpty:
+        "L"
+      of sgOccupied:
+        "#"
+    if (i + 1) mod g.ncols == 0:
+      result.add "\n"
+
+var exGrid = parse example
+echo exGrid
+func nrows(g: SeatGrid): int =
+  g.data.len div g.ncols
+
+echo exGrid.nrows</code></pre>
+<pre><samp>L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL
+
+10</samp></pre>
+<p>now we define a function to get adjacent indices. In part 2 we refactored this to use a <code>dir</code> function:</p>
+<pre><code class="nim">when defined(part1):
+  iterator adjIdx(i: int; g: SeatGrid): int =
+    if i >= g.ncols:
+      yield i - g.ncols      ## up
+    if i >= g.ncols and (i + 1) mod g.ncols != 0:
+      yield i - g.ncols + 1  ## up-right
+    if (i + 1) mod g.ncols != 0:
+      yield i + 1            ## right
+    if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len:
+      yield i + g.ncols + 1  ## right-down
+    if (i + g.ncols) < g.data.len:
+      yield i + g.ncols      ## down
+    if (i + g.ncols) < g.data.len and i mod g.ncols != 0:
+      yield i + g.ncols - 1  ## down-left
+    if i mod g.ncols != 0:
+      yield i - 1            ## left
+    if i mod g.ncols != 0 and i >= g.ncols:
+      yield i - g.ncols - 1  ## left-up
+  
+else:
+  type
+    Direction = enum
+      up, upright, right, rightdown, down, downleft, left, leftup
+  func dir(i: int; d: Direction; g: SeatGrid): (bool, int) =
+    result = (false, i)
+    case d
+    of up:
+      if i >= g.ncols:
+        result = (true, i - g.ncols) ## up
+    of upright:
+      if i >= g.ncols and (i + 1) mod g.ncols != 0:
+        result = (true, i - g.ncols + 1) ## up-right
+    of right:
+      if (i + 1) mod g.ncols != 0:
+        result = (true, i + 1) ## right
+    of rightdown:
+      if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len:
+        result = (true, i + g.ncols + 1) ## right-down
+    of down:
+      if (i + g.ncols) < g.data.len:
+        result = (true, i + g.ncols) ## down
+    of downleft:
+      if (i + g.ncols) < g.data.len and i mod g.ncols != 0:
+        result = (true, i + g.ncols - 1) ## down-left
+    of left:
+      if i mod g.ncols != 0:
+        result = (true, i - 1) ## left
+    of leftup:
+      if i mod g.ncols != 0 and i >= g.ncols:
+        result = (true, i - g.ncols - 1) ## left-up
+  
+  iterator adjIdx(i: int; g: SeatGrid): int =
+    var r = (false, 0)
+    for d in Direction:
+      r = dir(i, d, g)
+      if r[0]:
+        yield r[1]
+
+for i in [0, 5, 9, 40, 45, 49, 90, 95, 99]:
+  echo "adjIdx ", i
+  for j in adjIdx(i, exGrid):
+    echo "  ", j</code></pre>
+<pre><samp>adjIdx 0
+  1
+  11
+  10
+adjIdx 5
+  6
+  16
+  15
+  14
+  4
+adjIdx 9
+  19
+  18
+  8
+adjIdx 40
+  30
+  31
+  41
+  51
+  50
+adjIdx 45
+  35
+  36
+  46
+  56
+  55
+  54
+  44
+  34
+adjIdx 49
+  39
+  59
+  58
+  48
+  38
+adjIdx 90
+  80
+  81
+  91
+adjIdx 95
+  85
+  86
+  96
+  94
+  84
+adjIdx 99
+  89
+  98
+  88</samp></pre>
+<p>a <code>step</code> proc to solve part1. this is where I ran in the <em>issue</em></p>
+<pre><code class="nim">proc step(g: var SeatGrid): int =
+  var data = g.data          ## snapshot of grid
+                             ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+  var numOcc: int
+  for i in 0 .. g.data.high:
+    numOcc = 0
+    for j in adjIdx(i, g):
+      if data[j] == sgOccupied:
+        inc numOcc
+    if data[i] == sgEmpty and numOcc == 0:
+      g.data[i] = sgOccupied
+      inc result
+    elif data[i] == sgOccupied and numOcc >= 4:
+      g.data[i] = sgEmpty
+      inc result
+
+func countOcc(g: SeatGrid): int =
+  for s in g.data:
+    if s == sgOccupied:
+      inc result
+
+var i = 1
+while step(exGrid) > 0:
+  echo "step: ", i
+  echo exGrid
+  inc i
+echo "numOcc: ", countOcc(exGrid) ## 37
+let input = "2020/input11.txt".readFile.replace("\c", "")
+var inpGrid = parse input
+echo (inpGrid.ncols, inpGrid.nrows)
+i = 1
+while step(inpGrid) > 0:
+  inc i
+echo "stops at step: ", i    ## 98
+echo "numOcc: ", countOcc(inpGrid) ## 2334</code></pre>
+<pre><samp>step: 1
+#.##.##.##
+#######.##
+#.#.#..#..
+####.##.##
+#.##.##.##
+#.#####.##
+..#.#.....
+##########
+#.######.#
+#.#####.##
+
+step: 2
+#.LL.L#.##
+#LLLLLL.L#
+L.L.L..L..
+#LLL.LL.L#
+#.LL.LL.LL
+#.LLLL#.##
+..L.L.....
+#LLLLLLLL#
+#.LLLLLL.L
+#.#LLLL.##
+
+step: 3
+#.##.L#.##
+#L###LL.L#
+L.#.#..#..
+#L##.##.L#
+#.##.LL.LL
+#.###L#.##
+..#.#.....
+#L######L#
+#.LL###L.L
+#.#L###.##
+
+step: 4
+#.#L.L#.##
+#LLL#LL.L#
+L.L.L..#..
+#LLL.##.L#
+#.LL.LL.LL
+#.LL#L#.##
+..L.L.....
+#L#LLLL#L#
+#.LLLLLL.L
+#.#L#L#.##
+
+step: 5
+#.#L.L#.##
+#LLL#LL.L#
+L.#.L..#..
+#L##.##.L#
+#.#L.LL.LL
+#.#L#L#.##
+..L.L.....
+#L#L##L#L#
+#.LLLLLL.L
+#.#L#L#.##
+
+numOcc: 37
+(97, 92)
+stops at step: 98
+numOcc: 2334</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p>and a <code>step2</code> proc to solve part2</p>
+<pre><code class="nim">when not defined(part1):
+  echo "\n---Part2---\n"
+  proc step2(g: var SeatGrid): int =
+    var data = g.data        ## snapshot of grid
+                             ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+    var numOcc: int
+    var r = (false, 0)
+    for i in 0 .. g.data.high:
+      numOcc = 0
+      for d in Direction:
+        r = dir(i, d, g)
+        while r[0] and data[r[1]] == sgFloor:
+          r = dir(r[1], d, g)
+        if r[0] and data[r[1]] == sgOccupied:
+          inc numOcc
+      if data[i] == sgEmpty and numOcc == 0:
+        g.data[i] = sgOccupied
+        inc result
+      elif data[i] == sgOccupied and numOcc >= 5:
+        g.data[i] = sgEmpty
+        inc result
+
+  i = 1
+  exGrid = parse example
+  while step2(exGrid) > 0:
+    echo "step: ", i
+    echo exGrid
+    inc i
+  echo "numOcc: ", countOcc(exGrid) ## 26
+  inpGrid = parse input
+  i = 1
+  while step2(inpGrid) > 0:
+    inc i
+  echo "stops at step: ", i  ## 86
+  echo "numOcc: ", countOcc(inpGrid) ## 2100</code></pre>
+<pre><samp>---Part2---
+
+step: 1
+#.##.##.##
+#######.##
+#.#.#..#..
+####.##.##
+#.##.##.##
+#.#####.##
+..#.#.....
+##########
+#.######.#
+#.#####.##
+
+step: 2
+#.LL.LL.L#
+#LLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLL#
+#.LLLLLL.L
+#.LLLLL.L#
+
+step: 3
+#.L#.##.L#
+#L#####.LL
+L.#.#..#..
+##L#.##.##
+#.##.#L.##
+#.#####.#L
+..#.#.....
+LLL####LL#
+#.L#####.L
+#.L####.L#
+
+step: 4
+#.L#.L#.L#
+#LLLLLL.LL
+L.L.L..#..
+##LL.LL.L#
+L.LL.LL.L#
+#.LLLLL.LL
+..L.L.....
+LLLLLLLLL#
+#.LLLLL#.L
+#.L#LL#.L#
+
+step: 5
+#.L#.L#.L#
+#LLLLLL.LL
+L.L.L..#..
+##L#.#L.L#
+L.L#.#L.L#
+#.L####.LL
+..#.#.....
+LLL###LLL#
+#.LLLLL#.L
+#.L#LL#.L#
+
+step: 6
+#.L#.L#.L#
+#LLLLLL.LL
+L.L.L..#..
+##L#.#L.L#
+L.L#.LL.L#
+#.LLLL#.LL
+..#.L.....
+LLL###LLL#
+#.LLLLL#.L
+#.L#LL#.L#
+
+numOcc: 26
+stops at step: 86
+numOcc: 2100</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
 <hr>
