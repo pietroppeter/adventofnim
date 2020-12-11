@@ -1,0 +1,193 @@
+import strutils
+
+type
+  SeatGridKind = enum
+    sgFloor = ".", sgEmpty = "L", sgOccupied = "#"
+  SeatGrid = object
+    data: seq[SeatGridKind]
+    ncols: int
+
+let example = """L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL""".replace("\r", "")
+
+proc parse(text: string): SeatGrid =
+  for i, c in text:
+    case c:
+      of '.':
+        result.data.add sgFloor
+      of 'L':
+        result.data.add sgEmpty
+      of '\n':
+        if result.ncols == 0:
+          result.ncols = result.data.len
+        elif result.data.len mod result.ncols != 0:
+          echo "ERROR expect same number of columns ", i, " ", c
+      else:
+        echo "ERROR cannot parse ", i, " ", c
+
+proc `$`(g: SeatGrid): string =
+  for i, d in g.data:
+    result.add:
+      case d:
+        of sgFloor:
+          "."
+        of sgEmpty:
+          "L"
+        of sgOccupied:
+          "#"
+    if (i + 1) mod g.ncols == 0:
+      result.add "\n"
+
+var exGrid = parse example
+echo exGrid
+
+func nrows(g: SeatGrid): int =
+  g.data.len div g.ncols
+
+echo exGrid.nrows # 10
+
+when defined(part1):
+  iterator adjIdx(i: int, g: SeatGrid): int =
+    if i >= g.ncols: ## not first row
+      yield i - g.ncols ## up
+    if i >= g.ncols and (i + 1) mod g.ncols != 0: ## .. and not last column
+      yield i - g.ncols + 1 ## up-right
+    if (i + 1) mod g.ncols != 0: ## not last column
+      yield i + 1 ## right
+    if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len: ## .. and not last row
+      yield i + g.ncols + 1 ## right-down
+    if (i + g.ncols) < g.data.len: ## not last row
+      yield i + g.ncols ## down
+    if (i + g.ncols) < g.data.len and i mod g.ncols != 0: ## .. and not first column
+      yield i + g.ncols - 1 ## down-left
+    if i mod g.ncols != 0: ## not first column
+      yield i - 1 ## left
+    if i mod g.ncols != 0 and i >= g.ncols: ## .. and not first row
+      yield i - g.ncols - 1 ## left-up
+else:
+  # refactor adjIdx for part2
+  type Direction = enum
+    up, upright, right, rightdown, down, downleft, left, leftup
+
+  func dir(i: int, d: Direction, g: SeatGrid): (bool, int) =
+    result = (false, i)
+    case d:
+      of up:
+        if i >= g.ncols: ## not first row
+          result = (true, i - g.ncols) ## up
+      of upright:
+        if i >= g.ncols and (i + 1) mod g.ncols != 0: ## .. and not last column
+          result = (true, i - g.ncols + 1) ## up-right
+      of right:
+        if (i + 1) mod g.ncols != 0: ## not last column
+          result = (true, i + 1 ) ## right
+      of rightdown:
+        if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len: ## .. and not last row
+          result = (true, i + g.ncols + 1) ## right-down
+      of down:
+        if (i + g.ncols) < g.data.len: ## not last row
+          result = (true, i + g.ncols) ## down
+      of downleft:
+        if (i + g.ncols) < g.data.len and i mod g.ncols != 0: ## .. and not first column
+          result = (true, i + g.ncols - 1) ## down-left
+      of left:
+        if i mod g.ncols != 0: ## not first column
+          result = (true, i - 1) ## left
+      of leftup:
+        if i mod g.ncols != 0 and i >= g.ncols: ## .. and not first row
+          result = (true, i - g.ncols - 1) ## left-up
+
+  iterator adjIdx(i: int, g: SeatGrid): int =
+    var r = (false, 0)
+    for d in Direction:
+      r = dir(i, d, g)
+      if r[0]:
+        yield r[1]
+
+for i in [0, 5, 9, 40, 45, 49, 90, 95, 99]:
+  echo "adjIdx ", i
+  for j in adjIdx(i, exGrid):
+    echo "  ", j
+
+proc step(g: var SeatGrid): int =
+  var data = g.data ## snapshot of grid
+  ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+  var numOcc: int
+  for i in 0 .. g.data.high:
+    numOcc = 0
+    for j in adjIdx(i, g):
+      if data[j] == sgOccupied:
+        inc numOcc
+    if data[i] == sgEmpty and numOcc == 0:
+      g.data[i] = sgOccupied
+      inc result
+    elif data[i] == sgOccupied and numOcc >= 4:
+      g.data[i] = sgEmpty
+      inc result
+
+func countOcc(g: SeatGrid): int =
+  for s in g.data:
+    if s == sgOccupied:
+      inc result
+
+var i = 1
+while step(exGrid) > 0:
+  echo "step: ", i
+  echo exGrid
+  inc i
+echo "numOcc: ", countOcc(exGrid) ## 37
+
+let input = "2020/input11.txt".readFile.replace("\r", "")
+var inpGrid = parse input
+echo (inpGrid.ncols, inpGrid.nrows)
+i = 1
+while step(inpGrid) > 0:
+  inc i
+echo "stops at step: ", i ## 98
+echo "numOcc: ", countOcc(inpGrid) ## 2334
+
+when not defined(part1):
+  echo "\n---Part2---\n"
+
+  proc step2(g: var SeatGrid): int =
+    var data = g.data ## snapshot of grid
+    ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+    var numOcc: int
+    var r = (false, 0)
+    for i in 0 .. g.data.high:
+      numOcc = 0
+      for d in Direction:
+        r = dir(i, d, g)
+        while r[0] and data[r[1]] == sgFloor:
+          r = dir(r[1], d, g)
+        if r[0] and data[r[1]] == sgOccupied:
+          inc numOcc
+      if data[i] == sgEmpty and numOcc == 0:
+        g.data[i] = sgOccupied
+        inc result
+      elif data[i] == sgOccupied and numOcc >= 5:
+        g.data[i] = sgEmpty
+        inc result
+
+  i = 1
+  exGrid = parse example
+  while step2(exGrid) > 0:
+    echo "step: ", i
+    echo exGrid
+    inc i
+  echo "numOcc: ", countOcc(exGrid) ## 26
+
+  inpGrid = parse input
+  i = 1
+  while step2(inpGrid) > 0:
+    inc i
+  echo "stops at step: ", i ## 86
+  echo "numOcc: ", countOcc(inpGrid) ## 2100
