@@ -4,14 +4,18 @@ nbText: "## 2020, Day 11: Seating System"
 
 nbText: """standard day with a grid. Highlights:
 * a clean refactoring after part1 to solve part2
-* ran into an expected issue when copying a sequence inside a proc
-
-First we parse and show the example grid.
+* ran into an expected issue when copying a sequence inside a proc (fixed with Orc, see: [forum](https://forum.nim-lang.org/t/7241))
 """
 
 nbCode:
-  import strutils
+  import strutils, nimoji
 
+  when defined(gcOrc):
+    echo "using Orc :japanese_ogre:".emojize
+
+nbText: "First we parse and show the example grid."
+
+nbCode:
   type
     SeatGridKind = enum
       sgFloor = ".", sgEmpty = "L", sgOccupied = "#"
@@ -134,8 +138,10 @@ nbCode:
 nbText: "a `step` proc to solve part1. this is where I ran in the _issue_"
 nbCode:
   proc step(g: var SeatGrid): int =
-    var data = g.data ## snapshot of grid
-    ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+    when defined(gcOrc): ## let data would not work with gcRefc see: https://forum.nim-lang.org/t/7241
+      let data = g.data ## snapshot of grid
+    else:
+      var data = g.data
     var numOcc: int
     for i in 0 .. g.data.high:
       numOcc = 0
@@ -178,8 +184,10 @@ nbCode:
     echo "\n---Part2---\n"
 
     proc step2(g: var SeatGrid): int =
-      var data = g.data ## snapshot of grid
-      ## let data would not work!!! see: https://forum.nim-lang.org/t/3663
+      when defined(gcOrc): ## let data would not work with gcRefc see: https://forum.nim-lang.org/t/7241
+        let data = g.data ## snapshot of grid
+      else:
+        var data = g.data
       var numOcc: int
       var r = (false, 0)
       for i in 0 .. g.data.high:
