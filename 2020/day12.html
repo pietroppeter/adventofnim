@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day12.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='../static/androidstudio.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+<style>
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+  font-style: normal;
+  color: #ffff66;
+  text-shadow: 0 0 5px #ffff66;
+}
+</style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
+<hr><main>
+<h2>2020, Day 12: Rain risk ☔ ⛴</h2>
+<p>Another classic AOC in moving according to directions.
+Nice change of specs from part1 to part2,
+but I just added a proc overload and I was good to go
+(although my &quot;legacy&quot; Enum names do not really shine in part2).
+I did implement the bare minimum (while being my usual verbose,
+I am sure other people have much more synthetic solutions)
+and got away with it very quick.</p>
+<p>As for imports today is just one. Yep <code>parseEnum</code> and <code>parseInt</code>
+are in <code>strutils</code> and not in <code>parseutils</code>.
+<code>parseutils</code> contains parse functions that return an <code>int</code>.</p>
+<pre><code class="nim">import
+  strutils</code></pre>
+<p>All my types below. Using Vec2 both for pos and dir although I could go fancy and use a distinct UnitVec2</p>
+<pre><code class="nim">type
+  Vec2 = tuple[x, y: int]
+  Ship = object
+    pos: Vec2
+    dir: Vec2                ## it could be a distinct type (UnitVec2)
+  
+  InstructionKind = enum
+    goNorth = "N", goEast = "E", goSouth = "S", goWest = "W", goForward = "F",
+    rotLeft = "L", rotRight = "R" ## here I am breaking from naming convention of enums
+  Instruction = object
+    kind: InstructionKind
+    val: int</code></pre>
+<p>template will be useful between example and input and also for part2</p>
+<pre><code class="nim">var ship: Ship
+template resetShip() =
+  ship.pos = (0, 0)
+  ship.dir = (1, 0)
+
+resetShip</code></pre>
+<p>no need to come up with fancy names. <code>parse</code> is fine.</p>
+<pre><code class="nim">proc parse(text: string): seq[Instruction] =
+  var instr: Instruction
+  for line in text.splitLines:
+    instr.kind = parseEnum[InstructionKind](line[0 .. 0])
+    instr.val = parseInt(line[1 .. ^1])
+    result.add instr
+
+let example = """F10
+N3
+F7
+R90
+F11"""
+echo parse example</code></pre>
+<pre><samp>@[(kind: F, val: 10), (kind: N, val: 3), (kind: F, val: 7), (kind: R, val: 90), (kind: F, val: 11)]</samp></pre>
+<p>my set of functions for Vec2, I will support only left rotation...</p>
+<pre><code class="nim">func `+`(v, w: Vec2): Vec2 =
+  (v.x + w.x, v.y + w.y)
+
+func `*`(s: int; v: Vec2): Vec2 =
+  (s * v.x, s * v.y)
+
+func rotL(v: Vec2; deg: int): Vec2 =
+  case deg
+  of 180, -180:
+    (-v.x, -v.y)
+  of 90, -270:
+    (-v.y, v.x)              ## (1, 0) -> (0, 1) -> (-1, 0)
+  of -90, 270:
+    (v.y, -v.x)              ## (1, 0) -> (0, -1) -> (-1, 0)
+  else:
+    debugEcho "ERROR not supported"
+    (0, 0)
+
+template `+=`(a, b: untyped) =
+  a = a + b
+
+func manhattan(ship: Ship): int =
+  ## I could do it for a Vec2 but I will use it only for the ship, so...
+  abs(ship.pos.x) + abs(ship.pos.y)</code></pre>
+<p>heart of the solution is this, rather straightforward now:</p>
+<pre><code class="nim">proc move(ship: var Ship; instr: Instruction) =
+  case instr.kind
+  of goForward:
+    ship.pos += instr.val * ship.dir
+  of goNorth:
+    ship.pos += instr.val * (0, 1)
+  of goEast:
+    ship.pos += instr.val * (1, 0)
+  of goSouth:
+    ship.pos += instr.val * (0, -1)
+  of goWest:
+    ship.pos += instr.val * (-1, 0)
+  of rotLeft:
+    ship.dir = ship.dir.rotL(instr.val)
+  of rotRight:
+    ship.dir = ship.dir.rotL(-instr.val)</code></pre>
+<p>Let's move according to example instructions, printing out in case I need to debug</p>
+<pre><code class="nim">echo ship
+for instr in parse(example):
+  ship.move instr
+  echo "-> ", instr
+  echo ship
+echo manhattan ship          ## 25</code></pre>
+<pre><samp>(pos: (x: 0, y: 0), dir: (x: 1, y: 0))
+-> (kind: F, val: 10)
+(pos: (x: 10, y: 0), dir: (x: 1, y: 0))
+-> (kind: N, val: 3)
+(pos: (x: 10, y: 3), dir: (x: 1, y: 0))
+-> (kind: F, val: 7)
+(pos: (x: 17, y: 3), dir: (x: 1, y: 0))
+-> (kind: R, val: 90)
+(pos: (x: 17, y: 3), dir: (x: 0, y: -1))
+-> (kind: F, val: 11)
+(pos: (x: 17, y: -8), dir: (x: 0, y: -1))
+25</samp></pre>
+<p>all good, now the input!</p>
+<pre><code class="nim">let input = "2020/input12.txt".readFile
+resetShip
+for instr in parse(input):
+  ship.move instr
+echo manhattan ship          ## 1601</code></pre>
+<pre><samp>1601</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Part2</h3>
+<p>I just add a waypoint var and add overload for <code>move</code>:</p>
+<pre><code class="nim">var waypoint: Vec2
+template resetWaypoint() =
+  waypoint = (10, 1)
+
+resetWaypoint
+proc move(ship: var Ship; waypoint: var Vec2; instr: Instruction) =
+  case instr.kind
+  of goForward:
+    ship.pos += instr.val * waypoint
+  of goNorth:
+    waypoint += instr.val * (0, 1)
+  of goEast:
+    waypoint += instr.val * (1, 0)
+  of goSouth:
+    waypoint += instr.val * (0, -1)
+  of goWest:
+    waypoint += instr.val * (-1, 0)
+  of rotLeft:
+    waypoint = waypoint.rotL(instr.val)
+  of rotRight:
+    waypoint = waypoint.rotL(-instr.val)
+
+resetShip
+echo ship
+for instr in parse(example):
+  ship.move(waypoint, instr)
+  echo "W: ", waypoint
+  echo "-> ", instr
+  echo ship
+echo manhattan ship
+resetShip
+resetWaypoint
+for instr in parse(input):
+  ship.move(waypoint, instr)
+echo manhattan ship</code></pre>
+<pre><samp>(pos: (x: 0, y: 0), dir: (x: 1, y: 0))
+W: (x: 10, y: 1)
+-> (kind: F, val: 10)
+(pos: (x: 100, y: 10), dir: (x: 1, y: 0))
+W: (x: 10, y: 4)
+-> (kind: N, val: 3)
+(pos: (x: 100, y: 10), dir: (x: 1, y: 0))
+W: (x: 10, y: 4)
+-> (kind: F, val: 7)
+(pos: (x: 170, y: 38), dir: (x: 1, y: 0))
+W: (x: 4, y: -10)
+-> (kind: R, val: 90)
+(pos: (x: 170, y: 38), dir: (x: 1, y: 0))
+W: (x: 4, y: -10)
+-> (kind: F, val: 11)
+(pos: (x: 214, y: -72), dir: (x: 1, y: 0))
+286
+13340</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p>I was a bit nervous about this day 12 since last two years day 12 is where
+I started to lag behind.
+Instead it was a piece of cake 🍰 and my fastest ⚡ submission with no bugs 🐞.</p>
+<p>I probably am becoming a little better at this, but I do have a feeling like
+this year is slightly easier, maybe Eric is cutting us some slack because of, you know, 2020...</p>
+<p>Of course I will regret just saying this tomorrow and the next days... 😱</p>
+
+</main>
+<hr>
+<small>
+<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
+<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
+</small>
+</body>
+</html>
