@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>C:\Users\ppeterlongo\repos\adventofnim\2020\day13.html</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='../static/androidstudio.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+<style>
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+  font-style: normal;
+  color: #ffff66;
+  text-shadow: 0 0 5px #ffff66;
+}
+</style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
+<hr><main>
+<h2>2020, day 13: Shuttle Search 🔍 🚀</h2>
+<p>Today was another mathematical day and the main character was the
+<a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese Remainder Theorem</a> (CRT from now on).</p>
+<p>Even though the day was rather straightforward for everyone which was able to recall that,
+I find still very nice the fact that people could (and did) come up with very good solutions
+without knowing about CRT. In particular most people who did solved the problem without knowing about CRT
+did implement a very nice method to find solutions,
+<a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving">search by sieving</a>.</p>
+<p>The CRT did click from me rightaway, so I did decide not to look for existing implementation
+and decided to use the coefficient given by Bézout's identity, that can be computed with
+<a href="https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">Extended Euclidean Algorithm</a>.</p>
+<p>I also knew beforehand that I might run into overflow issues and I might need to use
+<a href="https://github.com/def-/nim-bigints">bigints</a>. I decided to first implement with standard <code>int</code>s and only
+later upgrade to bigints if needed.</p>
+<p>In the end I found out that the solution was below <code>int.high</code> but my specific methods using Bézout's coefficients
+did ran into an overflow, so I just applied a quick patch without changing proc's signature.</p>
+<p>In the end I think that the solution with the sieve is the most elegant and practical, since it would not need this.</p>
+<pre><code class="nim">import
+  strutils, sequtils
+
+import
+  sugar</code></pre>
+<p>part 1 was rather straightforward. I solved first for the example then wrapped that in a template
+and used it also to solve it for the real input. No reading from file this, just parsing directly in source and also very basic parsing.</p>
+<pre><code class="nim">template solve1() =
+  echo $buses                ## why nimsuggest complains when no $?
+  var id, wait, minWait: int
+  minWait = int.high
+  for bus in buses:
+    wait = bus - (timestamp mod bus)
+    echo bus, ": ", wait
+    if wait < minWait:
+      minWait = wait
+      id = bus
+  echo (id, minWait, id * minWait)
+
+block example:
+  let
+    timestamp = 939
+    buses = "7,13,x,x,59,x,31,19".replace(",x", "").split(",").map(parseInt)
+  solve1
+block part1:
+  let
+    timestamp = 1003055
+    buses = "37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13".replace(
+        ",x", "").split(",").map(parseInt)
+  solve1</code></pre>
+<pre><samp>@[7, 13, 59, 31, 19]
+7: 6
+13: 10
+59: 5
+31: 22
+19: 11
+(59, 5, 295)
+@[37, 41, 433, 23, 17, 19, 29, 593, 13]
+37: 15
+41: 10
+433: 206
+23: 21
+17: 13
+19: 12
+29: 26
+593: 301
+13: 12
+(41, 10, 410)</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Part 2</h3>
+<p>As mentioned I need Extended Euclidean Algorithm. I went with a rather straightforward implementation.
+I do not think my <code>if</code> and <code>return</code> here do conform to
+<a href="https://gist.github.com/disruptek/6d0cd6774d05adaa894db4deb646fc1d#miscellaneous">disruptek's tips and tricks</a>.</p>
+<p>I did have some debugging to do, and Wikipedia's worked example was very useful</p>
+<pre><code class="nim">type
+  Eq = tuple[modulus, remainder: int]
+func extEuclid(n1, n2: int): (int, int, int) =
+  let (a, b) = if n1 > n2:
+    (n1, n2) else:
+    (n2, n1)
+  var
+    r0 = a
+    r1 = b
+    s0 = 1
+    s1 = 0
+    t0 = 0
+    t1 = 1
+    q1 = r0 div r1
+    r2 = r0 - q1 * r1
+    s2 = s0 - q1 * s1
+    t2 = t0 - q1 * t1
+  when false:
+    dump (r0, r1, r2)
+    dump q1
+    dump (s0, s1, s2)
+    dump (t0, t1, t2)
+  while r2 != 0:
+    when false:
+      debugecho "iterate:"
+    r0 = r1
+    r1 = r2
+    s0 = s1
+    s1 = s2
+    t0 = t1
+    t1 = t2
+    q1 = r0 div r1
+    r2 = r0 - q1 * r1
+    s2 = s0 - q1 * s1
+    t2 = t0 - q1 * t1
+    when false:
+      dump (r0, r1, r2)
+      dump q1
+      dump (s0, s1, s2)
+      dump (t0, t1, t2)
+  return if n1 > n2:
+    (r1, s1, t1) else:
+    (r1, t1, s1)
+
+echo extEuclid(240, 46)      ## (2, -9, 47)</code></pre>
+<pre><samp>(2, -9, 47)</samp></pre>
+<p>my CRT solution algorithm did ran into overflows and I applied a patch inside using bigints</p>
+<pre><code class="nim">import
+  bigints
+
+## why can it have side effects?
+proc crt(eqs: seq[Eq]): int =
+  if eqs.len == 1:
+    return eqs[0].remainder
+  if eqs.len == 2:
+    let
+      (n1, a1) = eqs[0]
+      (n2, a2) = eqs[1]
+      (gcd, m1, m2) = extEuclid(n1, n2)
+    if gcd != 1:
+      echo "ERROR n1, n2 not coprime: ", (n1, n2, gcd)
+    ## gives me overflow here but result is good for int64. let's just patch this part with bigints:
+    let
+      ba1 = a1.initBigInt
+      bm2 = m2.initBigInt
+      bn2 = n2.initBigInt
+      ba2 = a2.initBigInt
+      bm1 = m1.initBigInt
+      bn1 = n1.initBigInt
+      bres = (ba1 * bm2 * bn2 + ba2 * bm1 * bn1) mod (bn1 * bn2)
+    result = parseInt($bres)
+    return result
+  let
+    a12 = crt(eqs[0 .. 1])
+    n12 = eqs[0].modulus * eqs[1].modulus
+  var eqs = @[(n12, a12)] & eqs[2 .. eqs.high]
+  return crt(eqs)
+
+dump crt(@[(3, 2), (5, 3), (7, 2)]) ## from sun-tzu: 23
+dump crt(@[(3, 0), (4, 3), (5, 4)]) ## wiki: 39</code></pre>
+<pre><samp>crt(@[(3, 2), (5, 3), (7, 2)]) = 23
+crt(@[(3, 0), (4, 3), (5, 4)]) = 39</samp></pre>
+<p>Once I got both implementations right I applied to the example
+(first manually parsed than I wrote the parse which also preprocesses stuff).
+Of course here the good strategy is, while parsing, to keep track of position and add remainder to my data.</p>
+<pre><code class="nim">let
+  ## buses = "7,13,x,x,59,x,31,19"
+  example2 = @[(7, 0), (13, 13 - 1), (59, 59 - 4), (31, 31 - 6), (19, 19 - 7)]
+echo crt(example2)
+proc parse(text: string): seq[Eq] =
+  var i = 0
+  for n in text.split(","):
+    if n != "x":
+      result.add (parseInt(n), i)
+    inc i
+  for i in 1 .. result.high:
+    result[i][1] = result[i][0] - result[i][1]
+
+echo parse "7,13,x,x,59,x,31,19"</code></pre>
+<pre><samp>1068781
+@[(modulus: 7, remainder: 0), (modulus: 13, remainder: 12), (modulus: 59, remainder: 55), (modulus: 31, remainder: 25), (modulus: 19, remainder: 12)]</samp></pre>
+<p>to make sure at least the solution was below int.high I did print my expected upper bound. Ah, I did assume all modulus were coprime and I actually suspect they are all prime but did not check</p>
+<pre><code class="nim">let part2input = parse "37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13"
+echo part2input
+var n = 1
+for eq in part2input:
+  n *= eq.modulus
+  echo n
+echo int.high
+echo "part2: ", crt(part2input)</code></pre>
+<pre><samp>@[(modulus: 37, remainder: 0), (modulus: 41, remainder: 14), (modulus: 433, remainder: 396), (modulus: 23, remainder: -22), (modulus: 17, remainder: -37), (modulus: 19, remainder: -37), (modulus: 29, remainder: -37), (modulus: 593, remainder: 525), (modulus: 13, remainder: -68)]
+37
+1517
+656861
+15107803
+256832651
+4879820369
+141514790701
+83918270885693
+1090937521514009
+9223372036854775807
+part2: 600691418730595</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+
+</main>
+<hr>
+<small>
+<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
+<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
+</small>
+</body>
+</html>
