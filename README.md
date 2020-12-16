@@ -5,6 +5,7 @@ nim solutions for advent of code
 I am starting to port all solutions to use [nimib](https://github.com/pietroppeter/nimib)
 
 current content ([home](index.html)):
+
 * 2020
   - [day01.html](https://pietroppeter.github.io/adventofnim/2020/day01.html)
   - [day02.html](https://pietroppeter.github.io/adventofnim/2020/day02.html)
@@ -22,13 +23,16 @@ current content ([home](index.html)):
   - [day14.html](https://pietroppeter.github.io/adventofnim/2020/day14.html)
   - [day15.html](https://pietroppeter.github.io/adventofnim/2020/day15.html)
 
+
 how to:
 
-* generate README.md and index.html: `nim r readme index.html > README.md`
-* regenerate also all html documents: `nim -d: regendoc r readme index.html > README.md`
+* generate README.md and index.html: `nim r index`
+* regenerate also all html documents: `nim -d:regendoc r index`
+
 
 ---
 
 * [repo](https://github.com/pietroppeter/adventofnim/)
 * [docs](https://pietroppeter.github.io/adventofnim/)
+
 

@@ -3,7 +3,7 @@ when defined(regendoc):
   import osproc
 
 nbInit
-
+nbDoc.title = ":house_with_garden::christmas_tree::crown:".emojize
 let
   docs = "https://pietroppeter.github.io/adventofnim/"
   repo = "https://github.com/pietroppeter/adventofnim/"
@@ -33,8 +33,8 @@ nbText: content
 nbText: """
 how to:
 
-* generate README.md and index.html: `nim r readme index.html > README.md`
-* regenerate also all html documents: `nim -d: regendoc r readme index.html > README.md`
+* generate README.md and index.html: `nim r index`
+* regenerate also all html documents: `nim -d:regendoc r index`
 """
 
 nbText: &"""
@@ -44,4 +44,7 @@ nbText: &"""
 * [docs]({docs})
 """
 
+nbSave
+nbDoc.filename = "README.md"
+nbDoc.render = renderMark
 nbSave
