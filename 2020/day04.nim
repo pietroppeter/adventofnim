@@ -125,3 +125,7 @@ nbCode:
 gotTheStar
 
 nbSave
+# idea for "visualization": play audio with paramidi. valid passport should be good chords, invalid passports should be dissonant chords. 
+# depending on eye color it will play a different instrument
+# with audio I should also visualize color of hair as a square (how do I sync audio with style?)
+# country id shows an emoji flag

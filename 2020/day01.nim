@@ -1,7 +1,6 @@
 import nimib, animu
 
 nbInit
-
 nbText : "# --- Day 1: Report Repair ---"
 
 nbText: "## input"
