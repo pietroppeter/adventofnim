@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2020\day17.nim</title>
+  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='../static/androidstudio.css'>
+  <script src="../static/highlight.nim.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+<style>
+a {
+    text-decoration: none;
+    color: #009900;
+}
+
+a:hover {
+    color: #99ff99;
+}
+
+em {
+    color: #ffffff;
+    font-style: normal;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+em.star {
+  font-style: normal;
+  color: #ffff66;
+  text-shadow: 0 0 5px #ffff66;
+}
+</style>
+</head>
+<body>
+<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
+<hr><main>
+<h2>2020, Day 17: Conway Cubes 🔲 🔳</h2>
+<p>Today is about implementing game of life in 3 or 4 dimensions.
+The usual thing to be careful about is to make a copy of the data structure you use to track active cells.</p>
+<p>My implementation is really basic and part2 is just a modified version of part1.
+The only highlight is a <code>Mat3</code> type and a <code>triple</code> iterator to implement <code>neighbours</code> iterator.</p>
+<p>I did suffer a bit because it took a moment to find a bug
+(I was forgetting to remove cubes that become inactive, I though I was starting from an empty buffer but I was not).</p>
+<p>some imports and my inputs:</p>
+<pre><code class="nim">import
+  sets, strutils, std / enumerate, strformat
+
+let example = """.#.
+..#
+###"""
+let input = """##..####
+.###....
+#.###.##
+#....#..
+...#..#.
+#.#...##
+..#.#.#.
+.##...#."""</code></pre>
+<p>Usual parsing:</p>
+<pre><code class="nim">type
+  Vec3 = tuple[x, y, z: int]
+  Active = HashSet[Vec3]
+proc parse(text: string): Active =
+  for y, line in enumerate(text.splitLines): ## why does this need enumerate?
+    for x, c in line:
+      if c == '#':
+        result.incl (x, y, 0)
+
+echo parse example</code></pre>
+<pre><samp>{(x: 0, y: 2, z: 0), (x: 1, y: 2, z: 0), (x: 1, y: 0, z: 0), (x: 2, y: 1, z: 0), (x: 2, y: 2, z: 0)}</samp></pre>
+<p>yes, I should have written a template for bbox, but I was lazy. Anyway I reproduced the vizualization:</p>
+<pre><code class="nim">func bbox(a: Active): (int, int, int, int, int, int) =
+  var xmin, xmax, ymin, ymax, zmin, zmax: int
+  (xmin, ymin, zmin) = (int.high, int.high, int.high)
+  (xmax, ymax, zmax) = (-int.high, -int.high, -int.high)
+  for v in a:
+    if v.x < xmin:
+      xmin = v.x
+    if v.x > xmax:
+      xmax = v.x
+    if v.y < ymin:
+      ymin = v.y
+    if v.y > ymax:
+      ymax = v.y
+    if v.z < zmin:
+      zmin = v.z
+    if v.z > zmax:
+      zmax = v.z
+  (xmin, xmax, ymin, ymax, zmin, zmax)
+
+func viz(a: Active): string =
+  let (xmin, xmax, ymin, ymax, zmin, zmax) = bbox a
+  for z in zmin .. zmax:
+    result.add &"z= {z}, y in {ymin..ymax}, x in {xmin}..{xmax}\n"
+    for y in ymin .. ymax:
+      for x in xmin .. xmax:
+        if (x, y, z) in a:
+          result.add "#"
+        else:
+          result.add "."
+      result.add "\n"
+    result.add "\n"
+
+var a = parse example
+echo viz(a)</code></pre>
+<pre><samp>z= 0, y in 0 .. 2, x in 0..2
+.#.
+..#
+###</samp></pre>
+<p>Here is the only bit of creativity I had for today: a <code>Mat3</code> type and two iterators that help me generate the neighbours.</p>
+<pre><code class="nim">type
+  Mat3 = tuple[a, b, c: Vec3]
+func `+`(v, w: Vec3): Vec3 =
+  (v.x + w.x, v.y + w.y, v.z + w.z)
+
+func `*`(v, w: Vec3): int =
+  (v.x * w.x + v.y * w.y + v.z * w.z)
+
+func `*`(m: Mat3; v: Vec3): Vec3 =
+  (m.a * v, m.b * v, m.c * v)
+
+iterator triple(a: array[3, int]): Vec3 =
+  for x in a:
+    for y in a:
+      for z in a:
+        yield (x, y, z)
+
+iterator neighbours(v: Vec3): Vec3 =
+  let m: Mat3 = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+  for u in triple([-1, 0, 1]):
+    if u == (0, 0, 0):
+      continue
+    yield v + m * u
+
+for v in neighbours((0, 0, 0)):
+  echo v</code></pre>
+<pre><samp>(x: -1, y: -1, z: -1)
+(x: -1, y: -1, z: 0)
+(x: -1, y: -1, z: 1)
+(x: -1, y: 0, z: -1)
+(x: -1, y: 0, z: 0)
+(x: -1, y: 0, z: 1)
+(x: -1, y: 1, z: -1)
+(x: -1, y: 1, z: 0)
+(x: -1, y: 1, z: 1)
+(x: 0, y: -1, z: -1)
+(x: 0, y: -1, z: 0)
+(x: 0, y: -1, z: 1)
+(x: 0, y: 0, z: -1)
+(x: 0, y: 0, z: 1)
+(x: 0, y: 1, z: -1)
+(x: 0, y: 1, z: 0)
+(x: 0, y: 1, z: 1)
+(x: 1, y: -1, z: -1)
+(x: 1, y: -1, z: 0)
+(x: 1, y: -1, z: 1)
+(x: 1, y: 0, z: -1)
+(x: 1, y: 0, z: 0)
+(x: 1, y: 0, z: 1)
+(x: 1, y: 1, z: -1)
+(x: 1, y: 1, z: 0)
+(x: 1, y: 1, z: 1)</samp></pre>
+<p>This is the key function</p>
+<pre><code class="nim">proc cycle(a: var Active) =
+  var b = a
+  let (xmin, xmax, ymin, ymax, zmin, zmax) = bbox a
+  var
+    cnt: int
+    w: Vec3
+  for x in (xmin - 1) .. (xmax + 1):
+    for y in (ymin - 1) .. (ymax + 1):
+      for z in (zmin - 1) .. (zmax + 1):
+        cnt = 0
+        w = (x, y, z)
+        for v in neighbours(w):
+          if v in a:
+            inc cnt
+        if w in a and cnt in [2, 3]:
+          b.incl w
+        else:               ## I was forgetting this branch
+          b.excl w
+        if w notin a and cnt == 3:
+          b.incl w
+  a = b</code></pre>
+<p>Reproducing first 3 loops for the example:</p>
+<pre><code class="nim">for i in 1 .. 3:
+  cycle a
+  echo viz(a)
+  echo "---\n"</code></pre>
+<pre><samp>z= -1, y in 1 .. 3, x in 0..2
+#..
+..#
+.#.
+
+z= 0, y in 1 .. 3, x in 0..2
+#.#
+.##
+.#.
+
+z= 1, y in 1 .. 3, x in 0..2
+#..
+..#
+.#.
+
+
+---
+
+z= -2, y in 0 .. 4, x in -1..3
+.....
+.....
+..#..
+.....
+.....
+
+z= -1, y in 0 .. 4, x in -1..3
+..#..
+.#..#
+....#
+.#...
+.....
+
+z= 0, y in 0 .. 4, x in -1..3
+##...
+##...
+#....
+....#
+.###.
+
+z= 1, y in 0 .. 4, x in -1..3
+..#..
+.#..#
+....#
+.#...
+.....
+
+z= 2, y in 0 .. 4, x in -1..3
+.....
+.....
+..#..
+.....
+.....
+
+
+---
+
+z= -2, y in -1 .. 5, x in -2..4
+.......
+.......
+..##...
+..###..
+.......
+.......
+.......
+
+z= -1, y in -1 .. 5, x in -2..4
+..#....
+...#...
+#......
+.....##
+.#...#.
+..#.#..
+...#...
+
+z= 0, y in -1 .. 5, x in -2..4
+...#...
+.......
+#......
+.......
+.....##
+.##.#..
+...#...
+
+z= 1, y in -1 .. 5, x in -2..4
+..#....
+...#...
+#......
+.....##
+.#...#.
+..#.#..
+...#...
+
+z= 2, y in -1 .. 5, x in -2..4
+.......
+.......
+..##...
+..###..
+.......
+.......
+.......
+
+
+---</samp></pre>
+<p>solving the example</p>
+<pre><code class="nim">for i in 1 .. 3:
+  cycle a
+echo a.len                   ## 112</code></pre>
+<pre><samp>112</samp></pre>
+<p>Finally, let's go for the input:</p>
+<pre><code class="nim">a = parse input
+for i in 1 .. 6:
+  cycle a
+echo "part 1:", a.len</code></pre>
+<pre><samp>part 1:209</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p>Part 2 is a straightforward change from part 1.
+You can look it up in the repo (I named for fourth dimension <code>q</code> because I wanted to keep using <code>w</code> for vector).</p>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+
+</main>
+<hr>
+<small>
+<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
+<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
+</small>
+</body>
+</html>

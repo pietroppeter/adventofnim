@@ -22,6 +22,7 @@ current content ([home](index.html)):
   - [day13.html](https://pietroppeter.github.io/adventofnim/2020/day13.html)
   - [day14.html](https://pietroppeter.github.io/adventofnim/2020/day14.html)
   - [day15.html](https://pietroppeter.github.io/adventofnim/2020/day15.html)
+  - [day17.html](https://pietroppeter.github.io/adventofnim/2020/day17.html)
 
 
 how to:
