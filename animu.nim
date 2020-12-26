@@ -14,6 +14,26 @@ export sequtils, algorithm, strscans, strformat, bitops
 
 import macros
 
+template ddebug* =
+  when defined(debug):
+    import sugar, strutils, macros
+    var debugIndent {.inject.} = 0
+template decho*(x: varargs[typed, `$`]) =
+  when defined(debug):
+    stdout.write " ".repeat(debugIndent)
+    # https://forum.nim-lang.org/t/5954
+    unpackvarargs(debugEcho, x)
+template ddump*(x: untyped) =
+  when defined(debug):
+    stdout.write " ".repeat(debugIndent)
+    dump x
+template dind* =
+  when defined(debug):
+    inc debugIndent, 2
+template dded* =
+  when defined(debug):
+    dec debugIndent, 2
+
 func emStar*(text: string): string = &"<em class=\"star\">{text}</em>"
 const star* = emStar("*")
 template gotTheStar* =
