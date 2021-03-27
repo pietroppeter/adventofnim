@@ -9,75 +9,171 @@
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
   <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
-}
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
 
-a:hover {
-    color: #99ff99;
-}
+    a:hover {
+        color: #99ff99;
+    }
 
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
-}
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
 
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
-}
-</style>
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div id="header-box">
+<span id="home"><a href="2020">🏡</a></span>
+<span id="header-title"><code>2020\day01.nim</code></span>
+<span id="github"><a href="https://github.com/pietroppeter/adventofnim"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1.2em" height="1.2em" style="vertical-align: middle;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27c.68 0 1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="#000"></path></svg></a></span>
+</div>
+<style>
+div#header-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>
+<hr>
+</header>
+<main>
 <h1>--- Day 1: Report Repair ---</h1>
 <h2>input</h2>
-<pre><code class="nim">let input: seq[int] = toSeq("2020/input01.txt".lines).map(parseInt)
-echo input.len
-echo input[0 .. 10]
-echo input[^10 .. ^1]</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> input: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] = toSeq(<span class="hljs-string">&quot;2020/input01.txt&quot;</span>.lines).map(parseInt)
+<span class="hljs-keyword">echo</span> input.len
+<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
+<span class="hljs-keyword">echo</span> input[^<span class="hljs-number">10</span> .. ^<span class="hljs-number">1</span>]</code></pre>
 <pre><samp>200
 @[1583, 1295, 1747, 1628, 1756, 1992, 1984, 1990, 2006, 1626, 1292]
 @[1743, 1909, 1451, 2000, 1978, 1938, 1707, 1337, 1362, 1263]</samp></pre>
 <h2>-- Part 1 --</h2>
 <p>solution to parse 1 does not necessarily even needs to parse the whole input.
 this solution is correct also for the edge case 2010 + 2010</p>
-<pre><code class="nim">var s, t: seq[int]
-for n in input:
-  if n < 1010:
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> s, t: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> input:
+  <span class="hljs-keyword">if</span> n &lt; <span class="hljs-number">1010</span>:
     t.add n
-  if 2020 - n in s:
-    echo "part 1: ", n * (2020 - n)
+  <span class="hljs-keyword">if</span> <span class="hljs-number">2020</span> - n <span class="hljs-keyword">in</span> s:
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part 1: &quot;</span>, n * (<span class="hljs-number">2020</span> - n)
   s.add n</code></pre>
 <pre><samp>part 1: 538464</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <h2>-- Part 2 --</h2>
-<pre><code class="nim">s.sort()
+<pre><code class="nim hljs">s.sort()
 t.sort()
-block outer:
-  for i, n in s:
-    for m in s[(i + 1) .. ^1]:
-      for k in t:
-        if n + m + k == 2020:
-          echo "part 2: ", n * m * k
-          break outer
-        if n + m + k > 2020:
-          break</code></pre>
+<span class="hljs-keyword">block</span> outer:
+  <span class="hljs-keyword">for</span> i, n <span class="hljs-keyword">in</span> s:
+    <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> s[(i + <span class="hljs-number">1</span>) .. ^<span class="hljs-number">1</span>]:
+      <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> t:
+        <span class="hljs-keyword">if</span> n + m + k == <span class="hljs-number">2020</span>:
+          <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part 2: &quot;</span>, n * m * k
+          <span class="hljs-keyword">break</span> outer
+        <span class="hljs-keyword">if</span> n + m + k &gt; <span class="hljs-number">2020</span>:
+          <span class="hljs-keyword">break</span></code></pre>
 <pre><samp>part 2: 278783190</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
+<span id="made">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span>
+<button id="show" onclick="toggleSourceDisplay()">Show Source</button>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+
+nbInit
+nbText : <span class="hljs-string">&quot;# --- Day 1: Report Repair ---&quot;</span>
+
+nbText: <span class="hljs-string">&quot;## input&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span> input: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] = toSeq(<span class="hljs-string">&quot;2020/input01.txt&quot;</span>.lines).map(parseInt)
+  <span class="hljs-keyword">echo</span> input.len
+  <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
+  <span class="hljs-keyword">echo</span> input[^<span class="hljs-number">10</span> .. ^<span class="hljs-number">1</span>]
+
+nbText: <span class="hljs-string">&quot;## -- Part 1 --&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+solution to parse 1 does not necessarily even needs to parse the whole input.
+this solution is correct also for the edge case 2010 + 2010&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">var</span> s, t: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]  <span class="hljs-comment"># t used in part 2</span>
+    
+  <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> input:
+    <span class="hljs-keyword">if</span> n &lt; <span class="hljs-number">1010</span>:
+      t.add n
+    <span class="hljs-keyword">if</span> <span class="hljs-number">2020</span> - n <span class="hljs-keyword">in</span> s:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part 1: &quot;</span>, n*(<span class="hljs-number">2020</span> - n)
+    s.add n
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;## -- Part 2 --&quot;</span>
+
+nbCode:
+  s.sort()
+  t.sort()
+  <span class="hljs-keyword">block</span> outer:
+    <span class="hljs-keyword">for</span> i, n <span class="hljs-keyword">in</span> s:
+      <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> s[(i + <span class="hljs-number">1</span>) .. ^<span class="hljs-number">1</span>]:
+        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> t:
+          <span class="hljs-keyword">if</span> n + m + k == <span class="hljs-number">2020</span>:
+            <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part 2: &quot;</span>, n*m*k
+            <span class="hljs-keyword">break</span> outer
+          <span class="hljs-keyword">if</span> n + m + k &gt; <span class="hljs-number">2020</span>:
+            <span class="hljs-keyword">break</span>
+
+gotTheStar
+
+<span class="hljs-comment"># TODO: fix how code elements look like when not a direct child of pre</span>
+<span class="hljs-comment"># nbText: &quot;the above solution is not necessarily correct since `k in t` could be one of `n` or `m`&quot;</span>
+
+nbSave</code></pre>
+</section>
+<script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script>
+<style>
+span#made {
+  font-size: 0.8rem;
+}
+button#show {
+  font-size: 0.8rem;
+}
+
+button#show {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+</style>
+</footer>
 </body>
 </html>
