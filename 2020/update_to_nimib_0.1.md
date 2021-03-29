@@ -6,6 +6,6 @@ Starting from day01:
 - [X] use default footer
 - [X] use default header
 - [X] keep custom head but remove highlight.js
-- [ ] fix the home link in nimib header (is not relatve link or it is not finding the correct project folder?)
-- [ ] github log for dark mode
+- [X] fix the home link in nimib header (is not relatve link or it is not finding the correct project folder?)
+- [X] github log for dark mode
 - [ ] ...

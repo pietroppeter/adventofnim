@@ -2,7 +2,7 @@
 
 nim solutions for advent of code
 
-I am starting to port all solutions to use [nimib](https://github.com/pietroppeter/nimib)
+WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
 
 current content ([home](index.html)):
 
