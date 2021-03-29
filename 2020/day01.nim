@@ -1,6 +1,7 @@
 import nimib, animu
 
 nbInit
+nbDoc.darkMode # only to have github logo in dark mode (the rest is in custom head)
 nbText : "# --- Day 1: Report Repair ---"
 
 nbText: "## input"

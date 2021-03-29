@@ -1,45 +1,68 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>🏡🎄👑</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>index.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href=".">🏡</a></span>
+  <span><code>index.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h1>🎄👑 adventofnim</h1>
 <p>nim solutions for advent of code</p>
-<p>I am starting to port all solutions to use <a href="https://github.com/pietroppeter/nimib">nimib</a></p>
+<p>WIP - updating solutions to <a href="https://github.com/pietroppeter/nimib">nimib</a> 0.1</p>
 <p>current content (<a href="index.html">home</a>):</p>
 <ul>
 <li>2020
@@ -75,10 +98,77 @@ em.star {
 </ul>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, nimoji, strformat, os, strutils
+<span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
+  <span class="hljs-keyword">import</span> osproc
+
+nbInit
+nbDoc.darkMode
+nbDoc.title = <span class="hljs-string">&quot;:christmas_tree::crown:&quot;</span>.emojize
+<span class="hljs-keyword">let</span>
+  docs = <span class="hljs-string">&quot;https://pietroppeter.github.io/adventofnim/&quot;</span>
+  repo = <span class="hljs-string">&quot;https://github.com/pietroppeter/adventofnim/&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+# :christmas_tree::crown: adventofnim
+
+nim solutions for advent of code
+
+WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
+
+current content ([home](index.html)):&quot;&quot;&quot;</span>.emojize
+
+<span class="hljs-keyword">var</span> content = <span class="hljs-string">&quot;* 2020</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+<span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> walkFiles(<span class="hljs-string">&quot;2020/*.html&quot;</span>):
+  <span class="hljs-keyword">let</span> g = f.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\\</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>)
+  content &amp;= &amp;<span class="hljs-string">&quot;  - [{g[5 .. ^1]}]({docs}{g})</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+  <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
+    <span class="hljs-keyword">let</span> cmd = <span class="hljs-string">&quot;nim r &quot;</span> &amp; changeFileExt(g, <span class="hljs-string">&quot;nim&quot;</span>)
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;exec: &quot;</span>, cmd
+    <span class="hljs-keyword">if</span> execCmd(cmd) != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR with: &quot;</span>, cmd
+
+
+nbText: content
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+how to:
+
+* generate README.md and index.html: `nim r index`
+* regenerate also all html documents: `nim -d:regendoc r index`
+&quot;&quot;&quot;</span>
+
+nbText: &amp;<span class="hljs-string">&quot;&quot;&quot;
+---
+
+* [repo]({repo})
+* [docs]({docs})
+&quot;&quot;&quot;</span>
+
+nbSave
+nbDoc.filename = <span class="hljs-string">&quot;README.md&quot;</span>
+nbDoc.render = renderMark
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

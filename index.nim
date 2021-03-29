@@ -3,7 +3,8 @@ when defined(regendoc):
   import osproc
 
 nbInit
-nbDoc.title = ":house_with_garden::christmas_tree::crown:".emojize
+nbDoc.darkMode
+nbDoc.title = ":christmas_tree::crown:".emojize
 let
   docs = "https://pietroppeter.github.io/adventofnim/"
   repo = "https://github.com/pietroppeter/adventofnim/"
@@ -13,7 +14,7 @@ nbText: """
 
 nim solutions for advent of code
 
-I am starting to port all solutions to use [nimib](https://github.com/pietroppeter/nimib)
+WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
 
 current content ([home](index.html)):""".emojize
 
