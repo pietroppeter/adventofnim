@@ -1,113 +1,136 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2020\day05.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day05.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day05.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h1>--- Day 5: Binary Boarding ---</h1>
 <p>parsing is straightforward, considering that encoding is basically binary</p>
-<pre><code class="nim">type
-  Seat = int16
-proc parseSeat(s: string): Seat =
-  discard parseBin[int16](s.multiReplace(
-      [("F", "0"), ("B", "1"), ("R", "1"), ("L", "0")]), result)
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Seat</span> = <span class="hljs-built_in">int16</span>
+<span class="hljs-keyword">proc</span> parseSeat(s: <span class="hljs-built_in">string</span>): <span class="hljs-type">Seat</span> =
+  <span class="hljs-keyword">discard</span> parseBin[<span class="hljs-built_in">int16</span>](s.multiReplace(
+      [(<span class="hljs-string">&quot;F&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>), (<span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>), (<span class="hljs-string">&quot;R&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>), (<span class="hljs-string">&quot;L&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>)]), <span class="hljs-literal">result</span>)
 
-chk parseSeat("FBFBBFFRLR"), 357</code></pre>
+chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>), <span class="hljs-number">357</span></code></pre>
 <pre><samp>[OK] parseSeat("FBFBBFFRLR") = 357</samp></pre>
 <p>if I want to get back row and col (I will use it for visualization at the end)</p>
-<pre><code class="nim">proc row(x: Seat): int =
-  x shr 3
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> row(x: <span class="hljs-type">Seat</span>): <span class="hljs-built_in">int</span> =
+  x <span class="hljs-keyword">shr</span> <span class="hljs-number">3</span>
 
-proc col(x: Seat): int =
-  result = x.int
-  result.mask(0b00000000000000000000000000000111)
+<span class="hljs-keyword">proc</span> col(x: <span class="hljs-type">Seat</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-literal">result</span> = x.<span class="hljs-built_in">int</span>
+  <span class="hljs-literal">result</span>.mask(<span class="hljs-number">0b00000000000000000000000000000111</span>)
 
-chk parseSeat("FBFBBFFRLR").row, 44
-chk parseSeat("FBFBBFFRLR").col, 5</code></pre>
+chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>).row, <span class="hljs-number">44</span>
+chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>).col, <span class="hljs-number">5</span></code></pre>
 <pre><samp>[OK] parseSeat("FBFBBFFRLR").row = 44
 [OK] parseSeat("FBFBBFFRLR").col = 5</samp></pre>
 <p><em>part1</em> is solved during parsing input file</p>
-<pre><code class="nim">var
-  maxSeat = 0
-  seats: seq[Seat]
-for line in "2020/input05.txt".lines:
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span>
+  maxSeat = <span class="hljs-number">0</span>
+  seats: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Seat</span>]
+<span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> <span class="hljs-string">&quot;2020/input05.txt&quot;</span>.lines:
   seats.add parseSeat(line)
-  if seats[^1] > maxSeat:
-    maxSeat = seats[^1]
-echo "part1: ", maxSeat
-chk(maxSeat, 947)</code></pre>
+  <span class="hljs-keyword">if</span> seats[^<span class="hljs-number">1</span>] &gt; maxSeat:
+    maxSeat = seats[^<span class="hljs-number">1</span>]
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, maxSeat
+chk(maxSeat, <span class="hljs-number">947</span>)</code></pre>
 <pre><samp>part1: 947
 [OK] maxSeat = 947</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <p><em>part 2</em> is solved by sorting and finding the gap</p>
-<pre><code class="nim">var mySeat: Seat
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> mySeat: <span class="hljs-type">Seat</span>
 seats.sort()
-for x in 1 ..< seats.len:
-  if seats[x] != seats[x - 1] + 1:
-    mySeat = seats[x] - 1    ## first try I forgot the "- 1!
-    break
-echo "part2: ", mySeat
-chk(maxSeat, 636)</code></pre>
+<span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> ..&lt; seats.len:
+  <span class="hljs-keyword">if</span> seats[x] != seats[x - <span class="hljs-number">1</span>] + <span class="hljs-number">1</span>:
+    mySeat = seats[x] - <span class="hljs-number">1</span>    <span class="hljs-comment">## first try I forgot the &quot;- 1!</span>
+    <span class="hljs-keyword">break</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, mySeat
+chk(maxSeat, <span class="hljs-number">636</span>)</code></pre>
 <pre><samp>part2: 636
 [KO] maxSeat = 947; expected = 636</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <p>what do we need to <em>visualize the plane</em>? I will convert Seat in (row, col)</p>
-<pre><code class="nim">type
-  RowCol = tuple[row, col: int]
-proc toPasses(s: seq[Seat]): HashSet[RowCol] =
-  for x in s:
-    result.incl (x.row, x.col).RowCol
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">RowCol</span> = <span class="hljs-keyword">tuple</span>[row, col: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">proc</span> toPasses(s: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Seat</span>]): <span class="hljs-type">HashSet</span>[<span class="hljs-type">RowCol</span>] =
+  <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> s:
+    <span class="hljs-literal">result</span>.incl (x.row, x.col).<span class="hljs-type">RowCol</span>
 
-proc showAndTell(s: HashSet[RowCol]): RowCol =
-  var text = "____01234567\n"
-  for row in 0 .. 127:
-    text.add &"{row:03} "
-    for col in 0 .. 7:
-      if (row, col) in s:
-        text.add "X"
-      elif row < 30 or row > 100:
-        text.add "."
-      else:
-        text.add "<em>O</em>"
-        result = (row, col)
-    text.add "\n"
-  text.add "\n"
-  echo text
+<span class="hljs-keyword">proc</span> showAndTell(s: <span class="hljs-type">HashSet</span>[<span class="hljs-type">RowCol</span>]): <span class="hljs-type">RowCol</span> =
+  <span class="hljs-keyword">var</span> text = <span class="hljs-string">&quot;____01234567</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+  <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-number">127</span>:
+    text.add &amp;<span class="hljs-string">&quot;{row:03} &quot;</span>
+    <span class="hljs-keyword">for</span> col <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-number">7</span>:
+      <span class="hljs-keyword">if</span> (row, col) <span class="hljs-keyword">in</span> s:
+        text.add <span class="hljs-string">&quot;X&quot;</span>
+      <span class="hljs-keyword">elif</span> row &lt; <span class="hljs-number">30</span> <span class="hljs-keyword">or</span> row &gt; <span class="hljs-number">100</span>:
+        text.add <span class="hljs-string">&quot;.&quot;</span>
+      <span class="hljs-keyword">else</span>:
+        text.add <span class="hljs-string">&quot;&lt;em&gt;O&lt;/em&gt;&quot;</span>
+        <span class="hljs-literal">result</span> = (row, col)
+    text.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+  text.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+  <span class="hljs-keyword">echo</span> text
 
-let myRowCol = seats.toPasses.showAndTell</code></pre>
+<span class="hljs-keyword">let</span> myRowCol = seats.toPasses.showAndTell</code></pre>
 <pre><samp>____01234567
 000 ........
 001 .......X
@@ -238,17 +261,119 @@ let myRowCol = seats.toPasses.showAndTell</code></pre>
 126 ........
 127 ........</samp></pre>
 <p>I can check back id</p>
-<pre><code class="nim">proc id(x: RowCol): int =
-  x.col + 8 * x.row
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> id(x: <span class="hljs-type">RowCol</span>): <span class="hljs-built_in">int</span> =
+  x.col + <span class="hljs-number">8</span> * x.row
 
 chk id(myRowCol), mySeat</code></pre>
 <pre><samp>[OK] id(myRowCol) = 636</samp></pre>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+
+nbInit
+nbText: <span class="hljs-string">&quot;# --- Day 5: Binary Boarding ---&quot;</span>
+nbText: <span class="hljs-string">&quot;parsing is straightforward, considering that encoding is basically binary&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">type</span> <span class="hljs-type">Seat</span> = <span class="hljs-built_in">int16</span>
+
+  <span class="hljs-keyword">proc</span> parseSeat(s: <span class="hljs-built_in">string</span>): <span class="hljs-type">Seat</span> =
+    <span class="hljs-keyword">discard</span> parseBin[<span class="hljs-built_in">int16</span>](s.multiReplace([
+      (<span class="hljs-string">&quot;F&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>), (<span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>), (<span class="hljs-string">&quot;R&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>), (<span class="hljs-string">&quot;L&quot;</span>, <span class="hljs-string">&quot;0&quot;</span>)
+    ]), <span class="hljs-literal">result</span>)
+
+  chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>), <span class="hljs-number">357</span>
+
+nbText: <span class="hljs-string">&quot;if I want to get back row and col (I will use it for visualization at the end)&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> row(x: <span class="hljs-type">Seat</span>): <span class="hljs-built_in">int</span> = x <span class="hljs-keyword">shr</span> <span class="hljs-number">3</span>
+  <span class="hljs-keyword">proc</span> col(x: <span class="hljs-type">Seat</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-literal">result</span> = x.<span class="hljs-built_in">int</span>
+    <span class="hljs-literal">result</span>.mask(<span class="hljs-number">0b111</span>)
+
+  chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>).row, <span class="hljs-number">44</span>
+  chk parseSeat(<span class="hljs-string">&quot;FBFBBFFRLR&quot;</span>).col, <span class="hljs-number">5</span>
+
+nbText: <span class="hljs-string">&quot;_part1_ is solved during parsing input file&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span>
+    maxSeat = <span class="hljs-number">0</span>
+    seats: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Seat</span>]
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> <span class="hljs-string">&quot;2020/input05.txt&quot;</span>.lines:
+    seats.add parseSeat(line)
+    <span class="hljs-keyword">if</span> seats[^<span class="hljs-number">1</span>] &gt; maxSeat:
+      maxSeat = seats[^<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, maxSeat
+  chk(maxSeat, <span class="hljs-number">947</span>)
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;_part 2_ is solved by sorting and finding the gap&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span> mySeat: <span class="hljs-type">Seat</span>
+  seats.sort()
+  <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> ..&lt; seats.len:
+    <span class="hljs-keyword">if</span> seats[x] != seats[x - <span class="hljs-number">1</span>] + <span class="hljs-number">1</span>:
+      mySeat = seats[x] - <span class="hljs-number">1</span> <span class="hljs-comment">## first try I forgot the &quot;- 1!</span>
+      <span class="hljs-keyword">break</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, mySeat
+  chk(maxSeat, <span class="hljs-number">636</span>)
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;what do we need to _visualize the plane_? I will convert Seat in (row, col)&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span> <span class="hljs-type">RowCol</span> = <span class="hljs-keyword">tuple</span>[row, col: <span class="hljs-built_in">int</span>]
+
+  <span class="hljs-keyword">proc</span> toPasses(s: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Seat</span>]): <span class="hljs-type">HashSet</span>[<span class="hljs-type">RowCol</span>] =
+    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> s:
+      <span class="hljs-literal">result</span>.incl (x.row, x.col).<span class="hljs-type">RowCol</span>
+
+  <span class="hljs-keyword">proc</span> showAndTell(s: <span class="hljs-type">HashSet</span>[<span class="hljs-type">RowCol</span>]): <span class="hljs-type">RowCol</span> =
+    <span class="hljs-keyword">var</span>
+      text = <span class="hljs-string">&quot;____01234567</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span> <span class="hljs-comment"># I need to fix spaces at the beginning of pre!</span>
+    <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-number">127</span>:
+      text.add &amp;<span class="hljs-string">&quot;{row:03} &quot;</span>
+      <span class="hljs-keyword">for</span> col <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-number">7</span>:
+        <span class="hljs-keyword">if</span> (row, col) <span class="hljs-keyword">in</span> s:
+          text.add <span class="hljs-string">&quot;X&quot;</span>
+        <span class="hljs-keyword">elif</span> row &lt; <span class="hljs-number">30</span> <span class="hljs-keyword">or</span> row &gt; <span class="hljs-number">100</span>:  <span class="hljs-comment"># I know my place is in the middle of the plane</span>
+          text.add <span class="hljs-string">&quot;.&quot;</span>
+        <span class="hljs-keyword">else</span>:
+          text.add <span class="hljs-string">&quot;&lt;em&gt;O&lt;/em&gt;&quot;</span>
+          <span class="hljs-literal">result</span> = (row, col)
+      text.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    text.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-keyword">echo</span> text
+
+  <span class="hljs-keyword">let</span> myRowCol = seats.toPasses.showAndTell
+  
+nbtext: <span class="hljs-string">&quot;I can check back id&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> id(x: <span class="hljs-type">RowCol</span>): <span class="hljs-built_in">int</span> = x.col + <span class="hljs-number">8</span>*x.row
+  chk id(myRowCol), mySeat
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

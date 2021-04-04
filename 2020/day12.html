@@ -1,42 +1,65 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>day12.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day12.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day12.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h2>2020, Day 12: Rain risk ☔ ⛴</h2>
 <p>Another classic AOC in moving according to directions.
 Nice change of specs from part1 to part2,
@@ -48,92 +71,92 @@ and got away with it very quick.</p>
 <p>As for imports today is just one. Yep <code>parseEnum</code> and <code>parseInt</code>
 are in <code>strutils</code> and not in <code>parseutils</code>.
 <code>parseutils</code> contains parse functions that return an <code>int</code>.</p>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   strutils</code></pre>
 <p>All my types below. Using Vec2 both for pos and dir although I could go fancy and use a distinct UnitVec2</p>
-<pre><code class="nim">type
-  Vec2 = tuple[x, y: int]
-  Ship = object
-    pos: Vec2
-    dir: Vec2                ## it could be a distinct type (UnitVec2)
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Vec2</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+  <span class="hljs-type">Ship</span> = <span class="hljs-keyword">object</span>
+    pos: <span class="hljs-type">Vec2</span>
+    dir: <span class="hljs-type">Vec2</span>                <span class="hljs-comment">## it could be a distinct type (UnitVec2)</span>
   
-  InstructionKind = enum
-    goNorth = "N", goEast = "E", goSouth = "S", goWest = "W", goForward = "F",
-    rotLeft = "L", rotRight = "R" ## here I am breaking from naming convention of enums
-  Instruction = object
-    kind: InstructionKind
-    val: int</code></pre>
+  <span class="hljs-type">InstructionKind</span> = <span class="hljs-keyword">enum</span>
+    goNorth = <span class="hljs-string">&quot;N&quot;</span>, goEast = <span class="hljs-string">&quot;E&quot;</span>, goSouth = <span class="hljs-string">&quot;S&quot;</span>, goWest = <span class="hljs-string">&quot;W&quot;</span>, goForward = <span class="hljs-string">&quot;F&quot;</span>,
+    rotLeft = <span class="hljs-string">&quot;L&quot;</span>, rotRight = <span class="hljs-string">&quot;R&quot;</span> <span class="hljs-comment">## here I am breaking from naming convention of enums</span>
+  <span class="hljs-type">Instruction</span> = <span class="hljs-keyword">object</span>
+    kind: <span class="hljs-type">InstructionKind</span>
+    val: <span class="hljs-built_in">int</span></code></pre>
 <p>template will be useful between example and input and also for part2</p>
-<pre><code class="nim">var ship: Ship
-template resetShip() =
-  ship.pos = (0, 0)
-  ship.dir = (1, 0)
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> ship: <span class="hljs-type">Ship</span>
+<span class="hljs-keyword">template</span> resetShip() =
+  ship.pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+  ship.dir = (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
 
 resetShip</code></pre>
 <p>no need to come up with fancy names. <code>parse</code> is fine.</p>
-<pre><code class="nim">proc parse(text: string): seq[Instruction] =
-  var instr: Instruction
-  for line in text.splitLines:
-    instr.kind = parseEnum[InstructionKind](line[0 .. 0])
-    instr.val = parseInt(line[1 .. ^1])
-    result.add instr
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>] =
+  <span class="hljs-keyword">var</span> instr: <span class="hljs-type">Instruction</span>
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    instr.kind = parseEnum[<span class="hljs-type">InstructionKind</span>](line[<span class="hljs-number">0</span> .. <span class="hljs-number">0</span>])
+    instr.val = parseInt(line[<span class="hljs-number">1</span> .. ^<span class="hljs-number">1</span>])
+    <span class="hljs-literal">result</span>.add instr
 
-let example = """F10
+<span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;F10
 N3
 F7
 R90
-F11"""
-echo parse example</code></pre>
+F11&quot;&quot;&quot;</span>
+<span class="hljs-keyword">echo</span> parse example</code></pre>
 <pre><samp>@[(kind: F, val: 10), (kind: N, val: 3), (kind: F, val: 7), (kind: R, val: 90), (kind: F, val: 11)]</samp></pre>
 <p>my set of functions for Vec2, I will support only left rotation...</p>
-<pre><code class="nim">func `+`(v, w: Vec2): Vec2 =
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> `+`(v, w: <span class="hljs-type">Vec2</span>): <span class="hljs-type">Vec2</span> =
   (v.x + w.x, v.y + w.y)
 
-func `*`(s: int; v: Vec2): Vec2 =
+<span class="hljs-keyword">func</span> `*`(s: <span class="hljs-built_in">int</span>; v: <span class="hljs-type">Vec2</span>): <span class="hljs-type">Vec2</span> =
   (s * v.x, s * v.y)
 
-func rotL(v: Vec2; deg: int): Vec2 =
-  case deg
-  of 180, -180:
+<span class="hljs-keyword">func</span> rotL(v: <span class="hljs-type">Vec2</span>; deg: <span class="hljs-built_in">int</span>): <span class="hljs-type">Vec2</span> =
+  <span class="hljs-keyword">case</span> deg
+  <span class="hljs-keyword">of</span> <span class="hljs-number">180</span>, -<span class="hljs-number">180</span>:
     (-v.x, -v.y)
-  of 90, -270:
-    (-v.y, v.x)              ## (1, 0) -> (0, 1) -> (-1, 0)
-  of -90, 270:
-    (v.y, -v.x)              ## (1, 0) -> (0, -1) -> (-1, 0)
-  else:
-    debugEcho "ERROR not supported"
-    (0, 0)
+  <span class="hljs-keyword">of</span> <span class="hljs-number">90</span>, -<span class="hljs-number">270</span>:
+    (-v.y, v.x)              <span class="hljs-comment">## (1, 0) -&gt; (0, 1) -&gt; (-1, 0)</span>
+  <span class="hljs-keyword">of</span> -<span class="hljs-number">90</span>, <span class="hljs-number">270</span>:
+    (v.y, -v.x)              <span class="hljs-comment">## (1, 0) -&gt; (0, -1) -&gt; (-1, 0)</span>
+  <span class="hljs-keyword">else</span>:
+    debugEcho <span class="hljs-string">&quot;ERROR not supported&quot;</span>
+    (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
 
-template `+=`(a, b: untyped) =
+<span class="hljs-keyword">template</span> `+=`(a, b: <span class="hljs-built_in">untyped</span>) =
   a = a + b
 
-func manhattan(ship: Ship): int =
-  ## I could do it for a Vec2 but I will use it only for the ship, so...
+<span class="hljs-keyword">func</span> manhattan(ship: <span class="hljs-type">Ship</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-comment">## I could do it for a Vec2 but I will use it only for the ship, so...</span>
   abs(ship.pos.x) + abs(ship.pos.y)</code></pre>
 <p>heart of the solution is this, rather straightforward now:</p>
-<pre><code class="nim">proc move(ship: var Ship; instr: Instruction) =
-  case instr.kind
-  of goForward:
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> move(ship: <span class="hljs-keyword">var</span> <span class="hljs-type">Ship</span>; instr: <span class="hljs-type">Instruction</span>) =
+  <span class="hljs-keyword">case</span> instr.kind
+  <span class="hljs-keyword">of</span> goForward:
     ship.pos += instr.val * ship.dir
-  of goNorth:
-    ship.pos += instr.val * (0, 1)
-  of goEast:
-    ship.pos += instr.val * (1, 0)
-  of goSouth:
-    ship.pos += instr.val * (0, -1)
-  of goWest:
-    ship.pos += instr.val * (-1, 0)
-  of rotLeft:
+  <span class="hljs-keyword">of</span> goNorth:
+    ship.pos += instr.val * (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+  <span class="hljs-keyword">of</span> goEast:
+    ship.pos += instr.val * (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">of</span> goSouth:
+    ship.pos += instr.val * (<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)
+  <span class="hljs-keyword">of</span> goWest:
+    ship.pos += instr.val * (-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">of</span> rotLeft:
     ship.dir = ship.dir.rotL(instr.val)
-  of rotRight:
+  <span class="hljs-keyword">of</span> rotRight:
     ship.dir = ship.dir.rotL(-instr.val)</code></pre>
 <p>Let's move according to example instructions, printing out in case I need to debug</p>
-<pre><code class="nim">echo ship
-for instr in parse(example):
+<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> ship
+<span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(example):
   ship.move instr
-  echo "-> ", instr
-  echo ship
-echo manhattan ship          ## 25</code></pre>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;-&gt; &quot;</span>, instr
+  <span class="hljs-keyword">echo</span> ship
+<span class="hljs-keyword">echo</span> manhattan ship          <span class="hljs-comment">## 25</span></code></pre>
 <pre><samp>(pos: (x: 0, y: 0), dir: (x: 1, y: 0))
 -> (kind: F, val: 10)
 (pos: (x: 10, y: 0), dir: (x: 1, y: 0))
@@ -147,50 +170,50 @@ echo manhattan ship          ## 25</code></pre>
 (pos: (x: 17, y: -8), dir: (x: 0, y: -1))
 25</samp></pre>
 <p>all good, now the input!</p>
-<pre><code class="nim">let input = "2020/input12.txt".readFile
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input12.txt&quot;</span>.readFile
 resetShip
-for instr in parse(input):
+<span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(input):
   ship.move instr
-echo manhattan ship          ## 1601</code></pre>
+<span class="hljs-keyword">echo</span> manhattan ship          <span class="hljs-comment">## 1601</span></code></pre>
 <pre><samp>1601</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <h3>Part2</h3>
 <p>I just add a waypoint var and add overload for <code>move</code>:</p>
-<pre><code class="nim">var waypoint: Vec2
-template resetWaypoint() =
-  waypoint = (10, 1)
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> waypoint: <span class="hljs-type">Vec2</span>
+<span class="hljs-keyword">template</span> resetWaypoint() =
+  waypoint = (<span class="hljs-number">10</span>, <span class="hljs-number">1</span>)
 
 resetWaypoint
-proc move(ship: var Ship; waypoint: var Vec2; instr: Instruction) =
-  case instr.kind
-  of goForward:
+<span class="hljs-keyword">proc</span> move(ship: <span class="hljs-keyword">var</span> <span class="hljs-type">Ship</span>; waypoint: <span class="hljs-keyword">var</span> <span class="hljs-type">Vec2</span>; instr: <span class="hljs-type">Instruction</span>) =
+  <span class="hljs-keyword">case</span> instr.kind
+  <span class="hljs-keyword">of</span> goForward:
     ship.pos += instr.val * waypoint
-  of goNorth:
-    waypoint += instr.val * (0, 1)
-  of goEast:
-    waypoint += instr.val * (1, 0)
-  of goSouth:
-    waypoint += instr.val * (0, -1)
-  of goWest:
-    waypoint += instr.val * (-1, 0)
-  of rotLeft:
+  <span class="hljs-keyword">of</span> goNorth:
+    waypoint += instr.val * (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+  <span class="hljs-keyword">of</span> goEast:
+    waypoint += instr.val * (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">of</span> goSouth:
+    waypoint += instr.val * (<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)
+  <span class="hljs-keyword">of</span> goWest:
+    waypoint += instr.val * (-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">of</span> rotLeft:
     waypoint = waypoint.rotL(instr.val)
-  of rotRight:
+  <span class="hljs-keyword">of</span> rotRight:
     waypoint = waypoint.rotL(-instr.val)
 
 resetShip
-echo ship
-for instr in parse(example):
+<span class="hljs-keyword">echo</span> ship
+<span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(example):
   ship.move(waypoint, instr)
-  echo "W: ", waypoint
-  echo "-> ", instr
-  echo ship
-echo manhattan ship
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;W: &quot;</span>, waypoint
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;-&gt; &quot;</span>, instr
+  <span class="hljs-keyword">echo</span> ship
+<span class="hljs-keyword">echo</span> manhattan ship
 resetShip
 resetWaypoint
-for instr in parse(input):
+<span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(input):
   ship.move(waypoint, instr)
-echo manhattan ship</code></pre>
+<span class="hljs-keyword">echo</span> manhattan ship</code></pre>
 <pre><samp>(pos: (x: 0, y: 0), dir: (x: 1, y: 0))
 W: (x: 10, y: 1)
 -> (kind: F, val: 10)
@@ -218,10 +241,212 @@ this year is slightly easier, maybe Eric is cutting us some slack because of, yo
 <p>Of course I will regret just saying this tomorrow and the next days... 😱</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu, nimoji
+
+nbInit
+nbText: <span class="hljs-string">&quot;&quot;&quot;## 2020, Day 12: Rain risk :umbrella: :ferry:
+
+Another classic AOC in moving according to directions.
+Nice change of specs from part1 to part2,
+but I just added a proc overload and I was good to go
+(although my &quot;legacy&quot; Enum names do not really shine in part2).
+I did implement the bare minimum (while being my usual verbose,
+I am sure other people have much more synthetic solutions)
+and got away with it very quick.
+
+As for imports today is just one. Yep `parseEnum` and `parseInt`
+are in `strutils` and not in `parseutils`.
+`parseutils` contains parse functions that return an `int`.
+&quot;&quot;&quot;</span>.emojize
+
+nbCode:
+  <span class="hljs-keyword">import</span> strutils
+
+nbText: <span class="hljs-string">&quot;All my types below. Using Vec2 both for pos and dir although I could go fancy and use a distinct UnitVec2&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Vec2</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+    <span class="hljs-type">Ship</span> = <span class="hljs-keyword">object</span>
+      pos: <span class="hljs-type">Vec2</span>
+      dir: <span class="hljs-type">Vec2</span> <span class="hljs-comment">## it could be a distinct type (UnitVec2)</span>
+    <span class="hljs-type">InstructionKind</span> = <span class="hljs-keyword">enum</span>
+      goNorth = <span class="hljs-string">&quot;N&quot;</span>, goEast = <span class="hljs-string">&quot;E&quot;</span>, goSouth = <span class="hljs-string">&quot;S&quot;</span>, goWest = <span class="hljs-string">&quot;W&quot;</span>,
+      goForward = <span class="hljs-string">&quot;F&quot;</span>, rotLeft = <span class="hljs-string">&quot;L&quot;</span>, rotRight = <span class="hljs-string">&quot;R&quot;</span>
+      <span class="hljs-comment">## here I am breaking from naming convention of enums</span>
+    <span class="hljs-type">Instruction</span> = <span class="hljs-keyword">object</span>
+      kind: <span class="hljs-type">InstructionKind</span>
+      val: <span class="hljs-built_in">int</span>
+
+nbText: <span class="hljs-string">&quot;template will be useful between example and input and also for part2&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span> ship: <span class="hljs-type">Ship</span>
+  <span class="hljs-keyword">template</span> resetShip =
+    ship.pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+    ship.dir = (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+  resetShip
+
+nbText: <span class="hljs-string">&quot;no need to come up with fancy names. `parse` is fine.&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>] =
+    <span class="hljs-keyword">var</span> instr: <span class="hljs-type">Instruction</span>
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      instr.kind = parseEnum[<span class="hljs-type">InstructionKind</span>](line[<span class="hljs-number">0.</span>.<span class="hljs-number">0</span>])
+      instr.val = parseInt(line[<span class="hljs-number">1</span> .. ^<span class="hljs-number">1</span>])
+      <span class="hljs-literal">result</span>.add instr
+
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;F10
+N3
+F7
+R90
+F11&quot;&quot;&quot;</span>
+
+  <span class="hljs-keyword">echo</span> parse example
+
+nbText: <span class="hljs-string">&quot;my set of functions for Vec2, I will support only left rotation...&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> `+`(v,w: <span class="hljs-type">Vec2</span>): <span class="hljs-type">Vec2</span> = (v.x + w.x, v.y + w.y)
+  <span class="hljs-keyword">func</span> `*`(s: <span class="hljs-built_in">int</span>, v: <span class="hljs-type">Vec2</span>): <span class="hljs-type">Vec2</span> = (s*v.x, s*v.y)
+  <span class="hljs-keyword">func</span> rotL(v: <span class="hljs-type">Vec2</span>, deg: <span class="hljs-built_in">int</span>): <span class="hljs-type">Vec2</span> =
+    <span class="hljs-keyword">case</span> deg:
+      <span class="hljs-keyword">of</span> <span class="hljs-number">180</span>, -<span class="hljs-number">180</span>:
+        (-v.x, -v.y)
+      <span class="hljs-keyword">of</span> <span class="hljs-number">90</span>, -<span class="hljs-number">270</span>:
+        (-v.y, v.x) <span class="hljs-comment">## (1, 0) -&gt; (0, 1) -&gt; (-1, 0)</span>
+      <span class="hljs-keyword">of</span> -<span class="hljs-number">90</span>, <span class="hljs-number">270</span>:
+        (v.y, -v.x) <span class="hljs-comment">## (1, 0) -&gt; (0, -1) -&gt; (-1, 0)</span>
+      <span class="hljs-keyword">else</span>:
+        debugEcho <span class="hljs-string">&quot;ERROR not supported&quot;</span>
+        (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">template</span> `+=`(a, b: <span class="hljs-built_in">untyped</span>) =
+    a = a + b
+
+  <span class="hljs-keyword">func</span> manhattan(ship: <span class="hljs-type">Ship</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-comment">## I could do it for a Vec2 but I will use it only for the ship, so...</span>
+    abs(ship.pos.x) + abs(ship.pos.y)
+
+nbText: <span class="hljs-string">&quot;heart of the solution is this, rather straightforward now:&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> move(ship: <span class="hljs-keyword">var</span> <span class="hljs-type">Ship</span>, instr: <span class="hljs-type">Instruction</span>) =
+    <span class="hljs-keyword">case</span> instr.kind:
+      <span class="hljs-keyword">of</span> goForward:
+        ship.pos += instr.val*ship.dir
+      <span class="hljs-keyword">of</span> goNorth:
+        ship.pos += instr.val*(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+      <span class="hljs-keyword">of</span> goEast:
+        ship.pos += instr.val*(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">of</span> goSouth:
+        ship.pos += instr.val*(<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)
+      <span class="hljs-keyword">of</span> goWest:
+        ship.pos += instr.val*(-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">of</span> rotLeft:
+        ship.dir = ship.dir.rotL(instr.val)
+      <span class="hljs-keyword">of</span> rotRight:
+        ship.dir = ship.dir.rotL(-instr.val)
+
+nbText: <span class="hljs-string">&quot;Let's move according to example instructions, printing out in case I need to debug&quot;</span>
+nbCode:
+  <span class="hljs-keyword">echo</span> ship
+  <span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(example):
+    ship.move instr
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;-&gt; &quot;</span>, instr
+    <span class="hljs-keyword">echo</span> ship
+
+  <span class="hljs-keyword">echo</span> manhattan ship <span class="hljs-comment">## 25</span>
+
+nbText: <span class="hljs-string">&quot;all good, now the input!&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input12.txt&quot;</span>.readFile
+
+  resetShip
+  <span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(input):
+    ship.move instr
+
+  <span class="hljs-keyword">echo</span> manhattan ship  <span class="hljs-comment">## 1601</span>
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;### Part2</span><span class="hljs-meta">\n</span><span class="hljs-string">I just add a waypoint var and add overload for `move`:&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span> waypoint: <span class="hljs-type">Vec2</span>
+  <span class="hljs-keyword">template</span> resetWaypoint =
+    waypoint = (<span class="hljs-number">10</span>, <span class="hljs-number">1</span>)
+  resetWaypoint
+
+  <span class="hljs-keyword">proc</span> move(ship: <span class="hljs-keyword">var</span> <span class="hljs-type">Ship</span>, waypoint: <span class="hljs-keyword">var</span> <span class="hljs-type">Vec2</span>, instr: <span class="hljs-type">Instruction</span>) =
+    <span class="hljs-keyword">case</span> instr.kind:
+      <span class="hljs-keyword">of</span> goForward:
+        ship.pos += instr.val*waypoint
+      <span class="hljs-keyword">of</span> goNorth:
+        waypoint += instr.val*(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+      <span class="hljs-keyword">of</span> goEast:
+        waypoint += instr.val*(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">of</span> goSouth:
+        waypoint += instr.val*(<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)
+      <span class="hljs-keyword">of</span> goWest:
+        waypoint += instr.val*(-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">of</span> rotLeft:
+        waypoint = waypoint.rotL(instr.val)
+      <span class="hljs-keyword">of</span> rotRight:
+        waypoint = waypoint.rotL(-instr.val)
+
+  resetShip
+  <span class="hljs-keyword">echo</span> ship
+  <span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(example):
+    ship.move(waypoint, instr)
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;W: &quot;</span>, waypoint
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;-&gt; &quot;</span>, instr
+    <span class="hljs-keyword">echo</span> ship
+
+  <span class="hljs-keyword">echo</span> manhattan ship
+
+  resetShip
+  resetWaypoint
+  <span class="hljs-keyword">for</span> instr <span class="hljs-keyword">in</span> parse(input):
+    ship.move(waypoint, instr)
+
+  <span class="hljs-keyword">echo</span> manhattan ship
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+I was a bit nervous about this day 12 since last two years day 12 is where
+I started to lag behind.
+Instead it was a piece of cake :cake: and my fastest :zap: submission with no bugs :beetle:.
+
+I probably am becoming a little better at this, but I do have a feeling like
+this year is slightly easier, maybe Eric is cutting us some slack because of, you know, 2020...
+
+Of course I will regret just saying this tomorrow and the next days... :scream:
+&quot;&quot;&quot;</span>.emojize
+<span class="hljs-comment"># the only error I got today was when compiling after the nimib version:</span>
+<span class="hljs-comment"># the usual error on parsing the example (forgot to dedent the multiline)</span>
+nbSave
+<span class="hljs-comment"># I probably should add to nimib something like the following:</span>
+<span class="hljs-comment">#[
+nbSaveCode # saves a nim file with just code
+nbAddCodeSource # adds to context the content of code blocks (it should be then made available from html for easier extraction)
+# in particular all code snippets should have easy pasting of code and you should also have a complete pasting for the whole code snippets
+]#</span></code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

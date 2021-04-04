@@ -8,4 +8,5 @@ Starting from day01:
 - [X] keep custom head but remove highlight.js
 - [X] fix the home link in nimib header (is not relatve link or it is not finding the correct project folder?)
 - [X] github log for dark mode
-- [ ] ...
+- [X] apply to all days (using new feature -d:nimibCustomPostInit)
+

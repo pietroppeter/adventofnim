@@ -1,63 +1,86 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2020\day11.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day11.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day11.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h2>2020, Day 11: Seating System</h2>
 <p>standard day with a grid. Highlights:</p>
 <ul>
 <li>a clean refactoring after part1 to solve part2</li>
 <li>ran into an expected issue when copying a sequence inside a proc (fixed with Orc, see: <a href="https://forum.nim-lang.org/t/7241">forum</a>)</li>
 </ul>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   strutils, nimoji
 
-when defined(gcOrc):
-  echo "using Orc :japanese_ogre:".emojize</code></pre>
+<span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc):
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;using Orc :japanese_ogre:&quot;</span>.emojize</code></pre>
 <pre><samp>using Orc 👹</samp></pre>
 <p>First we parse and show the example grid.</p>
-<pre><code class="nim">type
-  SeatGridKind = enum
-    sgFloor = ".", sgEmpty = "L", sgOccupied = "#"
-  SeatGrid = object
-    data: seq[SeatGridKind]
-    ncols: int
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">SeatGridKind</span> = <span class="hljs-keyword">enum</span>
+    sgFloor = <span class="hljs-string">&quot;.&quot;</span>, sgEmpty = <span class="hljs-string">&quot;L&quot;</span>, sgOccupied = <span class="hljs-string">&quot;#&quot;</span>
+  <span class="hljs-type">SeatGrid</span> = <span class="hljs-keyword">object</span>
+    data: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SeatGridKind</span>]
+    ncols: <span class="hljs-built_in">int</span>
 
-let example = """L.LL.LL.LL
+<span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;L.LL.LL.LL
 LLLLLLL.LL
 L.L.L..L..
 LLLL.LL.LL
@@ -66,42 +89,42 @@ L.LLLLL.LL
 ..L.L.....
 LLLLLLLLLL
 L.LLLLLL.L
-L.LLLLL.LL""".replace(
-    "\c", "")
-proc parse(text: string): SeatGrid =
-  for i, c in text:
-    case c
-    of '.':
-      result.data.add sgFloor
-    of 'L':
-      result.data.add sgEmpty
-    of '\n':
-      if result.ncols == 0:
-        result.ncols = result.data.len
-      elif result.data.len mod result.ncols != 0:
-        echo "ERROR expect same number of columns ", i, " ", c
-    else:
-      echo "ERROR cannot parse ", i, " ", c
+L.LLLLL.LL&quot;&quot;&quot;</span>.replace(
+    <span class="hljs-string">&quot;</span><span class="hljs-meta">\c</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+<span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">SeatGrid</span> =
+  <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> text:
+    <span class="hljs-keyword">case</span> c
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'.'</span>:
+      <span class="hljs-literal">result</span>.data.add sgFloor
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'L'</span>:
+      <span class="hljs-literal">result</span>.data.add sgEmpty
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'\n'</span>:
+      <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span>.ncols == <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span>.ncols = <span class="hljs-literal">result</span>.data.len
+      <span class="hljs-keyword">elif</span> <span class="hljs-literal">result</span>.data.len <span class="hljs-keyword">mod</span> <span class="hljs-literal">result</span>.ncols != <span class="hljs-number">0</span>:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR expect same number of columns &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR cannot parse &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
 
-proc `$`(g: SeatGrid): string =
-  for i, d in g.data:
-    result.add:
-      case d
-      of sgFloor:
-        "."
-      of sgEmpty:
-        "L"
-      of sgOccupied:
-        "#"
-    if (i + 1) mod g.ncols == 0:
-      result.add "\n"
+<span class="hljs-keyword">proc</span> `$`(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-keyword">for</span> i, d <span class="hljs-keyword">in</span> g.data:
+    <span class="hljs-literal">result</span>.add:
+      <span class="hljs-keyword">case</span> d
+      <span class="hljs-keyword">of</span> sgFloor:
+        <span class="hljs-string">&quot;.&quot;</span>
+      <span class="hljs-keyword">of</span> sgEmpty:
+        <span class="hljs-string">&quot;L&quot;</span>
+      <span class="hljs-keyword">of</span> sgOccupied:
+        <span class="hljs-string">&quot;#&quot;</span>
+    <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols == <span class="hljs-number">0</span>:
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
 
-var exGrid = parse example
-echo exGrid
-func nrows(g: SeatGrid): int =
-  g.data.len div g.ncols
+<span class="hljs-keyword">var</span> exGrid = parse example
+<span class="hljs-keyword">echo</span> exGrid
+<span class="hljs-keyword">func</span> nrows(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+  g.data.len <span class="hljs-keyword">div</span> g.ncols
 
-echo exGrid.nrows</code></pre>
+<span class="hljs-keyword">echo</span> exGrid.nrows</code></pre>
 <pre><samp>L.LL.LL.LL
 LLLLLLL.LL
 L.L.L..L..
@@ -115,68 +138,68 @@ L.LLLLL.LL
 
 10</samp></pre>
 <p>now we define a function to get adjacent indices. In part 2 we refactored this to use a <code>dir</code> function:</p>
-<pre><code class="nim">when defined(part1):
-  iterator adjIdx(i: int; g: SeatGrid): int =
-    if i >= g.ncols:
-      yield i - g.ncols      ## up
-    if i >= g.ncols and (i + 1) mod g.ncols != 0:
-      yield i - g.ncols + 1  ## up-right
-    if (i + 1) mod g.ncols != 0:
-      yield i + 1            ## right
-    if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len:
-      yield i + g.ncols + 1  ## right-down
-    if (i + g.ncols) < g.data.len:
-      yield i + g.ncols      ## down
-    if (i + g.ncols) < g.data.len and i mod g.ncols != 0:
-      yield i + g.ncols - 1  ## down-left
-    if i mod g.ncols != 0:
-      yield i - 1            ## left
-    if i mod g.ncols != 0 and i >= g.ncols:
-      yield i - g.ncols - 1  ## left-up
+<pre><code class="nim hljs"><span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(part1):
+  <span class="hljs-keyword">iterator</span> adjIdx(i: <span class="hljs-built_in">int</span>; g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">if</span> i &gt;= g.ncols:
+      <span class="hljs-keyword">yield</span> i - g.ncols      <span class="hljs-comment">## up</span>
+    <span class="hljs-keyword">if</span> i &gt;= g.ncols <span class="hljs-keyword">and</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">yield</span> i - g.ncols + <span class="hljs-number">1</span>  <span class="hljs-comment">## up-right</span>
+    <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">yield</span> i + <span class="hljs-number">1</span>            <span class="hljs-comment">## right</span>
+    <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (i + g.ncols) &lt; g.data.len:
+      <span class="hljs-keyword">yield</span> i + g.ncols + <span class="hljs-number">1</span>  <span class="hljs-comment">## right-down</span>
+    <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len:
+      <span class="hljs-keyword">yield</span> i + g.ncols      <span class="hljs-comment">## down</span>
+    <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len <span class="hljs-keyword">and</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">yield</span> i + g.ncols - <span class="hljs-number">1</span>  <span class="hljs-comment">## down-left</span>
+    <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">yield</span> i - <span class="hljs-number">1</span>            <span class="hljs-comment">## left</span>
+    <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i &gt;= g.ncols:
+      <span class="hljs-keyword">yield</span> i - g.ncols - <span class="hljs-number">1</span>  <span class="hljs-comment">## left-up</span>
   
-else:
-  type
-    Direction = enum
+<span class="hljs-keyword">else</span>:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Direction</span> = <span class="hljs-keyword">enum</span>
       up, upright, right, rightdown, down, downleft, left, leftup
-  func dir(i: int; d: Direction; g: SeatGrid): (bool, int) =
-    result = (false, i)
-    case d
-    of up:
-      if i >= g.ncols:
-        result = (true, i - g.ncols) ## up
-    of upright:
-      if i >= g.ncols and (i + 1) mod g.ncols != 0:
-        result = (true, i - g.ncols + 1) ## up-right
-    of right:
-      if (i + 1) mod g.ncols != 0:
-        result = (true, i + 1) ## right
-    of rightdown:
-      if (i + 1) mod g.ncols != 0 and (i + g.ncols) < g.data.len:
-        result = (true, i + g.ncols + 1) ## right-down
-    of down:
-      if (i + g.ncols) < g.data.len:
-        result = (true, i + g.ncols) ## down
-    of downleft:
-      if (i + g.ncols) < g.data.len and i mod g.ncols != 0:
-        result = (true, i + g.ncols - 1) ## down-left
-    of left:
-      if i mod g.ncols != 0:
-        result = (true, i - 1) ## left
-    of leftup:
-      if i mod g.ncols != 0 and i >= g.ncols:
-        result = (true, i - g.ncols - 1) ## left-up
+  <span class="hljs-keyword">func</span> dir(i: <span class="hljs-built_in">int</span>; d: <span class="hljs-type">Direction</span>; g: <span class="hljs-type">SeatGrid</span>): (<span class="hljs-built_in">bool</span>, <span class="hljs-built_in">int</span>) =
+    <span class="hljs-literal">result</span> = (<span class="hljs-literal">false</span>, i)
+    <span class="hljs-keyword">case</span> d
+    <span class="hljs-keyword">of</span> up:
+      <span class="hljs-keyword">if</span> i &gt;= g.ncols:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols) <span class="hljs-comment">## up</span>
+    <span class="hljs-keyword">of</span> upright:
+      <span class="hljs-keyword">if</span> i &gt;= g.ncols <span class="hljs-keyword">and</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols + <span class="hljs-number">1</span>) <span class="hljs-comment">## up-right</span>
+    <span class="hljs-keyword">of</span> right:
+      <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + <span class="hljs-number">1</span>) <span class="hljs-comment">## right</span>
+    <span class="hljs-keyword">of</span> rightdown:
+      <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (i + g.ncols) &lt; g.data.len:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols + <span class="hljs-number">1</span>) <span class="hljs-comment">## right-down</span>
+    <span class="hljs-keyword">of</span> down:
+      <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols) <span class="hljs-comment">## down</span>
+    <span class="hljs-keyword">of</span> downleft:
+      <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len <span class="hljs-keyword">and</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols - <span class="hljs-number">1</span>) <span class="hljs-comment">## down-left</span>
+    <span class="hljs-keyword">of</span> left:
+      <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - <span class="hljs-number">1</span>) <span class="hljs-comment">## left</span>
+    <span class="hljs-keyword">of</span> leftup:
+      <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i &gt;= g.ncols:
+        <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols - <span class="hljs-number">1</span>) <span class="hljs-comment">## left-up</span>
   
-  iterator adjIdx(i: int; g: SeatGrid): int =
-    var r = (false, 0)
-    for d in Direction:
+  <span class="hljs-keyword">iterator</span> adjIdx(i: <span class="hljs-built_in">int</span>; g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">var</span> r = (<span class="hljs-literal">false</span>, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> <span class="hljs-type">Direction</span>:
       r = dir(i, d, g)
-      if r[0]:
-        yield r[1]
+      <span class="hljs-keyword">if</span> r[<span class="hljs-number">0</span>]:
+        <span class="hljs-keyword">yield</span> r[<span class="hljs-number">1</span>]
 
-for i in [0, 5, 9, 40, 45, 49, 90, 95, 99]:
-  echo "adjIdx ", i
-  for j in adjIdx(i, exGrid):
-    echo "  ", j</code></pre>
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">9</span>, <span class="hljs-number">40</span>, <span class="hljs-number">45</span>, <span class="hljs-number">49</span>, <span class="hljs-number">90</span>, <span class="hljs-number">95</span>, <span class="hljs-number">99</span>]:
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;adjIdx &quot;</span>, i
+  <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> adjIdx(i, exGrid):
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;  &quot;</span>, j</code></pre>
 <pre><samp>adjIdx 0
   1
   11
@@ -227,43 +250,43 @@ adjIdx 99
   98
   88</samp></pre>
 <p>a <code>step</code> proc to solve part1. this is where I ran in the <em>issue</em></p>
-<pre><code class="nim">proc step(g: var SeatGrid): int =
-  when defined(gcOrc):
-    let data = g.data        ## snapshot of grid
-  else:
-    var data = g.data
-  var numOcc: int
-  for i in 0 .. g.data.high:
-    numOcc = 0
-    for j in adjIdx(i, g):
-      if data[j] == sgOccupied:
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> step(g: <span class="hljs-keyword">var</span> <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc):
+    <span class="hljs-keyword">let</span> data = g.data        <span class="hljs-comment">## snapshot of grid</span>
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-keyword">var</span> data = g.data
+  <span class="hljs-keyword">var</span> numOcc: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. g.data.<span class="hljs-keyword">high</span>:
+    numOcc = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> adjIdx(i, g):
+      <span class="hljs-keyword">if</span> data[j] == sgOccupied:
         inc numOcc
-    if data[i] == sgEmpty and numOcc == 0:
+    <span class="hljs-keyword">if</span> data[i] == sgEmpty <span class="hljs-keyword">and</span> numOcc == <span class="hljs-number">0</span>:
       g.data[i] = sgOccupied
-      inc result
-    elif data[i] == sgOccupied and numOcc >= 4:
+      inc <span class="hljs-literal">result</span>
+    <span class="hljs-keyword">elif</span> data[i] == sgOccupied <span class="hljs-keyword">and</span> numOcc &gt;= <span class="hljs-number">4</span>:
       g.data[i] = sgEmpty
-      inc result
+      inc <span class="hljs-literal">result</span>
 
-func countOcc(g: SeatGrid): int =
-  for s in g.data:
-    if s == sgOccupied:
-      inc result
+<span class="hljs-keyword">func</span> countOcc(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> g.data:
+    <span class="hljs-keyword">if</span> s == sgOccupied:
+      inc <span class="hljs-literal">result</span>
 
-var i = 1
-while step(exGrid) > 0:
-  echo "step: ", i
-  echo exGrid
+<span class="hljs-keyword">var</span> i = <span class="hljs-number">1</span>
+<span class="hljs-keyword">while</span> step(exGrid) &gt; <span class="hljs-number">0</span>:
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;step: &quot;</span>, i
+  <span class="hljs-keyword">echo</span> exGrid
   inc i
-echo "numOcc: ", countOcc(exGrid) ## 37
-let input = "2020/input11.txt".readFile.replace("\c", "")
-var inpGrid = parse input
-echo (inpGrid.ncols, inpGrid.nrows)
-i = 1
-while step(inpGrid) > 0:
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(exGrid) <span class="hljs-comment">## 37</span>
+<span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input11.txt&quot;</span>.readFile.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\c</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+<span class="hljs-keyword">var</span> inpGrid = parse input
+<span class="hljs-keyword">echo</span> (inpGrid.ncols, inpGrid.nrows)
+i = <span class="hljs-number">1</span>
+<span class="hljs-keyword">while</span> step(inpGrid) &gt; <span class="hljs-number">0</span>:
   inc i
-echo "stops at step: ", i    ## 98
-echo "numOcc: ", countOcc(inpGrid) ## 2334</code></pre>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;stops at step: &quot;</span>, i    <span class="hljs-comment">## 98</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(inpGrid) <span class="hljs-comment">## 2334</span></code></pre>
 <pre><samp>step: 1
 #.##.##.##
 #######.##
@@ -330,43 +353,43 @@ stops at step: 98
 numOcc: 2334</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <p>and a <code>step2</code> proc to solve part2</p>
-<pre><code class="nim">when not defined(part1):
-  echo "\n---Part2---\n"
-  proc step2(g: var SeatGrid): int =
-    when defined(gcOrc):
-      let data = g.data      ## snapshot of grid
-    else:
-      var data = g.data
-    var numOcc: int
-    var r = (false, 0)
-    for i in 0 .. g.data.high:
-      numOcc = 0
-      for d in Direction:
+<pre><code class="nim hljs"><span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">defined</span>(part1):
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-meta">---Part2---\n</span><span class="hljs-string">&quot;</span>
+  <span class="hljs-keyword">proc</span> step2(g: <span class="hljs-keyword">var</span> <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc):
+      <span class="hljs-keyword">let</span> data = g.data      <span class="hljs-comment">## snapshot of grid</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">var</span> data = g.data
+    <span class="hljs-keyword">var</span> numOcc: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">var</span> r = (<span class="hljs-literal">false</span>, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. g.data.<span class="hljs-keyword">high</span>:
+      numOcc = <span class="hljs-number">0</span>
+      <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> <span class="hljs-type">Direction</span>:
         r = dir(i, d, g)
-        while r[0] and data[r[1]] == sgFloor:
-          r = dir(r[1], d, g)
-        if r[0] and data[r[1]] == sgOccupied:
+        <span class="hljs-keyword">while</span> r[<span class="hljs-number">0</span>] <span class="hljs-keyword">and</span> data[r[<span class="hljs-number">1</span>]] == sgFloor:
+          r = dir(r[<span class="hljs-number">1</span>], d, g)
+        <span class="hljs-keyword">if</span> r[<span class="hljs-number">0</span>] <span class="hljs-keyword">and</span> data[r[<span class="hljs-number">1</span>]] == sgOccupied:
           inc numOcc
-      if data[i] == sgEmpty and numOcc == 0:
+      <span class="hljs-keyword">if</span> data[i] == sgEmpty <span class="hljs-keyword">and</span> numOcc == <span class="hljs-number">0</span>:
         g.data[i] = sgOccupied
-        inc result
-      elif data[i] == sgOccupied and numOcc >= 5:
+        inc <span class="hljs-literal">result</span>
+      <span class="hljs-keyword">elif</span> data[i] == sgOccupied <span class="hljs-keyword">and</span> numOcc &gt;= <span class="hljs-number">5</span>:
         g.data[i] = sgEmpty
-        inc result
+        inc <span class="hljs-literal">result</span>
 
-  i = 1
+  i = <span class="hljs-number">1</span>
   exGrid = parse example
-  while step2(exGrid) > 0:
-    echo "step: ", i
-    echo exGrid
+  <span class="hljs-keyword">while</span> step2(exGrid) &gt; <span class="hljs-number">0</span>:
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;step: &quot;</span>, i
+    <span class="hljs-keyword">echo</span> exGrid
     inc i
-  echo "numOcc: ", countOcc(exGrid) ## 26
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(exGrid) <span class="hljs-comment">## 26</span>
   inpGrid = parse input
-  i = 1
-  while step2(inpGrid) > 0:
+  i = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">while</span> step2(inpGrid) &gt; <span class="hljs-number">0</span>:
     inc i
-  echo "stops at step: ", i  ## 86
-  echo "numOcc: ", countOcc(inpGrid) ## 2100</code></pre>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;stops at step: &quot;</span>, i  <span class="hljs-comment">## 86</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(inpGrid) <span class="hljs-comment">## 2100</span></code></pre>
 <pre><samp>---Part2---
 
 step: 1
@@ -447,10 +470,250 @@ numOcc: 2100</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+nbInit
+nbText: <span class="hljs-string">&quot;## 2020, Day 11: Seating System&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;standard day with a grid. Highlights:
+* a clean refactoring after part1 to solve part2
+* ran into an expected issue when copying a sequence inside a proc (fixed with Orc, see: [forum](https://forum.nim-lang.org/t/7241))
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">import</span> strutils, nimoji
+
+  <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc):
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;using Orc :japanese_ogre:&quot;</span>.emojize
+
+nbText: <span class="hljs-string">&quot;First we parse and show the example grid.&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">SeatGridKind</span> = <span class="hljs-keyword">enum</span>
+      sgFloor = <span class="hljs-string">&quot;.&quot;</span>, sgEmpty = <span class="hljs-string">&quot;L&quot;</span>, sgOccupied = <span class="hljs-string">&quot;#&quot;</span>
+    <span class="hljs-type">SeatGrid</span> = <span class="hljs-keyword">object</span>
+      data: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SeatGridKind</span>]
+      ncols: <span class="hljs-built_in">int</span>
+
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL&quot;&quot;&quot;</span>.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\r</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)  <span class="hljs-comment"># I have had issues before (with the input)</span>
+
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">SeatGrid</span> =
+    <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> text:
+      <span class="hljs-keyword">case</span> c:
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'.'</span>:
+          <span class="hljs-literal">result</span>.data.add sgFloor
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'L'</span>:
+          <span class="hljs-literal">result</span>.data.add sgEmpty
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'\n'</span>:
+          <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span>.ncols == <span class="hljs-number">0</span>:
+            <span class="hljs-literal">result</span>.ncols = <span class="hljs-literal">result</span>.data.len
+          <span class="hljs-keyword">elif</span> <span class="hljs-literal">result</span>.data.len <span class="hljs-keyword">mod</span> <span class="hljs-literal">result</span>.ncols != <span class="hljs-number">0</span>:
+            <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR expect same number of columns &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR cannot parse &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
+
+  <span class="hljs-keyword">proc</span> `$`(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">string</span> =
+    <span class="hljs-keyword">for</span> i, d <span class="hljs-keyword">in</span> g.data:
+      <span class="hljs-literal">result</span>.add:
+        <span class="hljs-keyword">case</span> d:
+          <span class="hljs-keyword">of</span> sgFloor:
+            <span class="hljs-string">&quot;.&quot;</span>
+          <span class="hljs-keyword">of</span> sgEmpty:
+            <span class="hljs-string">&quot;L&quot;</span>
+          <span class="hljs-keyword">of</span> sgOccupied:
+            <span class="hljs-string">&quot;#&quot;</span>
+      <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols == <span class="hljs-number">0</span>:
+        <span class="hljs-literal">result</span>.add <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+
+  <span class="hljs-keyword">var</span> exGrid = parse example
+  <span class="hljs-keyword">echo</span> exGrid
+
+  <span class="hljs-keyword">func</span> nrows(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    g.data.len <span class="hljs-keyword">div</span> g.ncols
+
+  <span class="hljs-keyword">echo</span> exGrid.nrows <span class="hljs-comment"># 10</span>
+
+nbText: <span class="hljs-string">&quot;now we define a function to get adjacent indices. In part 2 we refactored this to use a `dir` function:&quot;</span>
+nbCode:
+  <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(part1):
+    <span class="hljs-keyword">iterator</span> adjIdx(i: <span class="hljs-built_in">int</span>, g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+      <span class="hljs-keyword">if</span> i &gt;= g.ncols: <span class="hljs-comment">## not first row</span>
+        <span class="hljs-keyword">yield</span> i - g.ncols <span class="hljs-comment">## up</span>
+      <span class="hljs-keyword">if</span> i &gt;= g.ncols <span class="hljs-keyword">and</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## .. and not last column</span>
+        <span class="hljs-keyword">yield</span> i - g.ncols + <span class="hljs-number">1</span> <span class="hljs-comment">## up-right</span>
+      <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## not last column</span>
+        <span class="hljs-keyword">yield</span> i + <span class="hljs-number">1</span> <span class="hljs-comment">## right</span>
+      <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (i + g.ncols) &lt; g.data.len: <span class="hljs-comment">## .. and not last row</span>
+        <span class="hljs-keyword">yield</span> i + g.ncols + <span class="hljs-number">1</span> <span class="hljs-comment">## right-down</span>
+      <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len: <span class="hljs-comment">## not last row</span>
+        <span class="hljs-keyword">yield</span> i + g.ncols <span class="hljs-comment">## down</span>
+      <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len <span class="hljs-keyword">and</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## .. and not first column</span>
+        <span class="hljs-keyword">yield</span> i + g.ncols - <span class="hljs-number">1</span> <span class="hljs-comment">## down-left</span>
+      <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## not first column</span>
+        <span class="hljs-keyword">yield</span> i - <span class="hljs-number">1</span> <span class="hljs-comment">## left</span>
+      <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i &gt;= g.ncols: <span class="hljs-comment">## .. and not first row</span>
+        <span class="hljs-keyword">yield</span> i - g.ncols - <span class="hljs-number">1</span> <span class="hljs-comment">## left-up</span>
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-comment"># refactor adjIdx for part2</span>
+    <span class="hljs-keyword">type</span> <span class="hljs-type">Direction</span> = <span class="hljs-keyword">enum</span>
+      up, upright, right, rightdown, down, downleft, left, leftup
+
+    <span class="hljs-keyword">func</span> dir(i: <span class="hljs-built_in">int</span>, d: <span class="hljs-type">Direction</span>, g: <span class="hljs-type">SeatGrid</span>): (<span class="hljs-built_in">bool</span>, <span class="hljs-built_in">int</span>) =
+      <span class="hljs-literal">result</span> = (<span class="hljs-literal">false</span>, i)
+      <span class="hljs-keyword">case</span> d:
+        <span class="hljs-keyword">of</span> up:
+          <span class="hljs-keyword">if</span> i &gt;= g.ncols: <span class="hljs-comment">## not first row</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols) <span class="hljs-comment">## up</span>
+        <span class="hljs-keyword">of</span> upright:
+          <span class="hljs-keyword">if</span> i &gt;= g.ncols <span class="hljs-keyword">and</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## .. and not last column</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols + <span class="hljs-number">1</span>) <span class="hljs-comment">## up-right</span>
+        <span class="hljs-keyword">of</span> right:
+          <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## not last column</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + <span class="hljs-number">1</span> ) <span class="hljs-comment">## right</span>
+        <span class="hljs-keyword">of</span> rightdown:
+          <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (i + g.ncols) &lt; g.data.len: <span class="hljs-comment">## .. and not last row</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols + <span class="hljs-number">1</span>) <span class="hljs-comment">## right-down</span>
+        <span class="hljs-keyword">of</span> down:
+          <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len: <span class="hljs-comment">## not last row</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols) <span class="hljs-comment">## down</span>
+        <span class="hljs-keyword">of</span> downleft:
+          <span class="hljs-keyword">if</span> (i + g.ncols) &lt; g.data.len <span class="hljs-keyword">and</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## .. and not first column</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i + g.ncols - <span class="hljs-number">1</span>) <span class="hljs-comment">## down-left</span>
+        <span class="hljs-keyword">of</span> left:
+          <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span>: <span class="hljs-comment">## not first column</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - <span class="hljs-number">1</span>) <span class="hljs-comment">## left</span>
+        <span class="hljs-keyword">of</span> leftup:
+          <span class="hljs-keyword">if</span> i <span class="hljs-keyword">mod</span> g.ncols != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> i &gt;= g.ncols: <span class="hljs-comment">## .. and not first row</span>
+            <span class="hljs-literal">result</span> = (<span class="hljs-literal">true</span>, i - g.ncols - <span class="hljs-number">1</span>) <span class="hljs-comment">## left-up</span>
+
+    <span class="hljs-keyword">iterator</span> adjIdx(i: <span class="hljs-built_in">int</span>, g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+      <span class="hljs-keyword">var</span> r = (<span class="hljs-literal">false</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> <span class="hljs-type">Direction</span>:
+        r = dir(i, d, g)
+        <span class="hljs-keyword">if</span> r[<span class="hljs-number">0</span>]:
+          <span class="hljs-keyword">yield</span> r[<span class="hljs-number">1</span>]
+
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0</span>, <span class="hljs-number">5</span>, <span class="hljs-number">9</span>, <span class="hljs-number">40</span>, <span class="hljs-number">45</span>, <span class="hljs-number">49</span>, <span class="hljs-number">90</span>, <span class="hljs-number">95</span>, <span class="hljs-number">99</span>]:
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;adjIdx &quot;</span>, i
+    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> adjIdx(i, exGrid):
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;  &quot;</span>, j
+
+nbText: <span class="hljs-string">&quot;a `step` proc to solve part1. this is where I ran in the _issue_&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> step(g: <span class="hljs-keyword">var</span> <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc): <span class="hljs-comment">## let data would not work with gcRefc see: https://forum.nim-lang.org/t/7241</span>
+      <span class="hljs-keyword">let</span> data = g.data <span class="hljs-comment">## snapshot of grid</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">var</span> data = g.data
+    <span class="hljs-keyword">var</span> numOcc: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. g.data.<span class="hljs-keyword">high</span>:
+      numOcc = <span class="hljs-number">0</span>
+      <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> adjIdx(i, g):
+        <span class="hljs-keyword">if</span> data[j] == sgOccupied:
+          inc numOcc
+      <span class="hljs-keyword">if</span> data[i] == sgEmpty <span class="hljs-keyword">and</span> numOcc == <span class="hljs-number">0</span>:
+        g.data[i] = sgOccupied
+        inc <span class="hljs-literal">result</span>
+      <span class="hljs-keyword">elif</span> data[i] == sgOccupied <span class="hljs-keyword">and</span> numOcc &gt;= <span class="hljs-number">4</span>:
+        g.data[i] = sgEmpty
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">func</span> countOcc(g: <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> g.data:
+      <span class="hljs-keyword">if</span> s == sgOccupied:
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">var</span> i = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">while</span> step(exGrid) &gt; <span class="hljs-number">0</span>:
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;step: &quot;</span>, i
+    <span class="hljs-keyword">echo</span> exGrid
+    inc i
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(exGrid) <span class="hljs-comment">## 37</span>
+
+  <span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input11.txt&quot;</span>.readFile.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\r</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)
+  <span class="hljs-keyword">var</span> inpGrid = parse input
+  <span class="hljs-keyword">echo</span> (inpGrid.ncols, inpGrid.nrows)
+  i = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">while</span> step(inpGrid) &gt; <span class="hljs-number">0</span>:
+    inc i
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;stops at step: &quot;</span>, i <span class="hljs-comment">## 98</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(inpGrid) <span class="hljs-comment">## 2334</span>
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;and a `step2` proc to solve part2&quot;</span>
+nbCode:
+  <span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">defined</span>(part1):
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-meta">---Part2---\n</span><span class="hljs-string">&quot;</span>
+
+    <span class="hljs-keyword">proc</span> step2(g: <span class="hljs-keyword">var</span> <span class="hljs-type">SeatGrid</span>): <span class="hljs-built_in">int</span> =
+      <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(gcOrc): <span class="hljs-comment">## let data would not work with gcRefc see: https://forum.nim-lang.org/t/7241</span>
+        <span class="hljs-keyword">let</span> data = g.data <span class="hljs-comment">## snapshot of grid</span>
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-keyword">var</span> data = g.data
+      <span class="hljs-keyword">var</span> numOcc: <span class="hljs-built_in">int</span>
+      <span class="hljs-keyword">var</span> r = (<span class="hljs-literal">false</span>, <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. g.data.<span class="hljs-keyword">high</span>:
+        numOcc = <span class="hljs-number">0</span>
+        <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> <span class="hljs-type">Direction</span>:
+          r = dir(i, d, g)
+          <span class="hljs-keyword">while</span> r[<span class="hljs-number">0</span>] <span class="hljs-keyword">and</span> data[r[<span class="hljs-number">1</span>]] == sgFloor:
+            r = dir(r[<span class="hljs-number">1</span>], d, g)
+          <span class="hljs-keyword">if</span> r[<span class="hljs-number">0</span>] <span class="hljs-keyword">and</span> data[r[<span class="hljs-number">1</span>]] == sgOccupied:
+            inc numOcc
+        <span class="hljs-keyword">if</span> data[i] == sgEmpty <span class="hljs-keyword">and</span> numOcc == <span class="hljs-number">0</span>:
+          g.data[i] = sgOccupied
+          inc <span class="hljs-literal">result</span>
+        <span class="hljs-keyword">elif</span> data[i] == sgOccupied <span class="hljs-keyword">and</span> numOcc &gt;= <span class="hljs-number">5</span>:
+          g.data[i] = sgEmpty
+          inc <span class="hljs-literal">result</span>
+
+    i = <span class="hljs-number">1</span>
+    exGrid = parse example
+    <span class="hljs-keyword">while</span> step2(exGrid) &gt; <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;step: &quot;</span>, i
+      <span class="hljs-keyword">echo</span> exGrid
+      inc i
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(exGrid) <span class="hljs-comment">## 26</span>
+
+    inpGrid = parse input
+    i = <span class="hljs-number">1</span>
+    <span class="hljs-keyword">while</span> step2(inpGrid) &gt; <span class="hljs-number">0</span>:
+      inc i
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;stops at step: &quot;</span>, i <span class="hljs-comment">## 86</span>
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;numOcc: &quot;</span>, countOcc(inpGrid) <span class="hljs-comment">## 2100</span>
+
+gotTheStar
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

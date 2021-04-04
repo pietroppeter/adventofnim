@@ -2,43 +2,66 @@
 <html lang="en-us">
 <head>
   <title>2020\day03.nim</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day03.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h1>--- Example ---</h1>
-<pre><code class="nim">let example = """..##.......
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;..##.......
 #...#...#..
 .#....#..#.
 ..#.#...#.#
@@ -48,8 +71,8 @@ em.star {
 .#........#
 #.##...#...
 #...##....#
-.#..#...#.#""".strip
-echo example</code></pre>
+.#..#...#.#&quot;&quot;&quot;</span>.strip
+<span class="hljs-keyword">echo</span> example</code></pre>
 <pre><samp>..##.......
 #...#...#..
 .#....#..#.
@@ -61,116 +84,116 @@ echo example</code></pre>
 #.##...#...
 #...##....#
 .#..#...#.#</samp></pre>
-<pre><code class="nim">type
-  StrideMap = object
-    data: seq[char]
-    stride: int
-    height: int
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">StrideMap</span> = <span class="hljs-keyword">object</span>
+    data: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">char</span>]
+    stride: <span class="hljs-built_in">int</span>
+    height: <span class="hljs-built_in">int</span>
 
-  Shape = tuple[stride, height: int]
-proc parse(text: string): StrideMap =
-  for line in text.splitLines:
-    inc result.height
-    result.data.add toSeq(line)
-    if result.stride > 0 and line.len != result.stride:
-      echo "ParseError: line does not matches stride"
-    result.stride = line.len
+  <span class="hljs-type">Shape</span> = <span class="hljs-keyword">tuple</span>[stride, height: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">StrideMap</span> =
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    inc <span class="hljs-literal">result</span>.height
+    <span class="hljs-literal">result</span>.data.add toSeq(line)
+    <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span>.stride &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> line.len != <span class="hljs-literal">result</span>.stride:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ParseError: line does not matches stride&quot;</span>
+    <span class="hljs-literal">result</span>.stride = line.len
 
-let map0 = parse example
-func shape(m: StrideMap): Shape =
+<span class="hljs-keyword">let</span> map0 = parse example
+<span class="hljs-keyword">func</span> shape(m: <span class="hljs-type">StrideMap</span>): <span class="hljs-type">Shape</span> =
   (m.stride, m.height)
 
-echo "shape:", map0.shape</code></pre>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;shape:&quot;</span>, map0.shape</code></pre>
 <pre><samp>shape:(stride: 11, height: 11)</samp></pre>
 <p>let's add coordinates:</p>
-<pre><code class="nim">type
-  Point = tuple[x, y: int]
-proc index(p: Point; m: StrideMap): int =
-  var x = p.x mod m.stride
-  if p.y >= m.height:
-    echo "ERROR: point too low!"
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Point</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">proc</span> index(p: <span class="hljs-type">Point</span>; m: <span class="hljs-type">StrideMap</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">var</span> x = p.x <span class="hljs-keyword">mod</span> m.stride
+  <span class="hljs-keyword">if</span> p.y &gt;= m.height:
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR: point too low!&quot;</span>
   x + p.y * m.stride
 
-proc `[]`(m: StrideMap; p: Point): char =
+<span class="hljs-keyword">proc</span> `[]`(m: <span class="hljs-type">StrideMap</span>; p: <span class="hljs-type">Point</span>): <span class="hljs-built_in">char</span> =
   m.data[p.index m]
 
-for p in [(3, 1), (6, 2)]:
-  echo p
-  echo "index: ", p.index(map0)
-  echo "on map: ", map0[p]</code></pre>
+<span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> [(<span class="hljs-number">3</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">2</span>)]:
+  <span class="hljs-keyword">echo</span> p
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;index: &quot;</span>, p.index(map0)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;on map: &quot;</span>, map0[p]</code></pre>
 <pre><samp>(3, 1)
 index: 14
 on map: .
 (6, 2)
 index: 28
 on map: #</samp></pre>
-<pre><code class="nim">type
-  Slope = tuple[dx, dy: int]
-  Path = seq[Point]
-  Ride = tuple[path: Path, ntrees: int]
-proc `+`(p: Point; s: Slope): Point =
-  result.x = p.x + s.dx
-  result.y = p.y + s.dy
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Slope</span> = <span class="hljs-keyword">tuple</span>[dx, dy: <span class="hljs-built_in">int</span>]
+  <span class="hljs-type">Path</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Point</span>]
+  <span class="hljs-type">Ride</span> = <span class="hljs-keyword">tuple</span>[path: <span class="hljs-type">Path</span>, ntrees: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">proc</span> `+`(p: <span class="hljs-type">Point</span>; s: <span class="hljs-type">Slope</span>): <span class="hljs-type">Point</span> =
+  <span class="hljs-literal">result</span>.x = p.x + s.dx
+  <span class="hljs-literal">result</span>.y = p.y + s.dy
 
-proc ride(m: StrideMap; s: Slope): Ride =
-  var p: Point
-  let ySteps = m.height div s.dy
-  for i in 1 ..< ySteps:
+<span class="hljs-keyword">proc</span> ride(m: <span class="hljs-type">StrideMap</span>; s: <span class="hljs-type">Slope</span>): <span class="hljs-type">Ride</span> =
+  <span class="hljs-keyword">var</span> p: <span class="hljs-type">Point</span>
+  <span class="hljs-keyword">let</span> ySteps = m.height <span class="hljs-keyword">div</span> s.dy
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> ..&lt; ySteps:
     p = p + s
-    result.path.add p
-    if m[p] == '#':
-      inc result.ntrees
+    <span class="hljs-literal">result</span>.path.add p
+    <span class="hljs-keyword">if</span> m[p] == <span class="hljs-string">'#'</span>:
+      inc <span class="hljs-literal">result</span>.ntrees
 
-let ride0 = ride(map0, (3, 1))
-echo "ntrees: ", ride0.ntrees</code></pre>
+<span class="hljs-keyword">let</span> ride0 = ride(map0, (<span class="hljs-number">3</span>, <span class="hljs-number">1</span>))
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ntrees: &quot;</span>, ride0.ntrees</code></pre>
 <pre><samp>ntrees: 7</samp></pre>
 <h2>--- Part 1 ---</h2>
 <p>now we are equipped to solve part1:</p>
-<pre><code class="nim">let
-  input = "2020/input03.txt".readFile
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span>
+  input = <span class="hljs-string">&quot;2020/input03.txt&quot;</span>.readFile
   map1 = parse input
-  ride1 = ride(map1, (3, 1))
-echo "part1: ", ride1.ntrees</code></pre>
+  ride1 = ride(map1, (<span class="hljs-number">3</span>, <span class="hljs-number">1</span>))
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, ride1.ntrees</code></pre>
 <pre><samp>part1: 205</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <h2>--- Part 2 ---</h2>
 <p>easy second part</p>
 <p>tricky last slope made me discover my implementation bug!</p>
 <p>now onto part2 on my puzzle input</p>
-<pre><code class="nim">part2 = 1
-for slope in slopes:
+<pre><code class="nim hljs">part2 = <span class="hljs-number">1</span>
+<span class="hljs-keyword">for</span> slope <span class="hljs-keyword">in</span> slopes:
   part2 *= ride(map1, slope).ntrees
-echo "part2: ", part2</code></pre>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, part2</code></pre>
 <pre><samp>part2: 3952146825</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <h1>Visualizations</h1>
 <p>I want to try to take advantage of the fact that I output html.</p>
 <p>I will reproduce the explantory design showing the ride through the example.</p>
-<pre><code class="nim">proc show(m: StrideMap; r: Ride; repeat = 6) =
-  var line = ""
-  var
-    i = 0
-    j = 0
-    p: Point = r.path[j]
-    c: char
-  for y in 0 ..< m.height:
-    for x in 0 ..< m.stride:
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> show(m: <span class="hljs-type">StrideMap</span>; r: <span class="hljs-type">Ride</span>; repeat = <span class="hljs-number">6</span>) =
+  <span class="hljs-keyword">var</span> line = <span class="hljs-string">&quot;&quot;</span>
+  <span class="hljs-keyword">var</span>
+    i = <span class="hljs-number">0</span>
+    j = <span class="hljs-number">0</span>
+    p: <span class="hljs-type">Point</span> = r.path[j]
+    c: <span class="hljs-built_in">char</span>
+  <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; m.height:
+    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; m.stride:
       line.add m.data[i]
       inc i
     line = line.repeat(repeat)
-    if y == p.y:
-      c = if m[p] == '.':
-        'O' else:
-        'X'
-      line = line[0 ..< p.x] & "<em>" & $c & "</em>" & line[p.x + 1 .. ^1]
+    <span class="hljs-keyword">if</span> y == p.y:
+      c = <span class="hljs-keyword">if</span> m[p] == <span class="hljs-string">'.'</span>:
+        <span class="hljs-string">'O'</span> <span class="hljs-keyword">else</span>:
+        <span class="hljs-string">'X'</span>
+      line = line[<span class="hljs-number">0</span> ..&lt; p.x] &amp; <span class="hljs-string">&quot;&lt;em&gt;&quot;</span> &amp; $c &amp; <span class="hljs-string">&quot;&lt;/em&gt;&quot;</span> &amp; line[p.x + <span class="hljs-number">1</span> .. ^<span class="hljs-number">1</span>]
       inc j
-      if j < r.path.len:
+      <span class="hljs-keyword">if</span> j &lt; r.path.len:
         p = r.path[j]
-    echo line
-    line = ""
+    <span class="hljs-keyword">echo</span> line
+    line = <span class="hljs-string">&quot;&quot;</span>
 
 show(map0, ride0)
-echo map1.shape</code></pre>
+<span class="hljs-keyword">echo</span> map1.shape</code></pre>
 <pre><samp>..##.........##.........##.........##.........##.........##.......
 #..<em>O</em>#...#..#...#...#..#...#...#..#...#...#..#...#...#..#...#...#..
 .#....<em>X</em>..#..#....#..#..#....#..#..#....#..#..#....#..#..#....#..#.
@@ -185,10 +208,183 @@ echo map1.shape</code></pre>
 (stride: 31, height: 323)</samp></pre>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+
+nbInit
+
+nbText: <span class="hljs-string">&quot;# --- Example ---&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;
+..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#&quot;&quot;&quot;</span>.strip
+  <span class="hljs-keyword">echo</span> example
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">StrideMap</span> = <span class="hljs-keyword">object</span>
+      data: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">char</span>]
+      stride: <span class="hljs-built_in">int</span>
+      height: <span class="hljs-built_in">int</span>
+    <span class="hljs-type">Shape</span> = <span class="hljs-keyword">tuple</span>[stride, height: <span class="hljs-built_in">int</span>]
+
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">StrideMap</span> =
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      inc <span class="hljs-literal">result</span>.height
+      <span class="hljs-literal">result</span>.data.add toSeq(line)
+      <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span>.stride &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> line.len != <span class="hljs-literal">result</span>.stride:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ParseError: line does not matches stride&quot;</span>
+      <span class="hljs-literal">result</span>.stride = line.len
+  
+  <span class="hljs-keyword">let</span> map0 = parse example
+  <span class="hljs-keyword">func</span> shape(m: <span class="hljs-type">StrideMap</span>): <span class="hljs-type">Shape</span> = (m.stride, m.height)
+  
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;shape:&quot;</span>, map0.shape
+
+nbText: <span class="hljs-string">&quot;let's add coordinates:&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Point</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+  <span class="hljs-keyword">proc</span> index(p: <span class="hljs-type">Point</span>, m: <span class="hljs-type">StrideMap</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">var</span> x = p.x <span class="hljs-keyword">mod</span> m.stride
+    <span class="hljs-keyword">if</span> p.y &gt;= m.height: <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR: point too low!&quot;</span>
+    x + p.y*m.stride
+
+  <span class="hljs-keyword">proc</span> `[]`(m: <span class="hljs-type">StrideMap</span>, p: <span class="hljs-type">Point</span>): <span class="hljs-built_in">char</span> =
+    m.data[p.index m]
+
+  <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> [(<span class="hljs-number">3</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">2</span>)]:
+    <span class="hljs-keyword">echo</span> p
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;index: &quot;</span>, p.index(map0)
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;on map: &quot;</span>, map0[p]
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Slope</span> = <span class="hljs-keyword">tuple</span>[dx, dy: <span class="hljs-built_in">int</span>]
+    <span class="hljs-type">Path</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Point</span>]
+    <span class="hljs-type">Ride</span> = <span class="hljs-keyword">tuple</span>[path: <span class="hljs-type">Path</span>, ntrees: <span class="hljs-built_in">int</span>]
+  
+  <span class="hljs-keyword">proc</span> `+`(p: <span class="hljs-type">Point</span>, s: <span class="hljs-type">Slope</span>): <span class="hljs-type">Point</span> =
+    <span class="hljs-literal">result</span>.x = p.x + s.dx
+    <span class="hljs-literal">result</span>.y = p.y + s.dy
+
+  <span class="hljs-keyword">proc</span> ride(m: <span class="hljs-type">StrideMap</span>, s: <span class="hljs-type">Slope</span>): <span class="hljs-type">Ride</span> =
+    <span class="hljs-keyword">var</span> p: <span class="hljs-type">Point</span>
+    <span class="hljs-keyword">let</span> ySteps = m.height <span class="hljs-keyword">div</span> s.dy  <span class="hljs-comment"># this part I forgot on first round</span>
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> ..&lt; ySteps:
+      p = p + s
+      <span class="hljs-literal">result</span>.path.add p
+      <span class="hljs-keyword">if</span> m[p] == <span class="hljs-string">'#'</span>:
+        inc <span class="hljs-literal">result</span>.ntrees
+  
+  <span class="hljs-keyword">let</span> ride0 = ride(map0, (<span class="hljs-number">3</span>, <span class="hljs-number">1</span>))
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ntrees: &quot;</span>, ride0.ntrees  <span class="hljs-comment"># expect 7</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;## --- Part 1 ---
+now we are equipped to solve part1:&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span>
+    input = <span class="hljs-string">&quot;2020/input03.txt&quot;</span>.readFile
+    map1 = parse input
+    ride1 = ride(map1, (<span class="hljs-number">3</span>, <span class="hljs-number">1</span>))
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, ride1.ntrees
+    
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;## --- Part 2 ---
+easy second part&quot;&quot;&quot;</span>
+
+<span class="hljs-keyword">template</span> nbNone(body: <span class="hljs-built_in">untyped</span>) = body
+
+nbNone:
+  <span class="hljs-keyword">let</span> slopes = [(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">3</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">7</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)]
+  <span class="hljs-keyword">var</span>
+    ntrees2: <span class="hljs-built_in">int</span>
+    part2 = <span class="hljs-number">1</span>
+  <span class="hljs-comment"># Example first, I expect: 2, 7, 3, 4, and 2. Total: 336</span>
+  <span class="hljs-keyword">for</span> slope <span class="hljs-keyword">in</span> slopes:
+    <span class="hljs-keyword">echo</span> slope
+    ntrees2 = ride(map0, slope).ntrees
+    <span class="hljs-keyword">echo</span> ntrees2
+    part2 *= ntrees2
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(example): &quot;</span>, part2
+
+nbText: <span class="hljs-string">&quot;tricky last slope made me discover my implementation bug!&quot;</span>
+nbText: <span class="hljs-string">&quot;now onto part2 on my puzzle input&quot;</span>
+
+nbCode:
+  part2 = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">for</span> slope <span class="hljs-keyword">in</span> slopes:
+    part2 *= ride(map1, slope).ntrees
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, part2
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;# Visualizations&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;I want to try to take advantage of the fact that I output html.
+
+I will reproduce the explantory design showing the ride through the example.
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">proc</span> show(m: <span class="hljs-type">StrideMap</span>, r: <span class="hljs-type">Ride</span>, repeat=<span class="hljs-number">6</span>) =
+    <span class="hljs-keyword">var</span> line = <span class="hljs-string">&quot;&quot;</span>
+    <span class="hljs-keyword">var</span>
+      i = <span class="hljs-number">0</span>
+      j = <span class="hljs-number">0</span>
+      p: <span class="hljs-type">Point</span> = r.path[j]
+      c: <span class="hljs-built_in">char</span>
+    <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; m.height:
+      <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; m.stride:
+        line.add m.data[i]
+        inc i
+
+      line = line.repeat(repeat)
+      <span class="hljs-keyword">if</span> y == p.y:
+        c = <span class="hljs-keyword">if</span> m[p] == <span class="hljs-string">'.'</span>: <span class="hljs-string">'O'</span> <span class="hljs-keyword">else</span>: <span class="hljs-string">'X'</span>
+        line = line[<span class="hljs-number">0</span> ..&lt; p.x] &amp; <span class="hljs-string">&quot;&lt;em&gt;&quot;</span> &amp; $c &amp; <span class="hljs-string">&quot;&lt;/em&gt;&quot;</span> &amp; line[p.x + <span class="hljs-number">1</span> .. ^<span class="hljs-number">1</span>]
+        inc j
+        <span class="hljs-keyword">if</span> j &lt; r.path.len:
+          p = r.path[j]
+      <span class="hljs-keyword">echo</span> line
+      line = <span class="hljs-string">&quot;&quot;</span>
+  show(map0, ride0)
+  <span class="hljs-keyword">echo</span> map1.shape
+<span class="hljs-comment"># hey: nbBlock is not available! I need to inject it!!</span>
+<span class="hljs-comment"># nbBlock.output = &quot;&lt;span style=\&quot;\&quot;&gt;&quot; &amp; nbBlock.output &amp; &quot;&lt;/span&gt;&quot;</span>
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

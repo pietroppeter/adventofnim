@@ -67,22 +67,22 @@ section#source {
 <ul>
 <li>2020
 <ul>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day01.html">day01.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day02.html">day02.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day03.html">day03.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day04.html">day04.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day05.html">day05.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day06.html">day06.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day07.html">day07.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day08.html">day08.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day09.html">day09.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day10hints.html">day10hints.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day11.html">day11.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day12.html">day12.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day13.html">day13.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day14.html">day14.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day15.html">day15.html</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/2020/day17.html">day17.html</a></li>
+<li><a href="2020/day01.html">day01.html</a></li>
+<li><a href="2020/day02.html">day02.html</a></li>
+<li><a href="2020/day03.html">day03.html</a></li>
+<li><a href="2020/day04.html">day04.html</a></li>
+<li><a href="2020/day05.html">day05.html</a></li>
+<li><a href="2020/day06.html">day06.html</a></li>
+<li><a href="2020/day07.html">day07.html</a></li>
+<li><a href="2020/day08.html">day08.html</a></li>
+<li><a href="2020/day09.html">day09.html</a></li>
+<li><a href="2020/day10hints.html">day10hints.html</a></li>
+<li><a href="2020/day11.html">day11.html</a></li>
+<li><a href="2020/day12.html">day12.html</a></li>
+<li><a href="2020/day13.html">day13.html</a></li>
+<li><a href="2020/day14.html">day14.html</a></li>
+<li><a href="2020/day15.html">day15.html</a></li>
+<li><a href="2020/day17.html">day17.html</a></li>
 </ul>
 </li>
 </ul>
@@ -90,11 +90,6 @@ section#source {
 <ul>
 <li>generate README.md and index.html: <code>nim r index</code></li>
 <li>regenerate also all html documents: <code>nim -d:regendoc r index</code></li>
-</ul>
-<hr />
-<ul>
-<li><a href="https://github.com/pietroppeter/adventofnim/">repo</a></li>
-<li><a href="https://pietroppeter.github.io/adventofnim/">docs</a></li>
 </ul>
 
 </main>
@@ -112,11 +107,8 @@ section#source {
   <span class="hljs-keyword">import</span> osproc
 
 nbInit
-nbDoc.darkMode
+
 nbDoc.title = <span class="hljs-string">&quot;:christmas_tree::crown:&quot;</span>.emojize
-<span class="hljs-keyword">let</span>
-  docs = <span class="hljs-string">&quot;https://pietroppeter.github.io/adventofnim/&quot;</span>
-  repo = <span class="hljs-string">&quot;https://github.com/pietroppeter/adventofnim/&quot;</span>
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;
 # :christmas_tree::crown: adventofnim
@@ -130,7 +122,7 @@ current content ([home](index.html)):&quot;&quot;&quot;</span>.emojize
 <span class="hljs-keyword">var</span> content = <span class="hljs-string">&quot;* 2020</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
 <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> walkFiles(<span class="hljs-string">&quot;2020/*.html&quot;</span>):
   <span class="hljs-keyword">let</span> g = f.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\\</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>)
-  content &amp;= &amp;<span class="hljs-string">&quot;  - [{g[5 .. ^1]}]({docs}{g})</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+  content &amp;= &amp;<span class="hljs-string">&quot;  - [{g[5 .. ^1]}]({g})</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
   <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
     <span class="hljs-keyword">let</span> cmd = <span class="hljs-string">&quot;nim r &quot;</span> &amp; changeFileExt(g, <span class="hljs-string">&quot;nim&quot;</span>)
     <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;exec: &quot;</span>, cmd
@@ -145,14 +137,7 @@ how to:
 
 * generate README.md and index.html: `nim r index`
 * regenerate also all html documents: `nim -d:regendoc r index`
-&quot;&quot;&quot;</span>
-
-nbText: &amp;<span class="hljs-string">&quot;&quot;&quot;
----
-
-* [repo]({repo})
-* [docs]({docs})
-&quot;&quot;&quot;</span>
+&quot;&quot;&quot;</span> <span class="hljs-comment"># use also -d:release since day15 can take a while in debug mode</span>
 
 nbSave
 nbDoc.filename = <span class="hljs-string">&quot;README.md&quot;</span>
