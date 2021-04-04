@@ -1,147 +1,170 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2020\day14.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day14.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day14.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h2>2020, Day 14: Docking Data 🚢 💽</h2>
 <p>Today was an opportunity to learn more about <a href="https://nim-lang.org/docs/bitops.html">bitops</a>.</p>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   bitops, tables, algorithm, math, strscans, strutils</code></pre>
 <p>For part 1 I first make sure I can parse the mask. <code>floating</code> field is a result of refactoring for part 2.</p>
-<pre><code class="nim">type
-  Mask = object
-    ones: int
-    zeros: int
-    floating: seq[int]
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Mask</span> = <span class="hljs-keyword">object</span>
+    ones: <span class="hljs-built_in">int</span>
+    zeros: <span class="hljs-built_in">int</span>
+    floating: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
 
-  Memory = Table[int, int]
-var
-  mem: Memory
-  mask: Mask
-proc parseMask(text: string): Mask =
-  for i, c in text.reversed:
-    case c
-    of '0':
-      result.zeros += 2 ^ i
-    of '1':
-      result.ones += 2 ^ i
-    of 'X':
-      result.floating.add i
-    else:
-      echo "ERROR unexpected character in mask string: ", i, " ", c
+  <span class="hljs-type">Memory</span> = <span class="hljs-type">Table</span>[<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">var</span>
+  mem: <span class="hljs-type">Memory</span>
+  mask: <span class="hljs-type">Mask</span>
+<span class="hljs-keyword">proc</span> parseMask(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Mask</span> =
+  <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> text.reversed:
+    <span class="hljs-keyword">case</span> c
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'0'</span>:
+      <span class="hljs-literal">result</span>.zeros += <span class="hljs-number">2</span> ^ i
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'1'</span>:
+      <span class="hljs-literal">result</span>.ones += <span class="hljs-number">2</span> ^ i
+    <span class="hljs-keyword">of</span> <span class="hljs-string">'X'</span>:
+      <span class="hljs-literal">result</span>.floating.add i
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR unexpected character in mask string: &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
 
-func apply(n: int; m: Mask): int =
-  result = n
-  setMask[int](result, m.ones)
-  clearMask[int](result, m.zeros)
+<span class="hljs-keyword">func</span> apply(n: <span class="hljs-built_in">int</span>; m: <span class="hljs-type">Mask</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-literal">result</span> = n
+  setMask[<span class="hljs-built_in">int</span>](<span class="hljs-literal">result</span>, m.ones)
+  clearMask[<span class="hljs-built_in">int</span>](<span class="hljs-literal">result</span>, m.zeros)
 
-mask = parseMask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X"
-echo mask
-echo 11.apply(mask)          ## 73
-echo 101.apply(mask)</code></pre>
+mask = parseMask <span class="hljs-string">&quot;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X&quot;</span>
+<span class="hljs-keyword">echo</span> mask
+<span class="hljs-keyword">echo</span> <span class="hljs-number">11.</span>apply(mask)          <span class="hljs-comment">## 73</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-number">101.</span>apply(mask)</code></pre>
 <pre><samp>(ones: 64, zeros: 2, floating: @[0, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35])
 73
 101</samp></pre>
 <p>Now let's parse full programming instructions with <code>startswith</code> and <code>scanf</code>.
 I gotta say that I tend to forget the syntax of object variants (<code>case kind: T</code> sounds pretty special).</p>
-<pre><code class="nim">type
-  Program = seq[Action]
-  ActionKind = enum
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Program</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Action</span>]
+  <span class="hljs-type">ActionKind</span> = <span class="hljs-keyword">enum</span>
     updateMask, writeMem
-  Action = object
-    case kind: ActionKind
-    of updateMask:
-        mask: Mask
+  <span class="hljs-type">Action</span> = <span class="hljs-keyword">object</span>
+    <span class="hljs-keyword">case</span> kind: <span class="hljs-type">ActionKind</span>
+    <span class="hljs-keyword">of</span> updateMask:
+        mask: <span class="hljs-type">Mask</span>
 
-    of writeMem:
-        address: int
-        value: int
+    <span class="hljs-keyword">of</span> writeMem:
+        address: <span class="hljs-built_in">int</span>
+        value: <span class="hljs-built_in">int</span>
 
   
-proc parse(text: string): Program =
-  var a: Action
-  for line in text.splitLines:
-    if line.startsWith("mask"):
+<span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Program</span> =
+  <span class="hljs-keyword">var</span> a: <span class="hljs-type">Action</span>
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    <span class="hljs-keyword">if</span> line.startsWith(<span class="hljs-string">&quot;mask&quot;</span>):
       a.kind = updateMask
-      a.mask = parseMask line[7 .. line.high]
-    elif line.startsWith("mem"):
+      a.mask = parseMask line[<span class="hljs-number">7</span> .. line.<span class="hljs-keyword">high</span>]
+    <span class="hljs-keyword">elif</span> line.startsWith(<span class="hljs-string">&quot;mem&quot;</span>):
       a.kind = writeMem
-      if not scanf(line, "mem[$i] = $i", a.address, a.value):
-        echo "ERROR parsing writeMem: ", line
-    else:
-      echo "ERROR parsing line: ", line
-    result.add a
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;mem[$i] = $i&quot;</span>, a.address, a.value):
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing writeMem: &quot;</span>, line
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing line: &quot;</span>, line
+    <span class="hljs-literal">result</span>.add a
 
-let example = """mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
+<span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
 mem[8] = 11
 mem[7] = 101
-mem[8] = 0"""
-let exProg = parse example
-echo $exProg</code></pre>
+mem[8] = 0&quot;&quot;&quot;</span>
+<span class="hljs-keyword">let</span> exProg = parse example
+<span class="hljs-keyword">echo</span> $exProg</code></pre>
 <pre><samp>@[(kind: updateMask, mask: (ones: 64, zeros: 2, floating: @[0, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35])), (kind: writeMem, address: 8, value: 11), (kind: writeMem, address: 7, value: 101), (kind: writeMem, address: 8, value: 0)]</samp></pre>
 <p>Last ingredient is the proc to run the Program on Cpu.</p>
-<pre><code class="nim">type
-  Cpu = object
-    mask: Mask
-    mem: Memory
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Cpu</span> = <span class="hljs-keyword">object</span>
+    mask: <span class="hljs-type">Mask</span>
+    mem: <span class="hljs-type">Memory</span>
 
-var cpu: Cpu
-template resetCpu() =
-  clear cpu.mem              ## no need to reset mask as it is update as first action in program
+<span class="hljs-keyword">var</span> cpu: <span class="hljs-type">Cpu</span>
+<span class="hljs-keyword">template</span> resetCpu() =
+  clear cpu.mem              <span class="hljs-comment">## no need to reset mask as it is update as first action in program</span>
   
-proc run(cpu: var Cpu; p: Program) =
-  for a in p:
-    case a.kind
-    of updateMask:
+<span class="hljs-keyword">proc</span> run(cpu: <span class="hljs-keyword">var</span> <span class="hljs-type">Cpu</span>; p: <span class="hljs-type">Program</span>) =
+  <span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> p:
+    <span class="hljs-keyword">case</span> a.kind
+    <span class="hljs-keyword">of</span> updateMask:
       cpu.mask = a.mask
-    of writeMem:
+    <span class="hljs-keyword">of</span> writeMem:
       cpu.mem[a.address] = a.value.apply(cpu.mask)
 
 cpu.run exProg
-echo cpu
-proc answer(cpu: Cpu): int =
-  for v in cpu.mem.values:
-    result += v
+<span class="hljs-keyword">echo</span> cpu
+<span class="hljs-keyword">proc</span> answer(cpu: <span class="hljs-type">Cpu</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cpu.mem.values:
+    <span class="hljs-literal">result</span> += v
 
-echo answer cpu
+<span class="hljs-keyword">echo</span> answer cpu
 resetCpu
-let inProg = parse "2020/input14.txt".readFile
+<span class="hljs-keyword">let</span> inProg = parse <span class="hljs-string">&quot;2020/input14.txt&quot;</span>.readFile
 cpu.run inProg
-echo answer cpu</code></pre>
+<span class="hljs-keyword">echo</span> answer cpu</code></pre>
 <pre><samp>(mask: (ones: 64, zeros: 2, floating: @[0, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]), mem: {7: 101, 8: 64})
 165
 14925946402938</samp></pre>
@@ -155,36 +178,36 @@ echo answer cpu</code></pre>
 </ul>
 <p>At one point I did consider coding a recursive iterator, but apparently that is not possible,
 see  <a href="https://forum.nim-lang.org/t/5697">forum</a>.</p>
-<pre><code class="nim">iterator zeroBits(s: seq[int]): seq[int] =
-  var m: int
-  var t: seq[int]
-  for n in 0 ..< 2 ^ (s.len):
+<pre><code class="nim hljs"><span class="hljs-keyword">iterator</span> zeroBits(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+  <span class="hljs-keyword">var</span> m: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">var</span> t: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+  <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; <span class="hljs-number">2</span> ^ (s.len):
     m = n
     t = @[]
-    for i in 0 .. s.high:
-      if m mod 2 == 0:
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. s.<span class="hljs-keyword">high</span>:
+      <span class="hljs-keyword">if</span> m <span class="hljs-keyword">mod</span> <span class="hljs-number">2</span> == <span class="hljs-number">0</span>:
         t.add s[i]
-      m = m shr 1
-    yield t
+      m = m <span class="hljs-keyword">shr</span> <span class="hljs-number">1</span>
+    <span class="hljs-keyword">yield</span> t
 
-for s in zeroBits(@[1, 3, 5]):
-  echo s
-func apply2(a: int; m: Mask): seq[int] =
-  var b = a
-  setMask[int](b, m.ones)
-  ## I ignore zeros part of the mask
-                         ## floating: loop over all possible combinations
-  for zeroBits in zeroBits(m.floating):
-    var c = b
-    for i in m.floating:
-      if i in zeroBits:
+<span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> zeroBits(@[<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]):
+  <span class="hljs-keyword">echo</span> s
+<span class="hljs-keyword">func</span> apply2(a: <span class="hljs-built_in">int</span>; m: <span class="hljs-type">Mask</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+  <span class="hljs-keyword">var</span> b = a
+  setMask[<span class="hljs-built_in">int</span>](b, m.ones)
+  <span class="hljs-comment">## I ignore zeros part of the mask</span>
+                         <span class="hljs-comment">## floating: loop over all possible combinations</span>
+  <span class="hljs-keyword">for</span> zeroBits <span class="hljs-keyword">in</span> zeroBits(m.floating):
+    <span class="hljs-keyword">var</span> c = b
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> m.floating:
+      <span class="hljs-keyword">if</span> i <span class="hljs-keyword">in</span> zeroBits:
         c.clearBit(i)
-      else:
+      <span class="hljs-keyword">else</span>:
         c.setBit(i)
-    result.add c
+    <span class="hljs-literal">result</span>.add c
 
-let exMask = parseMask("000000000000000000000000000000X1001X")
-echo 42.apply2(exMask)</code></pre>
+<span class="hljs-keyword">let</span> exMask = parseMask(<span class="hljs-string">&quot;000000000000000000000000000000X1001X&quot;</span>)
+<span class="hljs-keyword">echo</span> <span class="hljs-number">42.</span>apply2(exMask)</code></pre>
 <pre><samp>@[1, 3, 5]
 @[3, 5]
 @[1, 5]
@@ -195,26 +218,218 @@ echo 42.apply2(exMask)</code></pre>
 @[]
 @[26, 27, 58, 59]</samp></pre>
 <p>looks good. let's apply directly to input without bothering about the example</p>
-<pre><code class="nim">proc run2(cpu: var Cpu; p: Program) =
-  for a in p:
-    case a.kind
-    of updateMask:
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> run2(cpu: <span class="hljs-keyword">var</span> <span class="hljs-type">Cpu</span>; p: <span class="hljs-type">Program</span>) =
+  <span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> p:
+    <span class="hljs-keyword">case</span> a.kind
+    <span class="hljs-keyword">of</span> updateMask:
       cpu.mask = a.mask
-    of writeMem:
-      for address in a.address.apply2(cpu.mask):
+    <span class="hljs-keyword">of</span> writeMem:
+      <span class="hljs-keyword">for</span> address <span class="hljs-keyword">in</span> a.address.apply2(cpu.mask):
         cpu.mem[address] = a.value
 
 resetCpu
 cpu.run2 inProg
-echo answer cpu</code></pre>
+<span class="hljs-keyword">echo</span> answer cpu</code></pre>
 <pre><samp>3706820676200</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu, nimoji
+
+nbInit
+nbText: <span class="hljs-string">&quot;&quot;&quot;## 2020, Day 14: Docking Data :ship: :minidisc:
+
+Today was an opportunity to learn more about [bitops](https://nim-lang.org/docs/bitops.html).
+&quot;&quot;&quot;</span>.emojize
+
+nbCode:
+  <span class="hljs-keyword">import</span> bitops, tables, algorithm, math, strscans, strutils
+
+nbText: <span class="hljs-string">&quot;For part 1 I first make sure I can parse the mask. `floating` field is a result of refactoring for part 2.&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Mask</span> = <span class="hljs-keyword">object</span>
+      ones: <span class="hljs-built_in">int</span>
+      zeros: <span class="hljs-built_in">int</span>
+      floating: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+    <span class="hljs-type">Memory</span> = <span class="hljs-type">Table</span>[<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>]
+  <span class="hljs-keyword">var</span>
+    mem: <span class="hljs-type">Memory</span>
+    mask: <span class="hljs-type">Mask</span>
+
+  <span class="hljs-keyword">proc</span> parseMask(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Mask</span> =
+    <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> text.reversed:
+      <span class="hljs-keyword">case</span> c:
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'0'</span>:
+          <span class="hljs-literal">result</span>.zeros += <span class="hljs-number">2</span>^i
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'1'</span>:
+          <span class="hljs-literal">result</span>.ones += <span class="hljs-number">2</span>^i
+        <span class="hljs-keyword">of</span> <span class="hljs-string">'X'</span>:
+          <span class="hljs-literal">result</span>.floating.add i
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR unexpected character in mask string: &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, c
+
+  <span class="hljs-keyword">func</span> apply(n: <span class="hljs-built_in">int</span>, m: <span class="hljs-type">Mask</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-literal">result</span> = n
+    setMask[<span class="hljs-built_in">int</span>](<span class="hljs-literal">result</span>, m.ones)
+    clearMask[<span class="hljs-built_in">int</span>](<span class="hljs-literal">result</span>, m.zeros)
+
+  mask = parseMask <span class="hljs-string">&quot;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X&quot;</span>
+  <span class="hljs-keyword">echo</span> mask
+  <span class="hljs-keyword">echo</span> <span class="hljs-number">11.</span>apply(mask) <span class="hljs-comment">## 73</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-number">101.</span>apply(mask) <span class="hljs-comment">## </span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;Now let's parse full programming instructions with `startswith` and `scanf`.
+I gotta say that I tend to forget the syntax of object variants (`case kind: T` sounds pretty special).
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Program</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Action</span>] <span class="hljs-comment"># Action can go after</span>
+    <span class="hljs-type">ActionKind</span> = <span class="hljs-keyword">enum</span> updateMask, writeMem <span class="hljs-comment"># ActionKind apparently not</span>
+    <span class="hljs-type">Action</span> = <span class="hljs-keyword">object</span>
+      <span class="hljs-keyword">case</span> kind: <span class="hljs-type">ActionKind</span>  <span class="hljs-comment"># I tend to forget the syntax </span>
+      <span class="hljs-keyword">of</span> updateMask:
+        mask: <span class="hljs-type">Mask</span>
+      <span class="hljs-keyword">of</span> writeMem:
+        address: <span class="hljs-built_in">int</span>
+        value: <span class="hljs-built_in">int</span>
+
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Program</span> =
+    <span class="hljs-keyword">var</span> a: <span class="hljs-type">Action</span>
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      <span class="hljs-keyword">if</span> line.startsWith(<span class="hljs-string">&quot;mask&quot;</span>):
+        a.kind = updateMask
+        <span class="hljs-comment">#01234567</span>
+        <span class="hljs-comment">#mask = X</span>
+        a.mask = parseMask line[<span class="hljs-number">7.</span>.line.<span class="hljs-keyword">high</span>]
+      <span class="hljs-keyword">elif</span> line.startsWith(<span class="hljs-string">&quot;mem&quot;</span>):
+        a.kind = writeMem
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;mem[$i] = $i&quot;</span>, a.address, a.value):
+          <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing writeMem: &quot;</span>, line
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing line: &quot;</span>, line
+      <span class="hljs-literal">result</span>.add a
+
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
+mem[8] = 11
+mem[7] = 101
+mem[8] = 0&quot;&quot;&quot;</span>
+  <span class="hljs-keyword">let</span> exProg = parse example
+  <span class="hljs-keyword">echo</span> $exProg
+
+nbText: <span class="hljs-string">&quot;Last ingredient is the proc to run the Program on Cpu.&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Cpu</span> = <span class="hljs-keyword">object</span>
+      mask: <span class="hljs-type">Mask</span>
+      mem: <span class="hljs-type">Memory</span>
+  <span class="hljs-keyword">var</span> cpu: <span class="hljs-type">Cpu</span>
+
+  <span class="hljs-keyword">template</span> resetCpu =
+    clear cpu.mem  <span class="hljs-comment">## no need to reset mask as it is update as first action in program</span>
+
+  <span class="hljs-keyword">proc</span> run(cpu: <span class="hljs-keyword">var</span> <span class="hljs-type">Cpu</span>, p: <span class="hljs-type">Program</span>) =
+    <span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> p:
+      <span class="hljs-keyword">case</span> a.kind:
+        <span class="hljs-keyword">of</span> updateMask:
+          cpu.mask = a.mask
+        <span class="hljs-keyword">of</span> writeMem:
+          cpu.mem[a.address] = a.value.apply(cpu.mask)
+
+  cpu.run exProg
+  <span class="hljs-keyword">echo</span> cpu
+  <span class="hljs-keyword">proc</span> answer(cpu: <span class="hljs-type">Cpu</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cpu.mem.values:
+      <span class="hljs-literal">result</span> += v
+
+  <span class="hljs-keyword">echo</span> answer cpu
+
+  resetCpu
+  <span class="hljs-keyword">let</span> inProg = parse <span class="hljs-string">&quot;2020/input14.txt&quot;</span>.readFile
+  cpu.run inProg
+  <span class="hljs-keyword">echo</span> answer cpu
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;for part 2:
+* after refactoring mask code to parse floating bits (done above)
+* `run2` proc below is straightforward
+* `apply2` is the part that creates multiple addresses starting from a single address and a mask
+* finally `zeroBits` is the key ingredient that generates all floating bits combinations.
+
+At one point I did consider coding a recursive iterator, but apparently that is not possible,
+see  [forum](https://forum.nim-lang.org/t/5697).
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">iterator</span> zeroBits(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+    <span class="hljs-keyword">var</span> m: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">var</span> t:<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.&lt;<span class="hljs-number">2</span>^(s.len):
+      m = n
+      t = @[]
+      <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.s.<span class="hljs-keyword">high</span>:
+        <span class="hljs-keyword">if</span> m <span class="hljs-keyword">mod</span> <span class="hljs-number">2</span> == <span class="hljs-number">0</span>:
+          t.add s[i]
+        m = m <span class="hljs-keyword">shr</span> <span class="hljs-number">1</span>
+      <span class="hljs-keyword">yield</span> t
+
+  <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> zeroBits(@[<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">5</span>]):
+    <span class="hljs-keyword">echo</span> s
+
+  <span class="hljs-keyword">func</span> apply2(a: <span class="hljs-built_in">int</span>, m: <span class="hljs-type">Mask</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+    <span class="hljs-keyword">var</span> b = a
+    setMask[<span class="hljs-built_in">int</span>](b, m.ones)
+    <span class="hljs-comment">## I ignore zeros part of the mask</span>
+    <span class="hljs-comment">## floating: loop over all possible combinations</span>
+    <span class="hljs-keyword">for</span> zeroBits <span class="hljs-keyword">in</span> zeroBits(m.floating):
+      <span class="hljs-keyword">var</span> c = b
+      <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> m.floating:
+        <span class="hljs-keyword">if</span> i <span class="hljs-keyword">in</span> zeroBits:
+          c.clearBit(i)
+        <span class="hljs-keyword">else</span>:
+          c.setBit(i)
+      <span class="hljs-literal">result</span>.add c
+
+  <span class="hljs-keyword">let</span> exMask = parseMask(<span class="hljs-string">&quot;000000000000000000000000000000X1001X&quot;</span>)
+  <span class="hljs-keyword">echo</span> <span class="hljs-number">42.</span>apply2(exMask)
+
+nbText: <span class="hljs-string">&quot;looks good. let's apply directly to input without bothering about the example&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> run2(cpu: <span class="hljs-keyword">var</span> <span class="hljs-type">Cpu</span>, p: <span class="hljs-type">Program</span>) =
+    <span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> p:
+      <span class="hljs-keyword">case</span> a.kind:
+        <span class="hljs-keyword">of</span> updateMask:
+          cpu.mask = a.mask
+        <span class="hljs-keyword">of</span> writeMem:
+          <span class="hljs-keyword">for</span> address <span class="hljs-keyword">in</span> a.address.apply2(cpu.mask):
+            cpu.mem[address] = a.value
+
+  resetCpu
+  cpu.run2 inProg
+  <span class="hljs-keyword">echo</span> answer cpu
+
+gotTheStar
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

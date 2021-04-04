@@ -1,6 +1,7 @@
 import nimib, animu
 
 nbInit
+include alldays
 
 nbText: """# --- Day 4: Passport Processing ---
 

@@ -2,52 +2,75 @@
 <html lang="en-us">
 <head>
   <title>2020\day02.nim</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day02.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h1>--- Day 2: Password Philosophy ---</h1>
 <p>from <a href="https://adventofcode.com/2020/day/2">original text</a></p>
 <p>a list (your puzzle input) of <em>passwords</em>
 (according to the corrupted database) and
 <em>the corporate policy when that password was set</em>.</p>
 <p>For example, suppose you have the following list:</p>
-<pre><code class="nim">let example = """1-3 a: abcde
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;1-3 a: abcde
 1-3 b: cdefg
 2-9 c: ccccccccc
-"""
-echo example</code></pre>
+&quot;&quot;&quot;</span>
+<span class="hljs-keyword">echo</span> example</code></pre>
 <pre><samp>1-3 a: abcde
 1-3 b: cdefg
 2-9 c: ccccccccc</samp></pre>
@@ -67,61 +90,61 @@ both within the limits of their respective policies.</p>
 <p>something I love about Nim (wrt to my usual language Python)
 is that the first thing you do is structure your data (i.e. deciding types)
 and that is solving half of the problem.</p>
-<pre><code class="nim">type
-  Policy = object
-    min, max: Natural
-    ch: char
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Policy</span> = <span class="hljs-keyword">object</span>
+    min, max: <span class="hljs-type">Natural</span>
+    ch: <span class="hljs-built_in">char</span>
 
-  Row = tuple[policy: Policy, password: string]
-  Db = seq[Row]</code></pre>
+  <span class="hljs-type">Row</span> = <span class="hljs-keyword">tuple</span>[policy: <span class="hljs-type">Policy</span>, password: <span class="hljs-built_in">string</span>]
+  <span class="hljs-type">Db</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Row</span>]</code></pre>
 <p>and also that helps in naming.
 how do I call the parse function? well, <em>parse</em>!</p>
 <p>Do I want to extract parsing for the first row?
 easy and I do not have to pick a new name!</p>
-<pre><code class="nim">func parse(line: string): Row =
-  var
-    i, j: int
-    s, t: string
-  if not scanf(line, "$i-$i $w: $w", i, j, s, t):
-    debugEcho "error while parsing: " & line
-  if s.len != 1:
-    debugEcho "error in s.len. s: ", s, "; line: ", line
-  result.policy.min = i
-  result.policy.max = j
-  result.policy.ch = s[0]
-  result.password = t
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> parse(line: <span class="hljs-built_in">string</span>): <span class="hljs-type">Row</span> =
+  <span class="hljs-keyword">var</span>
+    i, j: <span class="hljs-built_in">int</span>
+    s, t: <span class="hljs-built_in">string</span>
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;$i-$i $w: $w&quot;</span>, i, j, s, t):
+    debugEcho <span class="hljs-string">&quot;error while parsing: &quot;</span> &amp; line
+  <span class="hljs-keyword">if</span> s.len != <span class="hljs-number">1</span>:
+    debugEcho <span class="hljs-string">&quot;error in s.len. s: &quot;</span>, s, <span class="hljs-string">&quot;; line: &quot;</span>, line
+  <span class="hljs-literal">result</span>.policy.min = i
+  <span class="hljs-literal">result</span>.policy.max = j
+  <span class="hljs-literal">result</span>.policy.ch = s[<span class="hljs-number">0</span>]
+  <span class="hljs-literal">result</span>.password = t
 
-proc parse(lines: seq[string]): Db =
-  for i, line in lines:
-    result.add parse(line)</code></pre>
+<span class="hljs-keyword">proc</span> parse(lines: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-type">Db</span> =
+  <span class="hljs-keyword">for</span> i, line <span class="hljs-keyword">in</span> lines:
+    <span class="hljs-literal">result</span>.add parse(line)</code></pre>
 <p>Also I love the fact that strscans prevents me to learn regular expressions.</p>
 <p>Let's see how parsing work on base example:</p>
-<pre><code class="nim">echo (parse example.strip.splitLines).join("\n")</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> (parse example.strip.splitLines).join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)</code></pre>
 <pre><samp>(policy: (min: 1, max: 3, ch: 'a'), password: "abcde")
 (policy: (min: 1, max: 3, ch: 'b'), password: "cdefg")
 (policy: (min: 2, max: 9, ch: 'c'), password: "ccccccccc")</samp></pre>
 <p>ok, good. Now let's solve part1 (for this example)</p>
 <h2>part 1</h2>
-<pre><code class="nim">func isValid(r: Row): bool =
-  var count: int
-  for c in r.password:
-    if c == r.policy.ch:
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> isValid(r: <span class="hljs-type">Row</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">var</span> count: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> r.password:
+    <span class="hljs-keyword">if</span> c == r.policy.ch:
       inc count
-  if count >= r.policy.min and count <= r.policy.max:
-    true
-  else:
-    false
+  <span class="hljs-keyword">if</span> count &gt;= r.policy.min <span class="hljs-keyword">and</span> count &lt;= r.policy.max:
+    <span class="hljs-literal">true</span>
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-literal">false</span>
 
-func part1(input: string): int =
-  for row in parse(input.strip.splitLines):
-    if row.isValid:
-      inc result
+<span class="hljs-keyword">func</span> part1(input: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> parse(input.strip.splitLines):
+    <span class="hljs-keyword">if</span> row.isValid:
+      inc <span class="hljs-literal">result</span>
 
-echo part1 example
-assert example.part1 == 2</code></pre>
+<span class="hljs-keyword">echo</span> part1 example
+<span class="hljs-keyword">assert</span> example.part1 == <span class="hljs-number">2</span></code></pre>
 <pre><samp>2</samp></pre>
 <p>now it's time to get the <em class="star">*</em>!</p>
-<pre><code class="nim">echo part1 "2020/input02.txt".readFile</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> part1 <span class="hljs-string">&quot;2020/input02.txt&quot;</span>.readFile</code></pre>
 <pre><samp>445</samp></pre>
 <p><em>ok, I did spend a bit of time debugging here, just to find out that I forgot to past content in file...</em></p>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
@@ -134,32 +157,202 @@ concept of &quot;index zero&quot;!)
 <em>Exactly one of these positions</em> must contain the given letter.
 Other occurrences of the letter are irrelevant
 for the purposes of policy enforcement.</p>
-<pre><code class="nim">func isValid2(r: Row): bool =
-  var count: int
-  if r.password[r.policy.min - 1] == r.policy.ch:
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> isValid2(r: <span class="hljs-type">Row</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">var</span> count: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">if</span> r.password[r.policy.min - <span class="hljs-number">1</span>] == r.policy.ch:
     inc count
-  if r.password[r.policy.max - 1] == r.policy.ch:
+  <span class="hljs-keyword">if</span> r.password[r.policy.max - <span class="hljs-number">1</span>] == r.policy.ch:
     inc count
-  count == 1
+  count == <span class="hljs-number">1</span>
 
-func part2(input: string): int =
-  for row in parse(input.strip.splitLines):
-    if row.isValid2:
-      inc result
+<span class="hljs-keyword">func</span> part2(input: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> parse(input.strip.splitLines):
+    <span class="hljs-keyword">if</span> row.isValid2:
+      inc <span class="hljs-literal">result</span>
 
-echo "example: ":
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;example: &quot;</span>:
   part2 example
-echo "part2: ":
-  part2 "2020/input02.txt".readFile</code></pre>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>:
+  part2 <span class="hljs-string">&quot;2020/input02.txt&quot;</span>.readFile</code></pre>
 <pre><samp>example: 1
 part2: 491</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+
+nbInit
+
+nbText: <span class="hljs-string">&quot;# --- Day 2: Password Philosophy ---&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;from [original text](https://adventofcode.com/2020/day/2)
+
+a list (your puzzle input) of _passwords_
+(according to the corrupted database) and
+_the corporate policy when that password was set_.
+
+For example, suppose you have the following list:
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc
+&quot;&quot;&quot;</span>
+  <span class="hljs-keyword">echo</span> example
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Each line gives the password policy and then the password.
+The password policy indicates the lowest and highest number of times
+a given letter must appear for the password to be valid.
+For example, 1-3 a means that the password must contain
+a at least 1 time and at most 3 times.
+
+In the above example, 2 passwords are valid.
+The middle password, cdefg, is not;
+it contains no instances of b, but needs at least 1.
+The first and third passwords are valid:
+  they contain one a or nine c,
+  both within the limits of their respective policies.
+
+_How many passwords are valid_ according to their policies?&quot;&quot;&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;## structure the data
+
+something I love about Nim (wrt to my usual language Python)
+is that the first thing you do is structure your data (i.e. deciding types)
+and that is solving half of the problem.
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Policy</span> = <span class="hljs-keyword">object</span>
+      min, max: <span class="hljs-type">Natural</span>
+      ch: <span class="hljs-built_in">char</span>
+    <span class="hljs-type">Row</span> = <span class="hljs-keyword">tuple</span>[policy: <span class="hljs-type">Policy</span>, password: <span class="hljs-built_in">string</span>]
+    <span class="hljs-type">Db</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-type">Row</span>]
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;and also that helps in naming.
+how do I call the parse function? well, _parse_!
+
+Do I want to extract parsing for the first row?
+easy and I do not have to pick a new name!
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">func</span> parse(line: <span class="hljs-built_in">string</span>): <span class="hljs-type">Row</span> =
+    <span class="hljs-keyword">var</span>
+      i, j: <span class="hljs-built_in">int</span>
+      s, t: <span class="hljs-built_in">string</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;$i-$i $w: $w&quot;</span>, i, j, s, t):
+      debugEcho <span class="hljs-string">&quot;error while parsing: &quot;</span> &amp; line
+    <span class="hljs-keyword">if</span> s.len != <span class="hljs-number">1</span>:
+      debugEcho <span class="hljs-string">&quot;error in s.len. s: &quot;</span>, s, <span class="hljs-string">&quot;; line: &quot;</span>, line
+    <span class="hljs-literal">result</span>.policy.min = i
+    <span class="hljs-literal">result</span>.policy.max = j
+    <span class="hljs-literal">result</span>.policy.ch = s[<span class="hljs-number">0</span>]
+    <span class="hljs-literal">result</span>.password = t
+
+  <span class="hljs-keyword">proc</span> parse(lines: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-type">Db</span> =
+    <span class="hljs-keyword">for</span> i, line <span class="hljs-keyword">in</span> lines:
+      <span class="hljs-literal">result</span>.add parse(line)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Also I love the fact that strscans prevents me to learn regular expressions.
+
+Let's see how parsing work on base example:
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">echo</span> (parse example.strip.splitLines).join(<span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+ok, good. Now let's solve part1 (for this example)
+
+## part 1
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">func</span> isValid(r: <span class="hljs-type">Row</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">var</span> count: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> r.password:
+      <span class="hljs-keyword">if</span> c == r.policy.ch:
+        inc count
+    <span class="hljs-keyword">if</span> count &gt;= r.policy.min <span class="hljs-keyword">and</span> count &lt;= r.policy.max:
+      <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-literal">false</span>
+
+  <span class="hljs-keyword">func</span> part1(input: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> parse(input.strip.splitLines):
+      <span class="hljs-keyword">if</span> row.isValid: inc <span class="hljs-literal">result</span>
+  
+  <span class="hljs-keyword">echo</span> part1 example
+  <span class="hljs-keyword">assert</span> example.part1 == <span class="hljs-number">2</span>
+
+nbText: &amp;<span class="hljs-string">&quot;now it's time to get the {star}!&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">echo</span> part1 <span class="hljs-string">&quot;2020/input02.txt&quot;</span>.readFile
+
+nbText: <span class="hljs-string">&quot;*ok, I did spend a bit of time debugging here, just to find out that I forgot to past content in file...*&quot;</span>
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;## --- Part 2 ---&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;from [original text](https://adventofcode.com/2020/day/2)
+
+Each policy actually describes _two positions in the password_,
+where 1 means the first character, 2 means the second character,
+and so on. (Be careful; Toboggan Corporate Policies have no
+concept of &quot;index zero&quot;!)
+_Exactly one of these positions_ must contain the given letter.
+Other occurrences of the letter are irrelevant
+for the purposes of policy enforcement.
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">func</span> isValid2(r: <span class="hljs-type">Row</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">var</span> count: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">if</span> r.password[r.policy.min - <span class="hljs-number">1</span>] == r.policy.ch:
+      inc count
+    <span class="hljs-keyword">if</span> r.password[r.policy.max - <span class="hljs-number">1</span>] == r.policy.ch:
+      inc count
+    count == <span class="hljs-number">1</span>
+
+  <span class="hljs-keyword">func</span> part2(input: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> parse(input.strip.splitLines):
+      <span class="hljs-keyword">if</span> row.isValid2: inc <span class="hljs-literal">result</span>
+  
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;example: &quot;</span>: part2 example
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>: part2 <span class="hljs-string">&quot;2020/input02.txt&quot;</span>.readFile
+
+gotTheStar
+
+<span class="hljs-comment"># You have completed Day 2!</span>
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

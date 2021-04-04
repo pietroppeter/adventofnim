@@ -1,42 +1,65 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2020\day13.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day13.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day13.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h2>2020, day 13: Shuttle Search 🔍 🚀</h2>
 <p>Today was another mathematical day and the main character was the
 <a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese Remainder Theorem</a> (CRT from now on).</p>
@@ -54,35 +77,35 @@ later upgrade to bigints if needed.</p>
 <p>In the end I found out that the solution was below <code>int.high</code> but my specific methods using Bézout's coefficients
 did ran into an overflow, so I just applied a quick patch without changing proc's signature.</p>
 <p>In the end I think that the solution with the sieve is the most elegant and practical, since it would not need this.</p>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   strutils, sequtils
 
-import
+<span class="hljs-keyword">import</span>
   sugar</code></pre>
 <p>part 1 was rather straightforward. I solved first for the example then wrapped that in a template
 and used it also to solve it for the real input. No reading from file this, just parsing directly in source and also very basic parsing.</p>
-<pre><code class="nim">template solve1() =
-  echo $buses                ## why nimsuggest complains when no $?
-  var id, wait, minWait: int
-  minWait = int.high
-  for bus in buses:
-    wait = bus - (timestamp mod bus)
-    echo bus, ": ", wait
-    if wait < minWait:
+<pre><code class="nim hljs"><span class="hljs-keyword">template</span> solve1() =
+  <span class="hljs-keyword">echo</span> $buses                <span class="hljs-comment">## why nimsuggest complains when no $?</span>
+  <span class="hljs-keyword">var</span> id, wait, minWait: <span class="hljs-built_in">int</span>
+  minWait = <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+  <span class="hljs-keyword">for</span> bus <span class="hljs-keyword">in</span> buses:
+    wait = bus - (timestamp <span class="hljs-keyword">mod</span> bus)
+    <span class="hljs-keyword">echo</span> bus, <span class="hljs-string">&quot;: &quot;</span>, wait
+    <span class="hljs-keyword">if</span> wait &lt; minWait:
       minWait = wait
       id = bus
-  echo (id, minWait, id * minWait)
+  <span class="hljs-keyword">echo</span> (id, minWait, id * minWait)
 
-block example:
-  let
-    timestamp = 939
-    buses = "7,13,x,x,59,x,31,19".replace(",x", "").split(",").map(parseInt)
+<span class="hljs-keyword">block</span> example:
+  <span class="hljs-keyword">let</span>
+    timestamp = <span class="hljs-number">939</span>
+    buses = <span class="hljs-string">&quot;7,13,x,x,59,x,31,19&quot;</span>.replace(<span class="hljs-string">&quot;,x&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).split(<span class="hljs-string">&quot;,&quot;</span>).map(parseInt)
   solve1
-block part1:
-  let
-    timestamp = 1003055
-    buses = "37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13".replace(
-        ",x", "").split(",").map(parseInt)
+<span class="hljs-keyword">block</span> part1:
+  <span class="hljs-keyword">let</span>
+    timestamp = <span class="hljs-number">1003055</span>
+    buses = <span class="hljs-string">&quot;37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13&quot;</span>.replace(
+        <span class="hljs-string">&quot;,x&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).split(<span class="hljs-string">&quot;,&quot;</span>).map(parseInt)
   solve1</code></pre>
 <pre><samp>@[7, 13, 59, 31, 19]
 7: 6
@@ -108,116 +131,116 @@ block part1:
 I do not think my <code>if</code> and <code>return</code> here do conform to
 <a href="https://gist.github.com/disruptek/6d0cd6774d05adaa894db4deb646fc1d#miscellaneous">disruptek's tips and tricks</a>.</p>
 <p>I did have some debugging to do, and Wikipedia's worked example was very useful</p>
-<pre><code class="nim">type
-  Eq = tuple[modulus, remainder: int]
-func extEuclid(n1, n2: int): (int, int, int) =
-  let (a, b) = if n1 > n2:
-    (n1, n2) else:
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Eq</span> = <span class="hljs-keyword">tuple</span>[modulus, remainder: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">func</span> extEuclid(n1, n2: <span class="hljs-built_in">int</span>): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
+  <span class="hljs-keyword">let</span> (a, b) = <span class="hljs-keyword">if</span> n1 &gt; n2:
+    (n1, n2) <span class="hljs-keyword">else</span>:
     (n2, n1)
-  var
+  <span class="hljs-keyword">var</span>
     r0 = a
     r1 = b
-    s0 = 1
-    s1 = 0
-    t0 = 0
-    t1 = 1
-    q1 = r0 div r1
+    s0 = <span class="hljs-number">1</span>
+    s1 = <span class="hljs-number">0</span>
+    t0 = <span class="hljs-number">0</span>
+    t1 = <span class="hljs-number">1</span>
+    q1 = r0 <span class="hljs-keyword">div</span> r1
     r2 = r0 - q1 * r1
     s2 = s0 - q1 * s1
     t2 = t0 - q1 * t1
-  when false:
+  <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>:
     dump (r0, r1, r2)
     dump q1
     dump (s0, s1, s2)
     dump (t0, t1, t2)
-  while r2 != 0:
-    when false:
-      debugecho "iterate:"
+  <span class="hljs-keyword">while</span> r2 != <span class="hljs-number">0</span>:
+    <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>:
+      debugecho <span class="hljs-string">&quot;iterate:&quot;</span>
     r0 = r1
     r1 = r2
     s0 = s1
     s1 = s2
     t0 = t1
     t1 = t2
-    q1 = r0 div r1
+    q1 = r0 <span class="hljs-keyword">div</span> r1
     r2 = r0 - q1 * r1
     s2 = s0 - q1 * s1
     t2 = t0 - q1 * t1
-    when false:
+    <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>:
       dump (r0, r1, r2)
       dump q1
       dump (s0, s1, s2)
       dump (t0, t1, t2)
-  return if n1 > n2:
-    (r1, s1, t1) else:
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> n1 &gt; n2:
+    (r1, s1, t1) <span class="hljs-keyword">else</span>:
     (r1, t1, s1)
 
-echo extEuclid(240, 46)      ## (2, -9, 47)</code></pre>
+<span class="hljs-keyword">echo</span> extEuclid(<span class="hljs-number">240</span>, <span class="hljs-number">46</span>)      <span class="hljs-comment">## (2, -9, 47)</span></code></pre>
 <pre><samp>(2, -9, 47)</samp></pre>
 <p>my CRT solution algorithm did ran into overflows and I applied a patch inside using bigints</p>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   bigints
 
-## why can it have side effects?
-proc crt(eqs: seq[Eq]): int =
-  if eqs.len == 1:
-    return eqs[0].remainder
-  if eqs.len == 2:
-    let
-      (n1, a1) = eqs[0]
-      (n2, a2) = eqs[1]
+<span class="hljs-comment">## why can it have side effects?</span>
+<span class="hljs-keyword">proc</span> crt(eqs: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Eq</span>]): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">if</span> eqs.len == <span class="hljs-number">1</span>:
+    <span class="hljs-keyword">return</span> eqs[<span class="hljs-number">0</span>].remainder
+  <span class="hljs-keyword">if</span> eqs.len == <span class="hljs-number">2</span>:
+    <span class="hljs-keyword">let</span>
+      (n1, a1) = eqs[<span class="hljs-number">0</span>]
+      (n2, a2) = eqs[<span class="hljs-number">1</span>]
       (gcd, m1, m2) = extEuclid(n1, n2)
-    if gcd != 1:
-      echo "ERROR n1, n2 not coprime: ", (n1, n2, gcd)
-    ## gives me overflow here but result is good for int64. let's just patch this part with bigints:
-    let
+    <span class="hljs-keyword">if</span> gcd != <span class="hljs-number">1</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR n1, n2 not coprime: &quot;</span>, (n1, n2, gcd)
+    <span class="hljs-comment">## gives me overflow here but result is good for int64. let's just patch this part with bigints:</span>
+    <span class="hljs-keyword">let</span>
       ba1 = a1.initBigInt
       bm2 = m2.initBigInt
       bn2 = n2.initBigInt
       ba2 = a2.initBigInt
       bm1 = m1.initBigInt
       bn1 = n1.initBigInt
-      bres = (ba1 * bm2 * bn2 + ba2 * bm1 * bn1) mod (bn1 * bn2)
-    result = parseInt($bres)
-    return result
-  let
-    a12 = crt(eqs[0 .. 1])
-    n12 = eqs[0].modulus * eqs[1].modulus
-  var eqs = @[(n12, a12)] & eqs[2 .. eqs.high]
-  return crt(eqs)
+      bres = (ba1 * bm2 * bn2 + ba2 * bm1 * bn1) <span class="hljs-keyword">mod</span> (bn1 * bn2)
+    <span class="hljs-literal">result</span> = parseInt($bres)
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">result</span>
+  <span class="hljs-keyword">let</span>
+    a12 = crt(eqs[<span class="hljs-number">0</span> .. <span class="hljs-number">1</span>])
+    n12 = eqs[<span class="hljs-number">0</span>].modulus * eqs[<span class="hljs-number">1</span>].modulus
+  <span class="hljs-keyword">var</span> eqs = @[(n12, a12)] &amp; eqs[<span class="hljs-number">2</span> .. eqs.<span class="hljs-keyword">high</span>]
+  <span class="hljs-keyword">return</span> crt(eqs)
 
-dump crt(@[(3, 2), (5, 3), (7, 2)]) ## from sun-tzu: 23
-dump crt(@[(3, 0), (4, 3), (5, 4)]) ## wiki: 39</code></pre>
+dump crt(@[(<span class="hljs-number">3</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">7</span>, <span class="hljs-number">2</span>)]) <span class="hljs-comment">## from sun-tzu: 23</span>
+dump crt(@[(<span class="hljs-number">3</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">4</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">4</span>)]) <span class="hljs-comment">## wiki: 39</span></code></pre>
 <pre><samp>crt(@[(3, 2), (5, 3), (7, 2)]) = 23
 crt(@[(3, 0), (4, 3), (5, 4)]) = 39</samp></pre>
 <p>Once I got both implementations right I applied to the example
 (first manually parsed than I wrote the parse which also preprocesses stuff).
 Of course here the good strategy is, while parsing, to keep track of position and add remainder to my data.</p>
-<pre><code class="nim">let
-  ## buses = "7,13,x,x,59,x,31,19"
-  example2 = @[(7, 0), (13, 13 - 1), (59, 59 - 4), (31, 31 - 6), (19, 19 - 7)]
-echo crt(example2)
-proc parse(text: string): seq[Eq] =
-  var i = 0
-  for n in text.split(","):
-    if n != "x":
-      result.add (parseInt(n), i)
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span>
+  <span class="hljs-comment">## buses = &quot;7,13,x,x,59,x,31,19&quot;</span>
+  example2 = @[(<span class="hljs-number">7</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">13</span>, <span class="hljs-number">13</span> - <span class="hljs-number">1</span>), (<span class="hljs-number">59</span>, <span class="hljs-number">59</span> - <span class="hljs-number">4</span>), (<span class="hljs-number">31</span>, <span class="hljs-number">31</span> - <span class="hljs-number">6</span>), (<span class="hljs-number">19</span>, <span class="hljs-number">19</span> - <span class="hljs-number">7</span>)]
+<span class="hljs-keyword">echo</span> crt(example2)
+<span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Eq</span>] =
+  <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> text.split(<span class="hljs-string">&quot;,&quot;</span>):
+    <span class="hljs-keyword">if</span> n != <span class="hljs-string">&quot;x&quot;</span>:
+      <span class="hljs-literal">result</span>.add (parseInt(n), i)
     inc i
-  for i in 1 .. result.high:
-    result[i][1] = result[i][0] - result[i][1]
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. <span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
+    <span class="hljs-literal">result</span>[i][<span class="hljs-number">1</span>] = <span class="hljs-literal">result</span>[i][<span class="hljs-number">0</span>] - <span class="hljs-literal">result</span>[i][<span class="hljs-number">1</span>]
 
-echo parse "7,13,x,x,59,x,31,19"</code></pre>
+<span class="hljs-keyword">echo</span> parse <span class="hljs-string">&quot;7,13,x,x,59,x,31,19&quot;</span></code></pre>
 <pre><samp>1068781
 @[(modulus: 7, remainder: 0), (modulus: 13, remainder: 12), (modulus: 59, remainder: 55), (modulus: 31, remainder: 25), (modulus: 19, remainder: 12)]</samp></pre>
 <p>to make sure at least the solution was below int.high I did print my expected upper bound. Ah, I did assume all modulus were coprime and I actually suspect they are all prime but did not check</p>
-<pre><code class="nim">let part2input = parse "37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13"
-echo part2input
-var n = 1
-for eq in part2input:
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> part2input = parse <span class="hljs-string">&quot;37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13&quot;</span>
+<span class="hljs-keyword">echo</span> part2input
+<span class="hljs-keyword">var</span> n = <span class="hljs-number">1</span>
+<span class="hljs-keyword">for</span> eq <span class="hljs-keyword">in</span> part2input:
   n *= eq.modulus
-  echo n
-echo int.high
-echo "part2: ", crt(part2input)</code></pre>
+  <span class="hljs-keyword">echo</span> n
+<span class="hljs-keyword">echo</span> <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, crt(part2input)</code></pre>
 <pre><samp>@[(modulus: 37, remainder: 0), (modulus: 41, remainder: 14), (modulus: 433, remainder: 396), (modulus: 23, remainder: -22), (modulus: 17, remainder: -37), (modulus: 19, remainder: -37), (modulus: 29, remainder: -37), (modulus: 593, remainder: 525), (modulus: 13, remainder: -68)]
 37
 1517
@@ -233,10 +256,223 @@ part2: 600691418730595</samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu, nimoji
+
+nbInit
+nbText: <span class="hljs-string">&quot;&quot;&quot;## 2020, day 13: Shuttle Search :mag: :rocket:
+
+Today was another mathematical day and the main character was the
+[Chinese Remainder Theorem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem) (CRT from now on).
+
+Even though the day was rather straightforward for everyone which was able to recall that,
+I find still very nice the fact that people could (and did) come up with very good solutions
+without knowing about CRT. In particular most people who did solved the problem without knowing about CRT
+did implement a very nice method to find solutions,
+[search by sieving](https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving).
+
+The CRT did click from me rightaway, so I did decide not to look for existing implementation
+and decided to use the coefficient given by Bézout's identity, that can be computed with
+[Extended Euclidean Algorithm](https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm).
+
+I also knew beforehand that I might run into overflow issues and I might need to use
+[bigints](https://github.com/def-/nim-bigints). I decided to first implement with standard `int`s and only
+later upgrade to bigints if needed.
+
+In the end I found out that the solution was below `int.high` but my specific methods using Bézout's coefficients
+did ran into an overflow, so I just applied a quick patch without changing proc's signature.
+
+In the end I think that the solution with the sieve is the most elegant and practical, since it would not need this.
+&quot;&quot;&quot;</span>.emojize
+
+nbCode:
+  <span class="hljs-keyword">import</span> strutils, sequtils
+  <span class="hljs-keyword">import</span> sugar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;part 1 was rather straightforward. I solved first for the example then wrapped that in a template
+and used it also to solve it for the real input. No reading from file this, just parsing directly in source and also very basic parsing.&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">template</span> solve1 =
+    <span class="hljs-keyword">echo</span> $buses <span class="hljs-comment">## why nimsuggest complains when no $?</span>
+    <span class="hljs-keyword">var</span>
+      id, wait, minWait: <span class="hljs-built_in">int</span>
+    minWait = <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+    <span class="hljs-keyword">for</span> bus <span class="hljs-keyword">in</span> buses:
+      wait = bus - (timestamp <span class="hljs-keyword">mod</span> bus)
+      <span class="hljs-keyword">echo</span> bus, <span class="hljs-string">&quot;: &quot;</span>, wait
+      <span class="hljs-keyword">if</span> wait &lt; minWait:
+        minWait = wait
+        id = bus
+    <span class="hljs-keyword">echo</span> (id, minWait, id*minWait)
+
+  <span class="hljs-keyword">block</span> example:
+    <span class="hljs-keyword">let</span>
+      timestamp = <span class="hljs-number">939</span>
+      buses = <span class="hljs-string">&quot;7,13,x,x,59,x,31,19&quot;</span>.replace(<span class="hljs-string">&quot;,x&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).split(<span class="hljs-string">&quot;,&quot;</span>).map(parseInt)
+    solve1
+  <span class="hljs-keyword">block</span> part1:
+    <span class="hljs-keyword">let</span>
+      timestamp = <span class="hljs-number">1003055</span>
+      buses = <span class="hljs-string">&quot;37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13&quot;</span>.replace(<span class="hljs-string">&quot;,x&quot;</span>, <span class="hljs-string">&quot;&quot;</span>).split(<span class="hljs-string">&quot;,&quot;</span>).map(parseInt)
+    solve1
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
+
+As mentioned I need Extended Euclidean Algorithm. I went with a rather straightforward implementation.
+I do not think my `if` and `return` here do conform to
+[disruptek's tips and tricks](https://gist.github.com/disruptek/6d0cd6774d05adaa894db4deb646fc1d#miscellaneous).
+
+I did have some debugging to do, and Wikipedia's worked example was very useful
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span> <span class="hljs-type">Eq</span> = <span class="hljs-keyword">tuple</span>[modulus, remainder: <span class="hljs-built_in">int</span>]
+
+  <span class="hljs-keyword">func</span> extEuclid(n1, n2: <span class="hljs-built_in">int</span>): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
+    <span class="hljs-keyword">let</span> (a,b) = <span class="hljs-keyword">if</span> n1 &gt; n2:
+        (n1, n2)
+      <span class="hljs-keyword">else</span>:
+        (n2, n1)
+    <span class="hljs-keyword">var</span>
+      <span class="hljs-comment"># intialize</span>
+      r0 = a
+      r1 = b
+      s0 = <span class="hljs-number">1</span>
+      s1 = <span class="hljs-number">0</span>
+      t0 = <span class="hljs-number">0</span>
+      t1 = <span class="hljs-number">1</span>
+      <span class="hljs-comment"># iterate</span>
+      q1 = r0 <span class="hljs-keyword">div</span> r1
+      r2 = r0 - q1*r1 <span class="hljs-comment"># = r0 mod r1</span>
+      s2 = s0 - q1*s1
+      t2 = t0 - q1*t1
+    <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>:
+      dump (r0, r1, r2)
+      dump q1
+      dump (s0, s1, s2)
+      dump (t0, t1, t2)
+    <span class="hljs-keyword">while</span> r2 != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>: debugecho <span class="hljs-string">&quot;iterate:&quot;</span>
+      <span class="hljs-comment"># shift</span>
+      r0 = r1
+      r1 = r2
+      s0 = s1
+      s1 = s2
+      t0 = t1
+      t1 = t2
+      <span class="hljs-comment"># iterate</span>
+      q1 = r0 <span class="hljs-keyword">div</span> r1
+      r2 = r0 - q1*r1 <span class="hljs-comment"># = r0 mod r1</span>
+      s2 = s0 - q1*s1
+      t2 = t0 - q1*t1
+      <span class="hljs-keyword">when</span> <span class="hljs-literal">false</span>:
+        dump (r0, r1, r2)
+        dump q1
+        dump (s0, s1, s2)
+        dump (t0, t1, t2)
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> n1 &gt; n2:
+        (r1, s1, t1)
+      <span class="hljs-keyword">else</span>:
+        (r1, t1, s1)
+
+  <span class="hljs-keyword">echo</span> extEuclid(<span class="hljs-number">240</span>, <span class="hljs-number">46</span>) <span class="hljs-comment">## (2, -9, 47)</span>
+
+nbText: <span class="hljs-string">&quot;my CRT solution algorithm did ran into overflows and I applied a patch inside using bigints&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">import</span> bigints
+  <span class="hljs-comment">## why can it have side effects?</span>
+  <span class="hljs-keyword">proc</span> crt(eqs: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Eq</span>]): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">if</span> eqs.len == <span class="hljs-number">1</span>:
+      <span class="hljs-keyword">return</span> eqs[<span class="hljs-number">0</span>].remainder
+    <span class="hljs-keyword">if</span> eqs.len == <span class="hljs-number">2</span>:
+      <span class="hljs-comment">#dump eqs</span>
+      <span class="hljs-keyword">let</span>
+        (n1, a1) = eqs[<span class="hljs-number">0</span>]
+        (n2, a2) = eqs[<span class="hljs-number">1</span>]
+        (gcd, m1, m2) = extEuclid(n1, n2)
+      <span class="hljs-keyword">if</span> gcd != <span class="hljs-number">1</span>:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR n1, n2 not coprime: &quot;</span>, (n1, n2, gcd)
+      <span class="hljs-comment">## gives me overflow here but result is good for int64. let's just patch this part with bigints:</span>
+      <span class="hljs-keyword">let</span>
+        ba1 = a1.initBigInt
+        bm2 = m2.initBigInt
+        bn2 = n2.initBigInt
+        ba2 = a2.initBigInt
+        bm1 = m1.initBigInt
+        bn1 = n1.initBigInt
+        bres = (ba1*bm2*bn2 + ba2*bm1*bn1) <span class="hljs-keyword">mod</span> (bn1*bn2)
+      <span class="hljs-literal">result</span> = parseInt($bres)
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">result</span>
+    <span class="hljs-keyword">let</span>
+      a12 = crt(eqs[<span class="hljs-number">0.</span>.<span class="hljs-number">1</span>])
+      n12 = eqs[<span class="hljs-number">0</span>].modulus*eqs[<span class="hljs-number">1</span>].modulus
+    <span class="hljs-comment">#dump (n12, a12)</span>
+    <span class="hljs-keyword">var</span> eqs = @[(n12, a12)] &amp; eqs[<span class="hljs-number">2</span> .. eqs.<span class="hljs-keyword">high</span>]
+    <span class="hljs-keyword">return</span> crt(eqs)
+
+  dump crt(@[(<span class="hljs-number">3</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">7</span>, <span class="hljs-number">2</span>)])  <span class="hljs-comment">## from sun-tzu: 23</span>
+  dump crt(@[(<span class="hljs-number">3</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">4</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">4</span>)])  <span class="hljs-comment">## wiki: 39</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;Once I got both implementations right I applied to the example
+(first manually parsed than I wrote the parse which also preprocesses stuff).
+Of course here the good strategy is, while parsing, to keep track of position and add remainder to my data.
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span>
+    <span class="hljs-comment">## buses = &quot;7,13,x,x,59,x,31,19&quot;</span>
+    example2 = @[(<span class="hljs-number">7</span>, <span class="hljs-number">0</span>),(<span class="hljs-number">13</span>, <span class="hljs-number">13</span> - <span class="hljs-number">1</span>),(<span class="hljs-number">59</span>, <span class="hljs-number">59</span> - <span class="hljs-number">4</span>),(<span class="hljs-number">31</span>, <span class="hljs-number">31</span> - <span class="hljs-number">6</span>),(<span class="hljs-number">19</span>, <span class="hljs-number">19</span> - <span class="hljs-number">7</span>)]
+  <span class="hljs-keyword">echo</span> crt(example2) <span class="hljs-comment"># 1068781</span>
+
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Eq</span>] =
+    <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> text.split(<span class="hljs-string">&quot;,&quot;</span>):
+      <span class="hljs-keyword">if</span> n != <span class="hljs-string">&quot;x&quot;</span>:
+        <span class="hljs-literal">result</span>.add (parseInt(n), i)
+      inc i
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1.</span>.<span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
+      <span class="hljs-literal">result</span>[i][<span class="hljs-number">1</span>] = <span class="hljs-literal">result</span>[i][<span class="hljs-number">0</span>] - <span class="hljs-literal">result</span>[i][<span class="hljs-number">1</span>]
+
+  <span class="hljs-keyword">echo</span> parse <span class="hljs-string">&quot;7,13,x,x,59,x,31,19&quot;</span>
+
+nbText: <span class="hljs-string">&quot;to make sure at least the solution was below int.high I did print my expected upper bound. Ah, I did assume all modulus were coprime and I actually suspect they are all prime but did not check&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> part2input = parse <span class="hljs-string">&quot;37,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,41,x,x,x,x,x,x,x,x,x,433,x,x,x,x,x,x,x,23,x,x,x,x,x,x,x,x,17,x,19,x,x,x,x,x,x,x,x,x,29,x,593,x,x,x,x,x,x,x,x,x,x,x,x,13&quot;</span>
+
+
+  <span class="hljs-keyword">echo</span> part2input
+  <span class="hljs-keyword">var</span> n = <span class="hljs-number">1</span>
+  <span class="hljs-keyword">for</span> eq <span class="hljs-keyword">in</span> part2input:
+    n *= eq.modulus
+    <span class="hljs-keyword">echo</span> n
+  <span class="hljs-keyword">echo</span> <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, crt(part2input)
+
+gotTheStar
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>

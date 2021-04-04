@@ -1,76 +1,99 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>day08.html</title>
-  <!-- https://css-tricks.com/emojis-as-favicons/ changed font-size to 80 to fit whale-->
+  <title>2020\day08.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
-  <link rel='stylesheet' href='../static/androidstudio.css'>
-  <script src="../static/highlight.nim.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-<style>
-a {
-    text-decoration: none;
-    color: #009900;
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-a:hover {
-    color: #99ff99;
+.nb-small {
+  font-size: 0.8rem;
 }
-
-em {
-    color: #ffffff;
-    font-style: normal;
-    text-shadow: 0 0 5px #ffffff;
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
-
-em.star {
-  font-style: normal;
-  color: #ffff66;
-  text-shadow: 0 0 5px #ffff66;
+section#source {
+  display:none
 }
 </style>
+  
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
 </head>
 <body>
-<header><nav><em class="star"><a href="https://pietroppeter.github.io/adventofnim/index.html">🎄👑 adventofnim</a></em></header>
-<hr><main>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2020\day08.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
 <h1>2020, Day 8: Handheld Halting</h1>
 <p>For a better solution than mine look at the solution shared
 by fxn on the forum (<a href="https://gist.github.com/fxn/bbd90877bcd27581ee5f7720495c3c3f">gist</a>).</p>
 <p>I use a inelegant global trace (instead of an <code>intsets</code> of visted indices).
 This solution is not that bad anyway.</p>
 <p>Listing the imports (usually I hide them from the document).</p>
-<pre><code class="nim">import
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
   strutils, parseutils, strformat, std / enumerate</code></pre>
 <p>rather standard types. I regretted very soon naming instructions
 in the program as <code>instrs</code>, what a bad name!</p>
-<pre><code class="nim">type
-  OpCode = enum
-    opNop = "nop", opAcc = "acc", opJmp = "jmp"
-  Instruction = tuple[op: OpCode, val: int]
-  Program = object
-    tr: int                  ## p.tr: pointer
-    acc: int                 ## global register
-    instrs: seq[Instruction]
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">OpCode</span> = <span class="hljs-keyword">enum</span>
+    opNop = <span class="hljs-string">&quot;nop&quot;</span>, opAcc = <span class="hljs-string">&quot;acc&quot;</span>, opJmp = <span class="hljs-string">&quot;jmp&quot;</span>
+  <span class="hljs-type">Instruction</span> = <span class="hljs-keyword">tuple</span>[op: <span class="hljs-type">OpCode</span>, val: <span class="hljs-built_in">int</span>]
+  <span class="hljs-type">Program</span> = <span class="hljs-keyword">object</span>
+    tr: <span class="hljs-built_in">int</span>                  <span class="hljs-comment">## p.tr: pointer</span>
+    acc: <span class="hljs-built_in">int</span>                 <span class="hljs-comment">## global register</span>
+    instrs: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>]
 
-  Trace = seq[seq[int]]</code></pre>
+  <span class="hljs-type">Trace</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]</code></pre>
 <p>the parsing is clean, since opcodes are 3 letters do not even need scanf (enumerate is used for debugging)</p>
-<pre><code class="nim">proc parse(text: string): seq[Instruction] =
-  var
-    op: OpCode
-    val: int
-  for i, line in enumerate(text.splitLines):
-    try:
-      op = parseEnum[OpCode](line[0 .. 2])
-      discard parseInt(line[4 .. ^1], val)
-      result.add (op, val)
-    except:
-      echo "ERROR parsing ", i, " ", line</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>] =
+  <span class="hljs-keyword">var</span>
+    op: <span class="hljs-type">OpCode</span>
+    val: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">for</span> i, line <span class="hljs-keyword">in</span> enumerate(text.splitLines):
+    <span class="hljs-keyword">try</span>:
+      op = parseEnum[<span class="hljs-type">OpCode</span>](line[<span class="hljs-number">0</span> .. <span class="hljs-number">2</span>])
+      <span class="hljs-keyword">discard</span> parseInt(line[<span class="hljs-number">4</span> .. ^<span class="hljs-number">1</span>], val)
+      <span class="hljs-literal">result</span>.add (op, val)
+    <span class="hljs-keyword">except</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, line</code></pre>
 <p>testing the first lines of code on the example</p>
-<pre><code class="nim">let example = """nop +0
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;nop +0
 acc +1
 jmp +4
 acc +3
@@ -78,57 +101,57 @@ jmp -3
 acc -99
 acc +1
 jmp -4
-acc +6"""
-var exp = Program(instrs: parse example)
-echo exp</code></pre>
+acc +6&quot;&quot;&quot;</span>
+<span class="hljs-keyword">var</span> exp = <span class="hljs-type">Program</span>(instrs: parse example)
+<span class="hljs-keyword">echo</span> exp</code></pre>
 <pre><samp>(tr: 0, acc: 0, instrs: @[(op: nop, val: 0), (op: acc, val: 1), (op: jmp, val: 4), (op: acc, val: 3), (op: jmp, val: -3), (op: acc, val: -99), (op: acc, val: 1), (op: jmp, val: -4), (op: acc, val: 6)])</samp></pre>
 <p>as mentioned, I decided to go with a global trace variable for simplicty</p>
-<pre><code class="nim">proc initTrace(p: Program): Trace =
-  result.setlen(p.instrs.len)
-  result[p.tr].add 1
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> initTrace(p: <span class="hljs-type">Program</span>): <span class="hljs-type">Trace</span> =
+  <span class="hljs-literal">result</span>.setlen(p.instrs.len)
+  <span class="hljs-literal">result</span>[p.tr].add <span class="hljs-number">1</span>
 
-var tr = initTrace(exp)
-echo tr
-template trace(): bool =
-  tr[p.tr].add(i + 1)
-  tr[p.tr].len == 1          ## somewhat cryptic. If you visited more than once length will be 2</code></pre>
+<span class="hljs-keyword">var</span> tr = initTrace(exp)
+<span class="hljs-keyword">echo</span> tr
+<span class="hljs-keyword">template</span> trace(): <span class="hljs-built_in">bool</span> =
+  tr[p.tr].add(i + <span class="hljs-number">1</span>)
+  tr[p.tr].len == <span class="hljs-number">1</span>          <span class="hljs-comment">## somewhat cryptic. If you visited more than once length will be 2</span></code></pre>
 <pre><samp>@[@[1], @[], @[], @[], @[], @[], @[], @[], @[]]</samp></pre>
 <p>and here is the code for the execution of the program (single step)</p>
-<pre><code class="nim">proc op(p: Program): OpCode =
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> op(p: <span class="hljs-type">Program</span>): <span class="hljs-type">OpCode</span> =
   p.instrs[p.tr].op
 
-proc val(p: Program): int =
+<span class="hljs-keyword">proc</span> val(p: <span class="hljs-type">Program</span>): <span class="hljs-built_in">int</span> =
   p.instrs[p.tr].val
 
-proc endd(p: Program): bool =
-  (p.tr == p.instrs.len)     ## end is keyword
+<span class="hljs-keyword">proc</span> endd(p: <span class="hljs-type">Program</span>): <span class="hljs-built_in">bool</span> =
+  (p.tr == p.instrs.len)     <span class="hljs-comment">## end is keyword</span>
   
-proc exec(p: var Program): bool =
-  let i = tr[p.tr][^1]
-  case p.op
-  of opNop:
+<span class="hljs-keyword">proc</span> exec(p: <span class="hljs-keyword">var</span> <span class="hljs-type">Program</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">let</span> i = tr[p.tr][^<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">case</span> p.op
+  <span class="hljs-keyword">of</span> opNop:
     inc p.tr
-  of opAcc:
+  <span class="hljs-keyword">of</span> opAcc:
     p.acc += p.val
     inc p.tr
-  of opJmp:
+  <span class="hljs-keyword">of</span> opJmp:
     inc p.tr, p.val
-  if p.endd:
-    return false
+  <span class="hljs-keyword">if</span> p.endd:
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
   trace</code></pre>
 <p>this was a template at the beginning
 but I forgot strformat has known <a href="https://nim-lang.org/docs/strformat.html#limitations">limitations with template arguments</a>.</p>
 <p>Of this I do like the name <code>echoo</code> (this is throwaway stuff for debugging purposes).</p>
-<pre><code class="nim">proc echoo(p: Program; tr: Trace) =
-  echo p.op, " ", fmt"{p.val:3}", " | ", tr[p.tr]
-  discard
+<pre><code class="nim hljs"><span class="hljs-keyword">proc</span> echoo(p: <span class="hljs-type">Program</span>; tr: <span class="hljs-type">Trace</span>) =
+  <span class="hljs-keyword">echo</span> p.op, <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">fmt&quot;{p.val:3}&quot;</span>, <span class="hljs-string">&quot; | &quot;</span>, tr[p.tr]
+  <span class="hljs-keyword">discard</span>
 
 echoo(exp, tr)
-while exec(exp):
+<span class="hljs-keyword">while</span> exec(exp):
   echoo(exp, tr)
 echoo(exp, tr)
-echo "part1: ", exp.acc      ## 5, ok
-exp.acc = 0                  ## reset for part2</code></pre>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, exp.acc      <span class="hljs-comment">## 5, ok</span>
+exp.acc = <span class="hljs-number">0</span>                  <span class="hljs-comment">## reset for part2</span></code></pre>
 <pre><samp>nop   0 | @[1]
 acc   1 | @[2]
 jmp   4 | @[3]
@@ -139,53 +162,216 @@ jmp  -3 | @[7]
 acc   1 | @[2, 8]
 part1: 5</samp></pre>
 <p>part 2 appears first for the example. It is straightforward test of fixing iteratively all positions</p>
-<pre><code class="nim">var q: Program
-var k: int
-template fix(p: Program) =
-  k = 0
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> q: <span class="hljs-type">Program</span>
+<span class="hljs-keyword">var</span> k: <span class="hljs-built_in">int</span>
+<span class="hljs-keyword">template</span> fix(p: <span class="hljs-type">Program</span>) =
+  k = <span class="hljs-number">0</span>
   q = p
-  while not q.endd:
+  <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> q.endd:
     q = p
-    if q.acc != 0:
-      echo "ERROR it should be zero!"
-    while p.instrs[k].op == opAcc:
+    <span class="hljs-keyword">if</span> q.acc != <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR it should be zero!&quot;</span>
+    <span class="hljs-keyword">while</span> p.instrs[k].op == opAcc:
       inc k
-    if p.instrs[k].op == opJmp:
+    <span class="hljs-keyword">if</span> p.instrs[k].op == opJmp:
       q.instrs[k].op = opNop
-    elif p.instrs[k].op == opNop:
+    <span class="hljs-keyword">elif</span> p.instrs[k].op == opNop:
       q.instrs[k].op = opJmp
-    else:
-      echo "ERROR should not be here"
-    ## echo "trying to fix instruction ", k
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR should not be here&quot;</span>
+    <span class="hljs-comment">## echo &quot;trying to fix instruction &quot;, k</span>
     tr = initTrace(q)
-    ## echo "q.acc: ", q.acc
-    while exec(q):
-      discard
+    <span class="hljs-comment">## echo &quot;q.acc: &quot;, q.acc</span>
+    <span class="hljs-keyword">while</span> exec(q):
+      <span class="hljs-keyword">discard</span>
     inc k
-  echo "part2: ", q.acc
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, q.acc
 
-fix exp                      ## 8, ok</code></pre>
+fix exp                      <span class="hljs-comment">## 8, ok</span></code></pre>
 <pre><samp>part2: 8</samp></pre>
 <p>Finally let's collect the stars!</p>
-<pre><code class="nim">let input = "2020/input08.txt".readFile
-var inp = Program(instrs: parse input)
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input08.txt&quot;</span>.readFile
+<span class="hljs-keyword">var</span> inp = <span class="hljs-type">Program</span>(instrs: parse input)
 tr = initTrace(inp)
-while exec(inp):
-  discard
-echo "part1: ", inp.acc      ## 1810
+<span class="hljs-keyword">while</span> exec(inp):
+  <span class="hljs-keyword">discard</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, inp.acc      <span class="hljs-comment">## 1810</span>
 tr = initTrace(inp)
-inp.acc = 0
-inp.tr = 0
-fix inp                      ## 969</code></pre>
+inp.acc = <span class="hljs-number">0</span>
+inp.tr = <span class="hljs-number">0</span>
+fix inp                      <span class="hljs-comment">## 969</span></code></pre>
 <pre><samp>part1: 1810
 part2: 969</samp></pre>
 <p>you know your solution is bad when trying to publish it you incur in all sorts of bugs...</p>
 
 </main>
+<footer>
 <hr>
-<small>
-<p>github repo for all my solutions: 🎄👑<a href="https://github.com/pietroppeter/adventofnim">adventofnim</a>;</p>
-<p>html output powered by 🐳<a href="https://github.com/pietroppeter/nimib">nimib</a>.</p>
-</small>
-</body>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+nbInit
+nbText: <span class="hljs-string">&quot;# 2020, Day 8: Handheld Halting&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;For a better solution than mine look at the solution shared
+by fxn on the forum ([gist](https://gist.github.com/fxn/bbd90877bcd27581ee5f7720495c3c3f)).
+
+I use a inelegant global trace (instead of an `intsets` of visted indices).
+This solution is not that bad anyway.
+
+Listing the imports (usually I hide them from the document).
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> strutils, parseutils, strformat, std/enumerate
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;rather standard types. I regretted very soon naming instructions
+in the program as `instrs`, what a bad name!&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">OpCode</span> = <span class="hljs-keyword">enum</span>
+      opNop = <span class="hljs-string">&quot;nop&quot;</span>, opAcc = <span class="hljs-string">&quot;acc&quot;</span>, opJmp = <span class="hljs-string">&quot;jmp&quot;</span>
+    <span class="hljs-type">Instruction</span> = <span class="hljs-keyword">tuple</span>[op: <span class="hljs-type">OpCode</span>, val: <span class="hljs-built_in">int</span>]
+    <span class="hljs-type">Program</span> = <span class="hljs-keyword">object</span>
+      tr: <span class="hljs-built_in">int</span> <span class="hljs-comment">## p.tr: pointer</span>
+      acc: <span class="hljs-built_in">int</span> <span class="hljs-comment">## global register</span>
+      instrs: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>]
+    <span class="hljs-type">Trace</span> = <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
+
+nbText: <span class="hljs-string">&quot;the parsing is clean, since opcodes are 3 letters do not even need scanf (enumerate is used for debugging)&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Instruction</span>] =
+    <span class="hljs-keyword">var</span>
+      op: <span class="hljs-type">OpCode</span>
+      val: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">for</span> i, line <span class="hljs-keyword">in</span> enumerate(text.splitLines):
+      <span class="hljs-keyword">try</span>:
+        op = parseEnum[<span class="hljs-type">OpCode</span>](line[<span class="hljs-number">0</span> .. <span class="hljs-number">2</span>])
+        <span class="hljs-keyword">discard</span> parseInt(line[<span class="hljs-number">4</span> .. ^<span class="hljs-number">1</span>], val)
+        <span class="hljs-literal">result</span>.add (op, val)
+      <span class="hljs-keyword">except</span>:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR parsing &quot;</span>, i, <span class="hljs-string">&quot; &quot;</span>, line
+
+nbText: <span class="hljs-string">&quot;testing the first lines of code on the example&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;nop +0
+acc +1
+jmp +4
+acc +3
+jmp -3
+acc -99
+acc +1
+jmp -4
+acc +6&quot;&quot;&quot;</span>
+
+  <span class="hljs-keyword">var</span> exp = <span class="hljs-type">Program</span>(instrs: parse example)
+  <span class="hljs-keyword">echo</span> exp
+
+nbText: <span class="hljs-string">&quot;as mentioned, I decided to go with a global trace variable for simplicty&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> initTrace(p: <span class="hljs-type">Program</span>): <span class="hljs-type">Trace</span> =
+    <span class="hljs-literal">result</span>.setlen(p.instrs.len)
+    <span class="hljs-literal">result</span>[p.tr].add <span class="hljs-number">1</span>
+
+  <span class="hljs-comment"># I will keep it global</span>
+  <span class="hljs-keyword">var</span> tr = initTrace(exp)
+  <span class="hljs-keyword">echo</span> tr
+
+  <span class="hljs-keyword">template</span> trace: <span class="hljs-built_in">bool</span> =
+    tr[p.tr].add(i + <span class="hljs-number">1</span>)
+    tr[p.tr].len == <span class="hljs-number">1</span>  <span class="hljs-comment">## somewhat cryptic. If you visited more than once length will be 2</span>
+
+nbText: <span class="hljs-string">&quot;and here is the code for the execution of the program (single step)&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> op(p: <span class="hljs-type">Program</span>): <span class="hljs-type">OpCode</span> = p.instrs[p.tr].op
+  <span class="hljs-keyword">proc</span> val(p: <span class="hljs-type">Program</span>): <span class="hljs-built_in">int</span> = p.instrs[p.tr].val
+  <span class="hljs-keyword">proc</span> endd(p: <span class="hljs-type">Program</span>): <span class="hljs-built_in">bool</span> = (p.tr == p.instrs.len) <span class="hljs-comment">## end is keyword</span>
+
+  <span class="hljs-keyword">proc</span> exec(p: <span class="hljs-keyword">var</span> <span class="hljs-type">Program</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">let</span>
+      i = tr[p.tr][^<span class="hljs-number">1</span>]
+    <span class="hljs-keyword">case</span> p.op:
+      <span class="hljs-keyword">of</span> opNop:
+        inc p.tr
+      <span class="hljs-keyword">of</span> opAcc:
+        p.acc += p.val
+        inc p.tr
+      <span class="hljs-keyword">of</span> opJmp:
+        inc p.tr, p.val
+    <span class="hljs-keyword">if</span> p.endd:
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+    trace
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;this was a template at the beginning
+but I forgot strformat has known [limitations with template arguments](https://nim-lang.org/docs/strformat.html#limitations).
+
+Of this I do like the name `echoo` (this is throwaway stuff for debugging purposes).
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">proc</span> echoo(p: <span class="hljs-type">Program</span>, tr: <span class="hljs-type">Trace</span>) =
+    <span class="hljs-keyword">echo</span> p.op, <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">fmt&quot;{p.val:3}&quot;</span>, <span class="hljs-string">&quot; | &quot;</span>, tr[p.tr]
+    <span class="hljs-keyword">discard</span>
+
+  echoo(exp, tr)
+  <span class="hljs-keyword">while</span> exec(exp): echoo(exp, tr)
+  echoo(exp, tr)
+
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, exp.acc <span class="hljs-comment">## 5, ok</span>
+  exp.acc = <span class="hljs-number">0</span> <span class="hljs-comment">## reset for part2</span>
+
+nbText: <span class="hljs-string">&quot;part 2 appears first for the example. It is straightforward test of fixing iteratively all positions&quot;</span>
+nbCode:
+  <span class="hljs-comment"># part 2 fix (example first)</span>
+  <span class="hljs-keyword">var</span> q: <span class="hljs-type">Program</span>
+  <span class="hljs-keyword">var</span> k: <span class="hljs-built_in">int</span> <span class="hljs-comment"># last operation to test fixing</span>
+  <span class="hljs-keyword">template</span> fix(p: <span class="hljs-type">Program</span>) =
+    k = <span class="hljs-number">0</span>
+    q = p
+    <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> q.endd:
+      q = p
+      <span class="hljs-keyword">if</span> q.acc != <span class="hljs-number">0</span>: <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR it should be zero!&quot;</span>
+      <span class="hljs-keyword">while</span> p.instrs[k].op == opAcc: inc k
+      <span class="hljs-keyword">if</span> p.instrs[k].op == opJmp: q.instrs[k].op = opNop
+      <span class="hljs-keyword">elif</span> p.instrs[k].op == opNop: q.instrs[k].op = opJmp
+      <span class="hljs-keyword">else</span>: <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR should not be here&quot;</span>
+      <span class="hljs-comment">##echo &quot;trying to fix instruction &quot;, k</span>
+      tr = initTrace(q)
+      <span class="hljs-comment">##echo &quot;q.acc: &quot;, q.acc</span>
+      <span class="hljs-keyword">while</span> exec(q): <span class="hljs-keyword">discard</span>
+      inc k
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2: &quot;</span>, q.acc
+
+  fix exp <span class="hljs-comment">## 8, ok</span>
+
+nbText: <span class="hljs-string">&quot;Finally let's collect the stars!&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> input = <span class="hljs-string">&quot;2020/input08.txt&quot;</span>.readFile
+  <span class="hljs-keyword">var</span> inp = <span class="hljs-type">Program</span>(instrs: parse input)
+  tr = initTrace(inp)
+  <span class="hljs-keyword">while</span> exec(inp): <span class="hljs-keyword">discard</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1: &quot;</span>, inp.acc <span class="hljs-comment">## 1810</span>
+  tr = initTrace(inp)
+  inp.acc = <span class="hljs-number">0</span>
+  inp.tr = <span class="hljs-number">0</span>
+  fix inp <span class="hljs-comment">## 969</span>
+
+nbText: <span class="hljs-string">&quot;you know your solution is bad when trying to publish it you incur in all sorts of bugs...&quot;</span>
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
 </html>
