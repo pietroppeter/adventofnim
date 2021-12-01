@@ -124,15 +124,16 @@ nbText: """### Visualization
 
 I will use the excellent [ggplotnim](https://github.com/Vindaar/ggplotnim)
 to plot the depth profile.
-
-_(not yet able to have the generation of image work :()_
 """
 
 nbCode:
   import ggplotnim 
-  let df = toDf(input)
+  var df = toDf(input)
+  df["x"] = collect:
+    for i in 1 .. input.len:
+      i
   echo df
-  # ggplot(df, aes("input")) + geom_histogram() + ggsave("2021/01depths.png")
+  ggplot(df, aes(x="x", y="input")) + geom_line() + ggsave("2021/01depths.png")
 
 nbImage("2021/01depths.png")
 nbSave
