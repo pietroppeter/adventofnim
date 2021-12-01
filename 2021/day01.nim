@@ -136,7 +136,7 @@ nbCode:
   ggplot(df, aes(x="x", y="input")) + geom_line() + ggsave("2021/01_depths.png")
 nbImage("2021/01_depths.png")
 
-nbText: "plotting relative depth"
+nbText: "Interesting also to plot the relative depth (and its average, which from previous chart one can expect to be close to 4):"
 nbCode:
   df["relative_depth"] = collect:
     for i in 0 .. input.high:
@@ -144,8 +144,28 @@ nbCode:
         0
       else:
         input[i] - input[i-1]
+  let mean_relative_depth = mean(df["relative_depth"].toTensor(float))
+  dump mean_relative_depth
   echo df
-  ggplot(df, aes(x="x", y="relative_depth")) + geom_line() + ggsave("2021/01_relative_depth.png")
-
+  ggplot(df, aes(x="x", y="relative_depth")) +
+    geom_line() +
+    geom_linerange(aes = aes(y = mean_relative_depth, xMin = 0, xMax = 2000), color=some(parseHtmlName("red"))) +
+    ggsave("2021/01_relative_depth.png")
 nbImage("2021/01_relative_depth.png")
+
+nbText: """
+Note that:
+  * to compute the mean we use `toTensor` and we convert to float (otherwise the result will be an `int`)
+  * we are using `geom_linerange` to plot the horizontal line since `geom_hline` is not (yet) implemented
+  * we have a color as an `Option[chroma.Color]` (from [chroma](https://github.com/treeform/chroma) package)
+"""
+#[
+  add section of highlights from subreddit
+
+  - new theme: adventure time
+  - site with all solutions
+  - turing complete solution
+  - deep water visualization
+  - ...
+]#
 nbSave

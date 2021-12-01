@@ -197,16 +197,22 @@ StatusSuccess output of write_to_png
 <figcaption></figcaption>
 </figure>
 
-<p>plotting relative depth</p>
+<p>Interesting also to plot the relative depth (and its average, which from previous chart one can expect to be close to 4):</p>
 <pre><code class="nim hljs">df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
     <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
       <span class="hljs-number">0</span>
     <span class="hljs-keyword">else</span>:
       input[i] - input[i-<span class="hljs-number">1</span>]
+<span class="hljs-keyword">let</span> mean_relative_depth = mean(df[<span class="hljs-string">&quot;relative_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
+dump mean_relative_depth
 <span class="hljs-keyword">echo</span> df
-ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)</code></pre>
-<pre><samp>Dataframe with 3 columns and 2000 rows:
+ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) +
+  geom_line() +
+  geom_linerange(aes = aes(y = mean_relative_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>))) +
+  ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)</code></pre>
+<pre><samp>mean_relative_depth = 3.8275
+Dataframe with 3 columns and 2000 rows:
                Idx             input                 x    relative_depth
             dtype:               int               int               int
                  0               104                 1                 0
@@ -231,7 +237,6 @@ ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="
                 19               178                20                -2
 
 INFO: The integer column `x` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;x&quot;), ...)`.
-INFO: The integer column `relative_depth` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;relative_depth&quot;), ...)`.
 StatusSuccess output of write_to_png
 </samp></pre>
 <figure>
@@ -239,6 +244,12 @@ StatusSuccess output of write_to_png
 <figcaption></figcaption>
 </figure>
 
+<p>Note that:</p>
+<ul>
+<li>to compute the mean we use <code>toTensor</code> and we convert to float (otherwise the result will be an <code>int</code>)</li>
+<li>we are using <code>geom_linerange</code> to plot the horizontal line since <code>geom_hline</code> is not (yet) implemented</li>
+<li>we have a color as an <code>Option[chroma.Color]</code> (from <a href="https://github.com/treeform/chroma">chroma</a> package)</li>
+</ul>
 
 </main>
 <footer>
@@ -388,7 +399,7 @@ nbCode:
   ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
 nbImage(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
 
-nbText: <span class="hljs-string">&quot;plotting relative depth&quot;</span>
+nbText: <span class="hljs-string">&quot;Interesting also to plot the relative depth (and its average, which from previous chart one can expect to be close to 4):&quot;</span>
 nbCode:
   df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
@@ -396,10 +407,30 @@ nbCode:
         <span class="hljs-number">0</span>
       <span class="hljs-keyword">else</span>:
         input[i] - input[i-<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">let</span> mean_relative_depth = mean(df[<span class="hljs-string">&quot;relative_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
+  dump mean_relative_depth
   <span class="hljs-keyword">echo</span> df
-  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
-
+  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) +
+    geom_line() +
+    geom_linerange(aes = aes(y = mean_relative_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>))) +
+    ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
 nbImage(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Note that:
+  * to compute the mean we use `toTensor` and we convert to float (otherwise the result will be an `int`)
+  * we are using `geom_linerange` to plot the horizontal line since `geom_hline` is not (yet) implemented
+  * we have a color as an `Option[chroma.Color]` (from [chroma](https://github.com/treeform/chroma) package)
+&quot;&quot;&quot;</span>
+<span class="hljs-comment">#[
+  add section of highlights from subreddit
+
+  - new theme: adventure time
+  - site with all solutions
+  - turing complete solution
+  - deep water visualization
+  - ...
+]#</span>
 nbSave</code></pre>
 </section><script>
 function toggleSourceDisplay() {
