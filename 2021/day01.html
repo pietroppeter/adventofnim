@@ -62,7 +62,7 @@ section#source {
 <hr>
 </header><main>
 <h2>2021, day 1: <a href="https://adventofcode.com/2021/day/1">Sonar Sweep</a> ⛴️🔈</h2>
-<p>Another year of Advent of Nim 🎄👑!</p>
+<p>Another year of <a href="https://forum.nim-lang.org/t/8657">Advent of Nim</a> 🎄👑!</p>
 <p><em>This year I would like to try and use cool nim libraries
 for visualization</em> and similar stuff.
 I will most likely be able to keep up only for a few days, but let's see.</p>
@@ -143,8 +143,8 @@ then we will apply previous function to the result.</p>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 <h3>Optimizing part 2</h3>
 <p>As hinted by <a href="https://github.com/narimiran">narimiran</a> in our nim-aoc discord chat,
-there is a simpler way to compute part 2 that also reveals that the &quot;window&quot; approach
-does not really denoise the signal. Since two successive windows of 3 depths have 2 overlapping
+there is a simpler way to compute part 2 that also reveals that <em>the &quot;window&quot; approach
+does not really denoise the signal</em>. Since two successive windows of 3 depths have 2 overlapping
 depth, to check if there is an increase we only need to check first and last depth:</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">func</span> countIncrease2(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], window=<span class="hljs-number">3</span>): <span class="hljs-built_in">int</span> =
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; (s.len - window):
@@ -156,16 +156,20 @@ depth, to check if there is an increase we only need to check first and last dep
 </samp></pre>
 <h3>Visualization</h3>
 <p>I will use the excellent <a href="https://github.com/Vindaar/ggplotnim">ggplotnim</a>
-to plot the depth profile.</p>
+to plot the depth profile and the dataframe library <a href="https://github.com/SciNim/Datamancer">datamancer</a>
+(implictly imported through ggplotnim) to manage the data.
+Thanks to <a href="https://github.com/Vindaar">Vindaar</a> for help in this section</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">import</span> ggplotnim 
-<span class="hljs-keyword">var</span> df = toDf(input)
+<span class="hljs-keyword">var</span> df = seqsToDf({<span class="hljs-string">&quot;depth&quot;</span>: input})  <span class="hljs-comment"># toDf(input): new column will be named input</span>
 df[<span class="hljs-string">&quot;x&quot;</span>] = collect:
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. input.len:
     i
 <span class="hljs-keyword">echo</span> df
-ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)</code></pre>
+ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;depth&quot;</span>)) + scale_y_reverse() +
+  geom_line(color=some(parseHex(<span class="hljs-string">&quot;ffff66&quot;</span>))) + theme_void(color=parseHex(<span class="hljs-string">&quot;202b38&quot;</span>)) +
+  ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)</code></pre>
 <pre><samp>Dataframe with 2 columns and 2000 rows:
-       Idx     input         x
+       Idx     depth         x
     dtype:       int       int
          0       104         1
          1       105         2
@@ -189,7 +193,6 @@ ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="
         19       178        20
 
 INFO: The integer column `x` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;x&quot;), ...)`.
-INFO: The integer column `input` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;input&quot;), ...)`.
 StatusSuccess output of write_to_png
 </samp></pre>
 <figure>
@@ -197,44 +200,73 @@ StatusSuccess output of write_to_png
 <figcaption></figcaption>
 </figure>
 
-<p>Interesting also to plot the relative depth (and its average, which from previous chart one can expect to be close to 4):</p>
-<pre><code class="nim hljs">df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
+<p>Note:</p>
+<ul>
+<li>we use <code>seqsToDf</code> and a table constructor in order to give a new name to input</li>
+<li>we reverse y scale to give the idea of increasing depth of sea bottom</li>
+<li>we use a gold line and same background as that of the page, removing all axis</li>
+</ul>
+<p>Interesting also to plot the depth differences
+(and its average, which from previous chart one can expect to be close to 4):</p>
+<pre><code class="nim hljs">df[<span class="hljs-string">&quot;diff_depth&quot;</span>] = collect:
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
     <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
       <span class="hljs-number">0</span>
     <span class="hljs-keyword">else</span>:
       input[i] - input[i-<span class="hljs-number">1</span>]
-<span class="hljs-keyword">let</span> mean_relative_depth = mean(df[<span class="hljs-string">&quot;relative_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
-dump mean_relative_depth
+<span class="hljs-keyword">let</span> mean_diff_depth = mean(df[<span class="hljs-string">&quot;diff_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
+dump mean_diff_depth
 <span class="hljs-keyword">echo</span> df
-ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) +
-  geom_line() +
-  geom_linerange(aes = aes(y = mean_relative_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>))) +
+<span class="hljs-keyword">let</span>
+  green = parseHex(<span class="hljs-string">&quot;009900&quot;</span>)
+  dark = parseHex(<span class="hljs-string">&quot;202b38&quot;</span>)
+  gold = parseHex(<span class="hljs-string">&quot;ffff66&quot;</span>)
+  red = parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>)
+<span class="hljs-keyword">let</span>
+  font_aoc = <span class="hljs-type">Font</span>(
+    family: <span class="hljs-string">&quot;sans-serif&quot;</span>,
+    size: <span class="hljs-number">12.0</span>,
+    bold: <span class="hljs-literal">false</span>,
+    slant: fsNormal,
+    color: green,
+    alignKind: taCenter
+  )
+  theme_aoc = <span class="hljs-type">Theme</span>(
+    canvasColor: some(dark),
+    plotBackgroundColor: some(dark),
+    gridLineColor: some(green),
+    labelFont: some(font_aoc),
+    tickLabelFont: some(font_aoc)
+  )
+
+ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;diff_depth&quot;</span>)) +
+  geom_line(color=some(gold)) + theme_aoc +
+  geom_linerange(aes = aes(y = mean_diff_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(red)) +
   ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)</code></pre>
-<pre><samp>mean_relative_depth = 3.8275
+<pre><samp>mean_diff_depth = 3.8275
 Dataframe with 3 columns and 2000 rows:
-               Idx             input                 x    relative_depth
-            dtype:               int               int               int
-                 0               104                 1                 0
-                 1               105                 2                 1
-                 2               109                 3                 4
-                 3               120                 4                11
-                 4               124                 5                 4
-                 5               113                 6               -11
-                 6               120                 7                 7
-                 7               121                 8                 1
-                 8               122                 9                 1
-                 9               123                10                 1
-                10               134                11                11
-                11               133                12                -1
-                12               134                13                 1
-                13               150                14                16
-                14               160                15                10
-                15               165                16                 5
-                16               179                17                14
-                17               178                18                -1
-                18               180                19                 2
-                19               178                20                -2
+           Idx         depth             x    diff_depth
+        dtype:           int           int           int
+             0           104             1             0
+             1           105             2             1
+             2           109             3             4
+             3           120             4            11
+             4           124             5             4
+             5           113             6           -11
+             6           120             7             7
+             7           121             8             1
+             8           122             9             1
+             9           123            10             1
+            10           134            11            11
+            11           133            12            -1
+            12           134            13             1
+            13           150            14            16
+            14           160            15            10
+            15           165            16             5
+            16           179            17            14
+            17           178            18            -1
+            18           180            19             2
+            19           178            20            -2
 
 INFO: The integer column `x` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;x&quot;), ...)`.
 StatusSuccess output of write_to_png
@@ -244,7 +276,7 @@ StatusSuccess output of write_to_png
 <figcaption></figcaption>
 </figure>
 
-<p>Note that:</p>
+<p>Note:</p>
 <ul>
 <li>to compute the mean we use <code>toTensor</code> and we convert to float (otherwise the result will be an <code>int</code>)</li>
 <li>we are using <code>geom_linerange</code> to plot the horizontal line since <code>geom_hline</code> is not (yet) implemented</li>
@@ -266,7 +298,7 @@ StatusSuccess output of write_to_png
 nbInit(theme=useAdventOfNim)
 nbText: <span class="hljs-string">&quot;&quot;&quot;## 2021, day 1: [Sonar Sweep](https://adventofcode.com/2021/day/1) ⛴️🔈
 
-Another year of Advent of Nim :christmas_tree::crown:!
+Another year of [Advent of Nim](https://forum.nim-lang.org/t/8657) :christmas_tree::crown:!
 
 _This year I would like to try and use cool nim libraries
 for visualization_ and similar stuff.
@@ -368,8 +400,8 @@ doAssert input.window.countIncrease == <span class="hljs-number">1608</span>
 nbText: <span class="hljs-string">&quot;&quot;&quot;### Optimizing part 2
 
 As hinted by [narimiran](https://github.com/narimiran) in our nim-aoc discord chat,
-there is a simpler way to compute part 2 that also reveals that the &quot;window&quot; approach
-does not really denoise the signal. Since two successive windows of 3 depths have 2 overlapping
+there is a simpler way to compute part 2 that also reveals that _the &quot;window&quot; approach
+does not really denoise the signal_. Since two successive windows of 3 depths have 2 overlapping
 depth, to check if there is an increase we only need to check first and last depth:
 &quot;&quot;&quot;</span>
 
@@ -381,43 +413,76 @@ nbCode:
 
   <span class="hljs-keyword">echo</span> input.countIncrease2
 
-<span class="hljs-comment">#doAssert input.countIncrease2 == 1608</span>
+doAssert input.countIncrease2 == <span class="hljs-number">1608</span>
+<span class="hljs-comment"># note that countIncrease2 is equivalent to countIncrease(..., window=1)</span>
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization
 
 I will use the excellent [ggplotnim](https://github.com/Vindaar/ggplotnim)
-to plot the depth profile.
+to plot the depth profile and the dataframe library [datamancer](https://github.com/SciNim/Datamancer)
+(implictly imported through ggplotnim) to manage the data.
+Thanks to [Vindaar](https://github.com/Vindaar) for help in this section
 &quot;&quot;&quot;</span>
 
 nbCode:
   <span class="hljs-keyword">import</span> ggplotnim 
-  <span class="hljs-keyword">var</span> df = toDf(input)
+  <span class="hljs-keyword">var</span> df = seqsToDf({<span class="hljs-string">&quot;depth&quot;</span>: input})  <span class="hljs-comment"># toDf(input): new column will be named input</span>
   df[<span class="hljs-string">&quot;x&quot;</span>] = collect:
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. input.len:
       i
   <span class="hljs-keyword">echo</span> df
-  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
+  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;depth&quot;</span>)) + scale_y_reverse() +
+    geom_line(color=some(parseHex(<span class="hljs-string">&quot;ffff66&quot;</span>))) + theme_void(color=parseHex(<span class="hljs-string">&quot;202b38&quot;</span>)) +
+    ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
 nbImage(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Note:
+  - we use `seqsToDf` and a table constructor in order to give a new name to input
+  - we reverse y scale to give the idea of increasing depth of sea bottom
+  - we use a gold line and same background as that of the page, removing all axis
 
-nbText: <span class="hljs-string">&quot;Interesting also to plot the relative depth (and its average, which from previous chart one can expect to be close to 4):&quot;</span>
+Interesting also to plot the depth differences
+(and its average, which from previous chart one can expect to be close to 4):&quot;&quot;&quot;</span>
 nbCode:
-  df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
+  df[<span class="hljs-string">&quot;diff_depth&quot;</span>] = collect:
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
       <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
         <span class="hljs-number">0</span>
       <span class="hljs-keyword">else</span>:
         input[i] - input[i-<span class="hljs-number">1</span>]
-  <span class="hljs-keyword">let</span> mean_relative_depth = mean(df[<span class="hljs-string">&quot;relative_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
-  dump mean_relative_depth
+  <span class="hljs-keyword">let</span> mean_diff_depth = mean(df[<span class="hljs-string">&quot;diff_depth&quot;</span>].toTensor(<span class="hljs-built_in">float</span>))
+  dump mean_diff_depth
   <span class="hljs-keyword">echo</span> df
-  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) +
-    geom_line() +
-    geom_linerange(aes = aes(y = mean_relative_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>))) +
+  <span class="hljs-keyword">let</span>
+    green = parseHex(<span class="hljs-string">&quot;009900&quot;</span>)
+    dark = parseHex(<span class="hljs-string">&quot;202b38&quot;</span>)
+    gold = parseHex(<span class="hljs-string">&quot;ffff66&quot;</span>)
+    red = parseHtmlName(<span class="hljs-string">&quot;red&quot;</span>)
+  <span class="hljs-keyword">let</span>
+    font_aoc = <span class="hljs-type">Font</span>(
+      family: <span class="hljs-string">&quot;sans-serif&quot;</span>,
+      size: <span class="hljs-number">12.0</span>,
+      bold: <span class="hljs-literal">false</span>,
+      slant: fsNormal,
+      color: green,
+      alignKind: taCenter
+    )
+    theme_aoc = <span class="hljs-type">Theme</span>(
+      canvasColor: some(dark),
+      plotBackgroundColor: some(dark),
+      gridLineColor: some(green),
+      labelFont: some(font_aoc),
+      tickLabelFont: some(font_aoc)
+    )
+
+  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;diff_depth&quot;</span>)) +
+    geom_line(color=some(gold)) + theme_aoc +
+    geom_linerange(aes = aes(y = mean_diff_depth, xMin = <span class="hljs-number">0</span>, xMax = <span class="hljs-number">2000</span>), color=some(red)) +
     ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
 nbImage(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;
-Note that:
+Note:
   * to compute the mean we use `toTensor` and we convert to float (otherwise the result will be an `int`)
   * we are using `geom_linerange` to plot the horizontal line since `geom_hline` is not (yet) implemented
   * we have a color as an `Option[chroma.Color]` (from [chroma](https://github.com/treeform/chroma) package)
