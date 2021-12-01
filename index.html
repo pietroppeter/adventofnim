@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>index.nim</title>
+  <title>🎄👑</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -62,10 +62,13 @@ section#source {
 <hr>
 </header><main>
 <h1>🎄👑 adventofnim</h1>
-<p>nim solutions for advent of code</p>
-<p>WIP - updating solutions to <a href="https://github.com/pietroppeter/nimib">nimib</a> 0.1</p>
-<p>current content (<a href="index.html">home</a>):</p>
+<p>nim solutions for advent of code (<a href="index.html">home</a>):</p>
 <ul>
+<li>2021
+<ul>
+<li><a href="2021/day01.html">day01.html</a></li>
+</ul>
+</li>
 <li>2020
 <ul>
 <li><a href="2020/day01.html">day01.html</a></li>
@@ -103,42 +106,48 @@ section#source {
 </div>
 </footer>
 <section id="source">
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, nimoji, strformat, os, strutils
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, nimoji, strformat, os, strutils, animu, tables
 <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
   <span class="hljs-keyword">import</span> osproc
 
-nbInit
+nbInit(theme=useAdventOfNim)
 
 nbDoc.title = <span class="hljs-string">&quot;:christmas_tree::crown:&quot;</span>.emojize
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;
 # :christmas_tree::crown: adventofnim
 
-nim solutions for advent of code
+nim solutions for advent of code ([home](index.html)):&quot;&quot;&quot;</span>.emojize
 
-WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
+<span class="hljs-keyword">let</span> years = [<span class="hljs-string">&quot;2021&quot;</span>, <span class="hljs-string">&quot;2020&quot;</span>]
+<span class="hljs-keyword">type</span> <span class="hljs-type">Content</span> = <span class="hljs-type">Table</span>[<span class="hljs-built_in">string</span>, <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]]
+<span class="hljs-keyword">var</span> content: <span class="hljs-type">Content</span>
 
-current content ([home](index.html)):&quot;&quot;&quot;</span>.emojize
+<span class="hljs-keyword">for</span> year <span class="hljs-keyword">in</span> years:
+  content[year] = @[]
+  <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> walkFiles(<span class="hljs-string">fmt&quot;{year}/*.html&quot;</span>):
+    <span class="hljs-keyword">let</span> g = f.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\\</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>)
+    content[year].add g
+    <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
+      <span class="hljs-keyword">let</span> cmd = <span class="hljs-string">&quot;nim r -d:release &quot;</span> &amp; changeFileExt(g, <span class="hljs-string">&quot;nim&quot;</span>)
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;exec: &quot;</span>, cmd
+      <span class="hljs-keyword">if</span> execCmd(cmd) != <span class="hljs-number">0</span>:
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR with: &quot;</span>, cmd
 
-<span class="hljs-keyword">var</span> content = <span class="hljs-string">&quot;* 2020</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
-<span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> walkFiles(<span class="hljs-string">&quot;2020/*.html&quot;</span>):
-  <span class="hljs-keyword">let</span> g = f.replace(<span class="hljs-string">&quot;</span><span class="hljs-meta">\\</span><span class="hljs-string">&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>)
-  content &amp;= &amp;<span class="hljs-string">&quot;  - [{g[5 .. ^1]}]({g})</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
-  <span class="hljs-keyword">when</span> <span class="hljs-keyword">defined</span>(regendoc):
-    <span class="hljs-keyword">let</span> cmd = <span class="hljs-string">&quot;nim r &quot;</span> &amp; changeFileExt(g, <span class="hljs-string">&quot;nim&quot;</span>)
-    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;exec: &quot;</span>, cmd
-    <span class="hljs-keyword">if</span> execCmd(cmd) != <span class="hljs-number">0</span>:
-      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;ERROR with: &quot;</span>, cmd
+<span class="hljs-keyword">proc</span> `$`(c: <span class="hljs-type">Content</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-keyword">for</span> year <span class="hljs-keyword">in</span> years:
+    <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;* {year}</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-keyword">for</span> page <span class="hljs-keyword">in</span> content[year]:
+      <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;  - [{page[5 .. ^1]}]({page})</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
 
-
-nbText: content
+nbText: $content
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;
 how to:
 
 * generate README.md and index.html: `nim r index`
 * regenerate also all html documents: `nim -d:regendoc r index`
-&quot;&quot;&quot;</span> <span class="hljs-comment"># use also -d:release since day15 can take a while in debug mode</span>
+&quot;&quot;&quot;</span>
 
 nbSave
 nbDoc.filename = <span class="hljs-string">&quot;README.md&quot;</span>
