@@ -107,13 +107,14 @@ nbText: """### Visualization
 I will use the excellent [ggplotnim](https://github.com/Vindaar/ggplotnim)
 to plot the depth profile.
 
-_(unfortunately I have not yet be able to have ggplotnim work on my M1 Mac since nim is compiled for M1 and cairo dlls are not)_
+_(not yet able to have the generation of image work :()_
 """
 
 nbCode:
   import ggplotnim 
   let df = toDf(input)
   echo df
-  ggplot(df, aes("input")) + geom_histogram() + ggsave("2021/01depths.png")
+  # ggplot(df, aes("input")) + geom_histogram() + ggsave("2021/01depths.png")
 
+nbImage("2021/01depths.png")
 nbSave
