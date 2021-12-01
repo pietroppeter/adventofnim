@@ -11,6 +11,8 @@ import os, strutils, times, parseutils, parseopt, hashes, tables, sets
 export os, strutils, times, parseutils, parseopt, hashes, tables, sets
 import sequtils, algorithm, strscans, strformat, bitops
 export sequtils, algorithm, strscans, strformat, bitops
+import math
+export math
 
 import macros
 

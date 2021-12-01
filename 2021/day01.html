@@ -62,7 +62,46 @@ section#source {
 <hr>
 </header><main>
 <h2>2021, day 1:</h2>
-<p>ready to rumble</p>
+<p>Another year of Advent of Nim 🎄👑!</p>
+<p>This year I would like to try and use cool nim libraries
+for visualization and similar stuff.
+I will most likely be able to keep up only for a few days, but let's see.</p>
+<p>But let's get to the first problem.
+As usual we have a sequence of integers as input.</p>
+<p>What is new this year is that,
+<a href="https://nim-lang.org/blog/2021/10/19/version-160-released.html">thanks to 1.6</a>
+we can use <code>toSeq</code> with method call syntax</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> input: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] = <span class="hljs-string">&quot;2021/input01.txt&quot;</span>.lines.toSeq.map(parseInt)
+<span class="hljs-keyword">echo</span> input.len
+<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
+<span class="hljs-keyword">echo</span> input[^<span class="hljs-number">10</span> .. ^<span class="hljs-number">1</span>]</code></pre>
+<pre><samp>2000
+@[104, 105, 109, 120, 124, 113, 120, 121, 122, 123, 134]
+@[7678, 7680, 7692, 7712, 7724, 7730, 7736, 7737, 7746, 7759]
+</samp></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> countIncrease(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. s.<span class="hljs-keyword">high</span>:
+    <span class="hljs-keyword">if</span> s[i] &gt; s[i - <span class="hljs-number">1</span>]:
+      inc <span class="hljs-literal">result</span>
+
+<span class="hljs-keyword">echo</span> countIncrease(input)</code></pre>
+<pre><samp>1557
+</samp></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> window(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]; size = <span class="hljs-number">3</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+  <span class="hljs-keyword">assert</span> s.len &gt;= size
+  <span class="hljs-keyword">var</span> sum = s[<span class="hljs-number">0</span> ..&lt; size].sum
+  <span class="hljs-literal">result</span>.add sum
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> size .. s.<span class="hljs-keyword">high</span>:
+    sum = sum - s[i - size] + s[i]
+    <span class="hljs-literal">result</span>.add sum
+
+<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]
+<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>].window
+<span class="hljs-keyword">echo</span> input.window.countIncrease</code></pre>
+<pre><samp>@[104, 105, 109, 120, 124, 113, 120, 121, 122, 123]
+@[318, 334, 353, 357, 357, 354, 363, 366]
+1608
+</samp></pre>
 
 </main>
 <footer>
@@ -74,14 +113,52 @@ section#source {
 </div>
 </footer>
 <section id="source">
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu, nimoji
 
-<span class="hljs-comment"># ctrl+command+space for emoji panel on Mac OS</span>
 nbInit(theme=useAdventOfNim)
 nbText: <span class="hljs-string">&quot;&quot;&quot;## 2021, day 1: 
 
-ready to rumble
-&quot;&quot;&quot;</span>
+Another year of Advent of Nim :christmas_tree::crown:!
+
+This year I would like to try and use cool nim libraries
+for visualization and similar stuff.
+I will most likely be able to keep up only for a few days, but let's see.
+
+But let's get to the first problem.
+As usual we have a sequence of integers as input.
+
+What is new this year is that,
+[thanks to 1.6](https://nim-lang.org/blog/2021/10/19/version-160-released.html)
+we can use `toSeq` with method call syntax
+&quot;&quot;&quot;</span>.emojize
+
+nbCode:
+  <span class="hljs-keyword">let</span> input: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] = <span class="hljs-string">&quot;2021/input01.txt&quot;</span>.lines.toSeq.map(parseInt)
+  <span class="hljs-keyword">echo</span> input.len
+  <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
+  <span class="hljs-keyword">echo</span> input[^<span class="hljs-number">10</span> .. ^<span class="hljs-number">1</span>]
+
+nbCode:
+  <span class="hljs-keyword">func</span> countIncrease(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. s.<span class="hljs-keyword">high</span>:
+      <span class="hljs-keyword">if</span> s[i] &gt; s[i - <span class="hljs-number">1</span>]:
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">echo</span> countIncrease(input)
+
+nbCode:
+  <span class="hljs-keyword">func</span> window(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], size=<span class="hljs-number">3</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
+    <span class="hljs-keyword">assert</span> s.len &gt;= size
+    <span class="hljs-keyword">var</span> sum = s[<span class="hljs-number">0</span> ..&lt; size].sum
+    <span class="hljs-literal">result</span>.add sum
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> size .. s.<span class="hljs-keyword">high</span>:
+      sum = sum - s[i - size] + s[i]
+      <span class="hljs-literal">result</span>.add sum
+  
+  <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]
+  <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>].window
+  <span class="hljs-keyword">echo</span> input.window.countIncrease
+
 nbSave</code></pre>
 </section><script>
 function toggleSourceDisplay() {
