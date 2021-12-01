@@ -102,6 +102,24 @@ nbCode:
 gotTheStar
 doAssert input.window.countIncrease == 1608
 
+nbText: """### Optimizing part 2
+
+As hinted by [narimiran](https://github.com/narimiran) in our nim-aoc discord chat,
+there is a simpler way to compute part 2 that also reveals that the "window" approach
+does not really denoise the signal. Since two successive windows of 3 depths have 2 overlapping
+depth, to check if there is an increase we only need to check first and last depth:
+"""
+
+nbCode:
+  func countIncrease2(s: seq[int], window=3): int =
+    for i in 0 ..< (s.len - window):
+      if s[i + window] > s[i]:
+        inc result
+
+  echo input.countIncrease2
+
+#doAssert input.countIncrease2 == 1608
+
 nbText: """### Visualization
 
 I will use the excellent [ggplotnim](https://github.com/Vindaar/ggplotnim)
