@@ -1,39 +1,45 @@
-import nimib, nimoji, strformat, os, strutils
+import nimib, nimoji, strformat, os, strutils, animu, tables
 when defined(regendoc):
   import osproc
 
-nbInit
+nbInit(theme=useAdventOfNim)
 
 nbDoc.title = ":christmas_tree::crown:".emojize
 
 nbText: """
 # :christmas_tree::crown: adventofnim
 
-nim solutions for advent of code
+nim solutions for advent of code ([home](index.html)):""".emojize
 
-WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
+let years = ["2021", "2020"]
+type Content = Table[string, seq[string]]
+var content: Content
 
-current content ([home](index.html)):""".emojize
+for year in years:
+  content[year] = @[]
+  for f in walkFiles(fmt"{year}/*.html"):
+    let g = f.replace("\\", "/")
+    content[year].add g
+    when defined(regendoc):
+      let cmd = "nim r -d:release " & changeFileExt(g, "nim")
+      echo "exec: ", cmd
+      if execCmd(cmd) != 0:
+        echo "ERROR with: ", cmd
 
-var content = "* 2020\n"
-for f in walkFiles("2020/*.html"):
-  let g = f.replace("\\", "/")
-  content &= &"  - [{g[5 .. ^1]}]({g})\n"
-  when defined(regendoc):
-    let cmd = "nim r " & changeFileExt(g, "nim")
-    echo "exec: ", cmd
-    if execCmd(cmd) != 0:
-      echo "ERROR with: ", cmd
+proc `$`(c: Content): string =
+  for year in years:
+    result &= &"* {year}\n"
+    for page in content[year]:
+      result &= &"  - [{page[5 .. ^1]}]({page})\n"
 
-
-nbText: content
+nbText: $content
 
 nbText: """
 how to:
 
 * generate README.md and index.html: `nim r index`
 * regenerate also all html documents: `nim -d:regendoc r index`
-""" # use also -d:release since day15 can take a while in debug mode
+"""
 
 nbSave
 nbDoc.filename = "README.md"

@@ -56,3 +56,9 @@ macro chk*(val, exp: untyped)  =
         debugEcho "[OK] ", `v`, " = ", `val`
       else:
         debugEcho "[KO] ", `v`, " = ", `val`, "; expected = ", `exp`
+
+import nimib, nimib / themes
+
+proc useAdventOfNim*(doc: var NbDoc) =
+  doc.useDefault
+  doc.darkMode

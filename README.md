@@ -1,11 +1,9 @@
 # 🎄👑 adventofnim
 
-nim solutions for advent of code
+nim solutions for advent of code ([home](index.html)):
 
-WIP - updating solutions to [nimib](https://github.com/pietroppeter/nimib) 0.1
-
-current content ([home](index.html)):
-
+* 2021
+  - [day01.html](2021/day01.html)
 * 2020
   - [day01.html](2020/day01.html)
   - [day02.html](2020/day02.html)
