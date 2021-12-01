@@ -141,6 +141,19 @@ then we will apply previous function to the result.</p>
 <pre><samp>1608
 </samp></pre>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Optimizing part 2</h3>
+<p>As hinted by <a href="https://github.com/narimiran">narimiran</a> in our nim-aoc discord chat,
+there is a simpler way to compute part 2 that also reveals that the &quot;window&quot; approach
+does not really denoise the signal. Since two successive windows of 3 depths have 2 overlapping
+depth, to check if there is an increase we only need to check first and last depth:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> countIncrease2(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], window=<span class="hljs-number">3</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; (s.len - window):
+    <span class="hljs-keyword">if</span> s[i + window] &gt; s[i]:
+      inc <span class="hljs-literal">result</span>
+
+<span class="hljs-keyword">echo</span> input.countIncrease2</code></pre>
+<pre><samp>1608
+</samp></pre>
 <h3>Visualization</h3>
 <p>I will use the excellent <a href="https://github.com/Vindaar/ggplotnim">ggplotnim</a>
 to plot the depth profile.</p>
@@ -293,6 +306,24 @@ nbCode:
 
 gotTheStar
 doAssert input.window.countIncrease == <span class="hljs-number">1608</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Optimizing part 2
+
+As hinted by [narimiran](https://github.com/narimiran) in our nim-aoc discord chat,
+there is a simpler way to compute part 2 that also reveals that the &quot;window&quot; approach
+does not really denoise the signal. Since two successive windows of 3 depths have 2 overlapping
+depth, to check if there is an increase we only need to check first and last depth:
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">func</span> countIncrease2(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], window=<span class="hljs-number">3</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> ..&lt; (s.len - window):
+      <span class="hljs-keyword">if</span> s[i + window] &gt; s[i]:
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">echo</span> input.countIncrease2
+
+<span class="hljs-comment">#doAssert input.countIncrease2 == 1608</span>
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization
 
