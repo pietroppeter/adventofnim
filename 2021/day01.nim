@@ -133,7 +133,19 @@ nbCode:
     for i in 1 .. input.len:
       i
   echo df
-  ggplot(df, aes(x="x", y="input")) + geom_line() + ggsave("2021/01depths.png")
+  ggplot(df, aes(x="x", y="input")) + geom_line() + ggsave("2021/01_depths.png")
+nbImage("2021/01_depths.png")
 
-nbImage("2021/01depths.png")
+nbText: "plotting relative depth"
+nbCode:
+  df["relative_depth"] = collect:
+    for i in 0 .. input.high:
+      if i == 0:
+        0
+      else:
+        input[i] - input[i-1]
+  echo df
+  ggplot(df, aes(x="x", y="relative_depth")) + geom_line() + ggsave("2021/01_relative_depth.png")
+
+nbImage("2021/01_relative_depth.png")
 nbSave

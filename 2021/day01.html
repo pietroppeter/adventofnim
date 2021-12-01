@@ -163,7 +163,7 @@ df[<span class="hljs-string">&quot;x&quot;</span>] = collect:
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. input.len:
     i
 <span class="hljs-keyword">echo</span> df
-ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01depths.png&quot;</span>)</code></pre>
+ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)</code></pre>
 <pre><samp>Dataframe with 2 columns and 2000 rows:
        Idx     input         x
     dtype:       int       int
@@ -193,7 +193,49 @@ INFO: The integer column `input` has been automatically determined to be continu
 StatusSuccess output of write_to_png
 </samp></pre>
 <figure>
-<img src="../2021/01depths.png" alt="">
+<img src="../2021/01_depths.png" alt="">
+<figcaption></figcaption>
+</figure>
+
+<p>plotting relative depth</p>
+<pre><code class="nim hljs">df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
+    <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
+      <span class="hljs-number">0</span>
+    <span class="hljs-keyword">else</span>:
+      input[i] - input[i-<span class="hljs-number">1</span>]
+<span class="hljs-keyword">echo</span> df
+ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)</code></pre>
+<pre><samp>Dataframe with 3 columns and 2000 rows:
+               Idx             input                 x    relative_depth
+            dtype:               int               int               int
+                 0               104                 1                 0
+                 1               105                 2                 1
+                 2               109                 3                 4
+                 3               120                 4                11
+                 4               124                 5                 4
+                 5               113                 6               -11
+                 6               120                 7                 7
+                 7               121                 8                 1
+                 8               122                 9                 1
+                 9               123                10                 1
+                10               134                11                11
+                11               133                12                -1
+                12               134                13                 1
+                13               150                14                16
+                14               160                15                10
+                15               165                16                 5
+                16               179                17                14
+                17               178                18                -1
+                18               180                19                 2
+                19               178                20                -2
+
+INFO: The integer column `x` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;x&quot;), ...)`.
+INFO: The integer column `relative_depth` has been automatically determined to be continuous. To overwrite this behavior add a `+ scale_x/y_discrete()` call to the plotting chain. Choose `x` or `y` depending on which axis this column refers to. Or apply a `factor` to the column name in the `aes` call, i.e. `aes(..., factor(&quot;relative_depth&quot;), ...)`.
+StatusSuccess output of write_to_png
+</samp></pre>
+<figure>
+<img src="../2021/01_relative_depth.png" alt="">
 <figcaption></figcaption>
 </figure>
 
@@ -343,9 +385,21 @@ nbCode:
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. input.len:
       i
   <span class="hljs-keyword">echo</span> df
-  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01depths.png&quot;</span>)
+  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;input&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
+nbImage(<span class="hljs-string">&quot;2021/01_depths.png&quot;</span>)
 
-nbImage(<span class="hljs-string">&quot;2021/01depths.png&quot;</span>)
+nbText: <span class="hljs-string">&quot;plotting relative depth&quot;</span>
+nbCode:
+  df[<span class="hljs-string">&quot;relative_depth&quot;</span>] = collect:
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. input.<span class="hljs-keyword">high</span>:
+      <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
+        <span class="hljs-number">0</span>
+      <span class="hljs-keyword">else</span>:
+        input[i] - input[i-<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">echo</span> df
+  ggplot(df, aes(x=<span class="hljs-string">&quot;x&quot;</span>, y=<span class="hljs-string">&quot;relative_depth&quot;</span>)) + geom_line() + ggsave(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
+
+nbImage(<span class="hljs-string">&quot;2021/01_relative_depth.png&quot;</span>)
 nbSave</code></pre>
 </section><script>
 function toggleSourceDisplay() {
