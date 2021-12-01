@@ -185,7 +185,8 @@ nbCode:
       gridLineColor: some(green),
       labelFont: some(font_aoc),
       tickLabelFont: some(font_aoc),
-      hideTicks: some(true)  # I cannot find where to set them as green, so I hide them
+      # hideTicks: some(true)  # with this line:
+      # fatal.nim(53Error: unhandled exception: index out of bounds, the container is empty [IndexDefect]
     )
   ggplot(df, aes(x="x", y="diff_depth")) +
     geom_line(color=some(gold)) + theme_aoc +
