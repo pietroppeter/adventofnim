@@ -61,16 +61,16 @@ section#source {
 </div>
 <hr>
 </header><main>
-<h2>2021, day 1:</h2>
+<h2>2021, day 1: <a href="https://adventofcode.com/2021/day/1">Sonar Sweep</a> ⛴️🔈</h2>
 <p>Another year of Advent of Nim 🎄👑!</p>
-<p>This year I would like to try and use cool nim libraries
-for visualization and similar stuff.
+<p><em>This year I would like to try and use cool nim libraries
+for visualization</em> and similar stuff.
 I will most likely be able to keep up only for a few days, but let's see.</p>
 <p>But let's get to the first problem.
 As usual we have a sequence of integers as input.</p>
 <p>What is new this year is that,
 <a href="https://nim-lang.org/blog/2021/10/19/version-160-released.html">thanks to 1.6</a>
-we can use <code>toSeq</code> with method call syntax</p>
+we can use <code>toSeq</code> with method call syntax!</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">let</span> input: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] = <span class="hljs-string">&quot;2021/input01.txt&quot;</span>.lines.toSeq.map(parseInt)
 <span class="hljs-keyword">echo</span> input.len
 <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
@@ -79,14 +79,49 @@ we can use <code>toSeq</code> with method call syntax</p>
 @[104, 105, 109, 120, 124, 113, 120, 121, 122, 123, 134]
 @[7678, 7680, 7692, 7712, 7724, 7730, 7736, 7737, 7746, 7759]
 </samp></pre>
+<h3>Part 1</h3>
+<blockquote>
+<p>As the submarine drops below the surface of the ocean, it automatically performs a sonar sweep of the nearby sea floor. On a small screen, the sonar sweep report (your puzzle input) appears: each line is a measurement of the sea floor depth as the sweep looks further and further away from the submarine.</p>
+<p>For example, suppose you had the following report:</p>
+</blockquote>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> report = <span class="hljs-string">&quot;&quot;&quot;199
+200
+208
+210
+200
+207
+240
+269
+260
+263&quot;&quot;&quot;</span></code></pre>
+<blockquote>
+<p>This report indicates that, scanning outward from the submarine, the sonar sweep found depths of 199, 200, 208, 210, and so on.</p>
+<p>The first order of business is to figure out how quickly the depth increases, ...</p>
+<p>To do this, count the <em>number of times a depth measurement increases</em> from the previous measurement</p>
+<p>... In this example, there are 7 measurements that are larger than the previous measurement.</p>
+</blockquote>
+<p>The solution for part1 (as expected) is pretty straightforward.
+Just make sure you start from index 1:</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">func</span> countIncrease(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. s.<span class="hljs-keyword">high</span>:
     <span class="hljs-keyword">if</span> s[i] &gt; s[i - <span class="hljs-number">1</span>]:
       inc <span class="hljs-literal">result</span>
 
+<span class="hljs-keyword">let</span> testInput = report.splitLines.toSeq.map(parseInt)
+doAssert testInput.countIncrease == <span class="hljs-number">7</span>
 <span class="hljs-keyword">echo</span> countIncrease(input)</code></pre>
 <pre><samp>1557
 </samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Part 2</h3>
+<blockquote>
+<p>Considering every single measurement isn't as useful as you expected: there's just too much noise in the data.</p>
+<p>Instead, consider <em>sums of a three-measurement sliding window</em>.</p>
+<p>... Your goal now is to count <em>the number of times the sum of measurements in this sliding window increases</em> from the previous sum.</p>
+<p>... In [test] example, there are 5 sums that are larger than the previous sum.</p>
+</blockquote>
+<p>let's create a function that copmutes the window function of a sequence,
+then we will apply previous function to the result.</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">func</span> window(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]; size = <span class="hljs-number">3</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
   <span class="hljs-keyword">assert</span> s.len &gt;= size
   <span class="hljs-keyword">var</span> sum = s[<span class="hljs-number">0</span> ..&lt; size].sum
@@ -96,11 +131,47 @@ we can use <code>toSeq</code> with method call syntax</p>
     <span class="hljs-literal">result</span>.add sum
 
 <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]
-<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>].window
-<span class="hljs-keyword">echo</span> input.window.countIncrease</code></pre>
+<span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>].window</code></pre>
 <pre><samp>@[104, 105, 109, 120, 124, 113, 120, 121, 122, 123]
 @[318, 334, 353, 357, 357, 354, 363, 366]
-1608
+</samp></pre>
+<pre><code class="nim hljs">doAssert testInput.window.countIncrease == <span class="hljs-number">5</span>
+<span class="hljs-keyword">echo</span> input.window.countIncrease</code></pre>
+<pre><samp>1608
+</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Visualization</h3>
+<p>I will use the excellent <a href="https://github.com/Vindaar/ggplotnim">ggplotnim</a>
+to plot the depth profile</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span>
+  ggplotnim
+
+<span class="hljs-keyword">let</span> df = toDf(input)
+<span class="hljs-keyword">echo</span> df</code></pre>
+<pre><samp>Dataframe with 1 columns and 2000 rows:
+       Idx     input
+    dtype:       int
+         0       104
+         1       105
+         2       109
+         3       120
+         4       124
+         5       113
+         6       120
+         7       121
+         8       122
+         9       123
+        10       134
+        11       133
+        12       134
+        13       150
+        14       160
+        15       165
+        16       179
+        17       178
+        18       180
+        19       178
+
 </samp></pre>
 
 </main>
@@ -116,12 +187,12 @@ we can use <code>toSeq</code> with method call syntax</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu, nimoji
 
 nbInit(theme=useAdventOfNim)
-nbText: <span class="hljs-string">&quot;&quot;&quot;## 2021, day 1: 
+nbText: <span class="hljs-string">&quot;&quot;&quot;## 2021, day 1: [Sonar Sweep](https://adventofcode.com/2021/day/1) ⛴️🔈
 
 Another year of Advent of Nim :christmas_tree::crown:!
 
-This year I would like to try and use cool nim libraries
-for visualization and similar stuff.
+_This year I would like to try and use cool nim libraries
+for visualization_ and similar stuff.
 I will most likely be able to keep up only for a few days, but let's see.
 
 But let's get to the first problem.
@@ -129,7 +200,7 @@ As usual we have a sequence of integers as input.
 
 What is new this year is that,
 [thanks to 1.6](https://nim-lang.org/blog/2021/10/19/version-160-released.html)
-we can use `toSeq` with method call syntax
+we can use `toSeq` with method call syntax!
 &quot;&quot;&quot;</span>.emojize
 
 nbCode:
@@ -138,14 +209,66 @@ nbCode:
   <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> .. <span class="hljs-number">10</span>]
   <span class="hljs-keyword">echo</span> input[^<span class="hljs-number">10</span> .. ^<span class="hljs-number">1</span>]
 
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 1
+
+&gt; As the submarine drops below the surface of the ocean, it automatically performs a sonar sweep of the nearby sea floor. On a small screen, the sonar sweep report (your puzzle input) appears: each line is a measurement of the sea floor depth as the sweep looks further and further away from the submarine.
+&gt; 
+&gt; For example, suppose you had the following report:
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">let</span> report = <span class="hljs-string">&quot;&quot;&quot;
+199
+200
+208
+210
+200
+207
+240
+269
+260
+263&quot;&quot;&quot;</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+&gt; This report indicates that, scanning outward from the submarine, the sonar sweep found depths of 199, 200, 208, 210, and so on.
+&gt; 
+&gt; The first order of business is to figure out how quickly the depth increases, ...
+&gt;
+&gt; To do this, count the _number of times a depth measurement increases_ from the previous measurement
+&gt;
+&gt; ... In this example, there are 7 measurements that are larger than the previous measurement.
+
+The solution for part1 (as expected) is pretty straightforward.
+Just make sure you start from index 1:
+&quot;&quot;&quot;</span>
+
 nbCode:
   <span class="hljs-keyword">func</span> countIncrease(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. s.<span class="hljs-keyword">high</span>:
       <span class="hljs-keyword">if</span> s[i] &gt; s[i - <span class="hljs-number">1</span>]:
         inc <span class="hljs-literal">result</span>
 
+  <span class="hljs-keyword">let</span> testInput = report.splitLines.toSeq.map(parseInt)
+  doAssert testInput.countIncrease == <span class="hljs-number">7</span>
   <span class="hljs-keyword">echo</span> countIncrease(input)
 
+doAssert countIncrease(input) == <span class="hljs-number">1557</span>
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
+
+&gt; Considering every single measurement isn't as useful as you expected: there's just too much noise in the data.
+&gt;
+&gt; Instead, consider _sums of a three-measurement sliding window_.
+&gt;
+&gt; ... Your goal now is to count _the number of times the sum of measurements in this sliding window increases_ from the previous sum.
+&gt;
+&gt; ... In [test] example, there are 5 sums that are larger than the previous sum.
+
+let's create a function that copmutes the window function of a sequence,
+then we will apply previous function to the result.
+&quot;&quot;&quot;</span>
 nbCode:
   <span class="hljs-keyword">func</span> window(s: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], size=<span class="hljs-number">3</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
     <span class="hljs-keyword">assert</span> s.len &gt;= size
@@ -157,7 +280,24 @@ nbCode:
   
   <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]
   <span class="hljs-keyword">echo</span> input[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>].window
+
+nbCode:
+  doAssert testInput.window.countIncrease == <span class="hljs-number">5</span>
   <span class="hljs-keyword">echo</span> input.window.countIncrease
+
+gotTheStar
+doAssert input.window.countIncrease == <span class="hljs-number">1608</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization
+
+I will use the excellent [ggplotnim](https://github.com/Vindaar/ggplotnim)
+to plot the depth profile
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">import</span> ggplotnim 
+  <span class="hljs-keyword">let</span> df = toDf(input)
+  <span class="hljs-keyword">echo</span> df
 
 nbSave</code></pre>
 </section><script>
