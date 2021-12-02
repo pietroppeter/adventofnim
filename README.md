@@ -4,6 +4,7 @@ nim solutions for advent of code ([home](index.html)):
 
 * 2021
   - [day01.html](2021/day01.html)
+  - [day02.html](2021/day02.html)
 * 2020
   - [day01.html](2020/day01.html)
   - [day02.html](2020/day02.html)
