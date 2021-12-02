@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2021/day02.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+</style>
+  
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2021/day02.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<h2>Day 2: <a href="https://adventofcode.com/2021/day/2">Dive!</a> 🚣‍♂️</h2>
+<p>Let's start from the <em>title</em>. Last year titles were all two words, with today's title
+(Dive!) we break this recent tradition (in the past there were longer titles).
+Were there other days with <em>single word</em> titles in the past? Is there a list
+of titles used? The best I could come up with is
+<a href="https://github.com/narimiran/AdventOfCode2020">miran's repo collection</a>,
+but it seems he is also breaking tradition this year and not adding the title
+to his usual nice table.</p>
+<p>Today the problem involved <em>parsing</em>, as we would all expect.
+But do we really need to parse stuff?
+The <a href="https://narimiran.github.io/2021/01/11/nim-parsing.html">small bible for parsing in Nim for Advent of Code</a> is again from miran.
+You would think he would have covered all methods for parsing,
+but in fact today I discovered there are two more:</p>
+<ul>
+<li>one is <a href="https://nim-lang.org/docs/strscans.html#scanTuple.m%2Cuntyped%2Cstatic%5Bstring%5D%2Cvarargs%5Buntyped%5D">scanTuple</a>,
+which is <code>scanf</code> without the need of predeclaring the variables.
+Why does miran's bible misses on that?
+does he have beef with <a href="https://github.com/nim-lang/Nim/pull/16300">beef</a>?
+Well, the reason is more likely to be that it was implemented after the post was written
+and in fact it is another new shiny thing from 1.6, a hidden gem that
+was not even mentioned in the <a href="https://nim-lang.org/blog/2021/10/19/version-160-released.html">release notes</a></li>
+<li>the second apocriphal way of doing parsing is even more <em>magic</em> since
+<em>you do not actually do the parsing</em> and let a <em>good old friend</em> do it.
+It dawned on me during breakfast while I was <em>looking at the puzzle input</em>
+and thinking about <em>an implementation</em> 🤯!</li>
+</ul>
+<p>What is it? follow along to find out!</p>
+<h3>Part 1</h3>
+<blockquote>
+<p>[...] the submarine can take a series of commands like forward 1, down 2, or up 3:</p>
+<ul>
+<li>forward X increases the horizontal position by X units.</li>
+<li>down X <em>increases</em> the depth by X units.</li>
+<li>up X <em>decreases</em> the depth by X units.
+Note that since you're on a submarine, down and up affect your <em>depth</em>, and so they have the opposite result of what you might expect.</li>
+</ul>
+<p>The submarine seems to already have a planned course (your puzzle input). You should probably figure out where it's going. For example:</p>
+</blockquote>
+<pre><code class="nim hljs"><span class="hljs-keyword">template</span> testInput =
+  forward <span class="hljs-number">5</span>
+  down <span class="hljs-number">5</span>
+  forward <span class="hljs-number">8</span>
+  up <span class="hljs-number">3</span>
+  down <span class="hljs-number">8</span>
+  forward <span class="hljs-number">2</span></code></pre>
+<blockquote>
+<p>Your horizontal position and depth both start at 0.</p>
+<p>[...] After following these instructions, you would have a horizontal position of 15 and a depth of 10. (Multiplying these together produces 150.)</p>
+<p>Calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?</p>
+</blockquote>
+<p>Can you see now what is the magic trick and the old friend?
+Did the <em>template</em> above give it away?
+Well, the trick is that the old friend that will do that parsing is
+Nim compiler and I will just have to <code>include</code> the input (which I have saved in a nim file):</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span>
+  solution: <span class="hljs-built_in">int</span>
+<span class="hljs-keyword">template</span> solve = solution = pos.x*pos.d</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> pos: <span class="hljs-keyword">tuple</span>[x, d: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">template</span> down(n: <span class="hljs-built_in">int</span>) = pos.d += n
+<span class="hljs-keyword">template</span> up(n: <span class="hljs-built_in">int</span>) = pos.d -= n
+<span class="hljs-keyword">template</span> forward(n: <span class="hljs-built_in">int</span>) = pos.x += n
+<span class="hljs-keyword">template</span> reset = pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+testInput
+solve
+<span class="hljs-keyword">assert</span> solution == <span class="hljs-number">150</span>
+<span class="hljs-comment"># real input</span>
+reset
+<span class="hljs-keyword">include</span> input02
+solve
+<span class="hljs-keyword">echo</span> solution</code></pre>
+<pre><samp>2322630
+</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<h3>Part 2</h3>
+<blockquote>
+<p>Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.</p>
+<p>In addition to horizontal position and depth, you'll also need to track a third value, <em>aim</em>, which also starts at 0. The commands also mean something entirely different than you first thought:</p>
+<ul>
+<li>down X <em>increases</em> your aim by X units.</li>
+<li>up X <em>decreases</em> your aim by X units.</li>
+<li>forward X does two things:
+<ul>
+<li>It increases your horizontal position by X units.</li>
+<li>It increases your depth by your aim <em>multiplied by</em> X.</li>
+</ul>
+</li>
+</ul>
+<p>[...] Now, the above example [...] you would have a horizontal position of 15 and a depth of 60. (Multiplying these produces <em>900</em>.)</p>
+<p>Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. <em>What do you get if you multiply your final horizontal position by your final depth?</em></p>
+</blockquote>
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> pos: <span class="hljs-keyword">tuple</span>[x, d, a: <span class="hljs-built_in">int</span>]
+<span class="hljs-keyword">template</span> down(n: <span class="hljs-built_in">int</span>) = pos.a += n
+<span class="hljs-keyword">template</span> up(n: <span class="hljs-built_in">int</span>) = pos.a -= n
+<span class="hljs-keyword">template</span> forward(n: <span class="hljs-built_in">int</span>) =
+  pos.x += n
+  pos.d += pos.a*n
+<span class="hljs-keyword">template</span> reset = pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+testInput
+solve
+<span class="hljs-keyword">assert</span> solution == <span class="hljs-number">900</span>
+reset
+<span class="hljs-keyword">include</span> input02
+solve
+<span class="hljs-keyword">echo</span> solution</code></pre>
+<pre><samp>2105273490
+</samp></pre>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+<p>Note that in nimib I can limit the scope of the code to a single block
+with <code>nbCodeInBlock</code>, which is what I am doing here to be able to redefine same stuff
+for part 2 (but <code>solution</code>, <code>solve</code> and <code>testInput</code> are in a <code>nbCode</code> block
+so that they can be available for both parts).</p>
+<h3>highlights of the day</h3>
+<ul>
+<li>as I suspect I was not the only to have thought about the <code>include</code> parsing trick,
+checkout <a href="https://github.com/MichalMarsalek/Advent-of-code/tree/master/2021/Nim">MichalMarsalek repo</a>
+which has also a great setup specific for aoc.</li>
+<li><a href="https://github.com/PMunch/aoc2021">pmunch</a> shared his repo and is back streaming for another year! 🥳</li>
+</ul>
+<p>from <a href="https://www.reddit.com/r/adventofcode/">subreddit</a>:</p>
+<ul>
+<li>a <a href="https://www.reddit.com/r/adventofcode/comments/r77mkv/these_problems_are_harder_than_i_remembered/">fake day 3</a> about <em>wreath numbers</em></li>
+<li>a crazy <a href="https://www.reddit.com/r/adventofcode/comments/r71sss/2021_day_1_ue4_short_intro_video/">Unreal engine rendering of first day</a></li>
+<li>a <a href="https://www.reddit.com/r/adventofcode/comments/r6v23p/day_1_part_1_a_solution_in_piet_a_language_where/">solution in Piet</a>
+an esoteric language where programs look like abstract paintings</li>
+</ul>
+<p>I would also have wanted to do a visualization with <a href="https://github.com/EriKWDev/nanim">nanim</a>
+but did not have yet time, maybe I will add it later, stay tuned and happy Advent of Nim! 🎄👑</p>
+
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+
+nbInit(theme=useAdventOfNim)
+nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 2: [Dive!](https://adventofcode.com/2021/day/2) 🚣‍♂️
+
+Let's start from the _title_. Last year titles were all two words, with today's title
+(Dive!) we break this recent tradition (in the past there were longer titles).
+Were there other days with _single word_ titles in the past? Is there a list
+of titles used? The best I could come up with is
+[miran's repo collection](https://github.com/narimiran/AdventOfCode2020),
+but it seems he is also breaking tradition this year and not adding the title
+to his usual nice table.
+
+Today the problem involved _parsing_, as we would all expect.
+But do we really need to parse stuff?
+The [small bible for parsing in Nim for Advent of Code](https://narimiran.github.io/2021/01/11/nim-parsing.html) is again from miran.
+You would think he would have covered all methods for parsing,
+but in fact today I discovered there are two more:
+
+  - one is [scanTuple](https://nim-lang.org/docs/strscans.html#scanTuple.m%2Cuntyped%2Cstatic%5Bstring%5D%2Cvarargs%5Buntyped%5D),
+    which is `scanf` without the need of predeclaring the variables.
+    Why does miran's bible misses on that?
+    does he have beef with [beef](https://github.com/nim-lang/Nim/pull/16300)?
+    Well, the reason is more likely to be that it was implemented after the post was written
+    and in fact it is another new shiny thing from 1.6, a hidden gem that
+    was not even mentioned in the [release notes](https://nim-lang.org/blog/2021/10/19/version-160-released.html)
+  - the second apocriphal way of doing parsing is even more _magic_ since
+    _you do not actually do the parsing_ and let a _good old friend_ do it.
+    It dawned on me during breakfast while I was _looking at the puzzle input_
+    and thinking about _an implementation_ 🤯!
+
+What is it? follow along to find out!
+
+### Part 1
+
+&gt; [...] the submarine can take a series of commands like forward 1, down 2, or up 3:
+&gt; 
+&gt; - forward X increases the horizontal position by X units.
+&gt; - down X _increases_ the depth by X units.
+&gt; - up X _decreases_ the depth by X units.
+&gt; Note that since you're on a submarine, down and up affect your _depth_, and so they have the opposite result of what you might expect.
+&gt; 
+&gt; The submarine seems to already have a planned course (your puzzle input). You should probably figure out where it's going. For example:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">template</span> testInput =
+    forward <span class="hljs-number">5</span>
+    down <span class="hljs-number">5</span>
+    forward <span class="hljs-number">8</span>
+    up <span class="hljs-number">3</span>
+    down <span class="hljs-number">8</span>
+    forward <span class="hljs-number">2</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+&gt; Your horizontal position and depth both start at 0. 
+&gt; 
+&gt; [...] After following these instructions, you would have a horizontal position of 15 and a depth of 10. (Multiplying these together produces 150.)
+&gt; 
+&gt; Calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?
+
+Can you see now what is the magic trick and the old friend?
+Did the _template_ above give it away?
+Well, the trick is that the old friend that will do that parsing is
+Nim compiler and I will just have to `include` the input (which I have saved in a nim file):
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span>
+    solution: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">template</span> solve = solution = pos.x*pos.d
+
+nbCodeInBlock:
+  <span class="hljs-keyword">var</span> pos: <span class="hljs-keyword">tuple</span>[x, d: <span class="hljs-built_in">int</span>]
+  <span class="hljs-keyword">template</span> down(n: <span class="hljs-built_in">int</span>) = pos.d += n
+  <span class="hljs-keyword">template</span> up(n: <span class="hljs-built_in">int</span>) = pos.d -= n
+  <span class="hljs-keyword">template</span> forward(n: <span class="hljs-built_in">int</span>) = pos.x += n
+  <span class="hljs-keyword">template</span> reset = pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+  testInput
+  solve
+  <span class="hljs-keyword">assert</span> solution == <span class="hljs-number">150</span>
+  <span class="hljs-comment"># real input</span>
+  reset
+  <span class="hljs-keyword">include</span> input02
+  solve
+  <span class="hljs-keyword">echo</span> solution
+
+gotTheStar
+
+<span class="hljs-keyword">assert</span> solution == <span class="hljs-number">2322630</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
+
+&gt; Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+&gt; 
+&gt; In addition to horizontal position and depth, you'll also need to track a third value, _aim_, which also starts at 0. The commands also mean something entirely different than you first thought:
+&gt; 
+&gt; - down X _increases_ your aim by X units.
+&gt; - up X _decreases_ your aim by X units.
+&gt; - forward X does two things:
+&gt;   - It increases your horizontal position by X units.
+&gt;   - It increases your depth by your aim _multiplied by_ X.
+&gt;
+&gt; [...] Now, the above example [...] you would have a horizontal position of 15 and a depth of 60. (Multiplying these produces _900_.)
+&gt; 
+&gt; Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. _What do you get if you multiply your final horizontal position by your final depth?_
+&quot;&quot;&quot;</span>
+nbCodeInBlock:
+  <span class="hljs-keyword">var</span> pos: <span class="hljs-keyword">tuple</span>[x, d, a: <span class="hljs-built_in">int</span>]
+  <span class="hljs-keyword">template</span> down(n: <span class="hljs-built_in">int</span>) = pos.a += n
+  <span class="hljs-keyword">template</span> up(n: <span class="hljs-built_in">int</span>) = pos.a -= n
+  <span class="hljs-keyword">template</span> forward(n: <span class="hljs-built_in">int</span>) =
+    pos.x += n
+    pos.d += pos.a*n
+  <span class="hljs-keyword">template</span> reset = pos = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+  testInput
+  solve
+  <span class="hljs-keyword">assert</span> solution == <span class="hljs-number">900</span>
+  reset
+  <span class="hljs-keyword">include</span> input02
+  solve
+  <span class="hljs-keyword">echo</span> solution
+
+gotTheStar
+
+<span class="hljs-keyword">assert</span> solution == <span class="hljs-number">2105273490</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Note that in nimib I can limit the scope of the code to a single block
+with `nbCodeInBlock`, which is what I am doing here to be able to redefine same stuff
+for part 2 (but `solution`, `solve` and `testInput` are in a `nbCode` block
+so that they can be available for both parts).
+
+### highlights of the day
+
+- as I suspect I was not the only to have thought about the `include` parsing trick,
+  checkout [MichalMarsalek repo](https://github.com/MichalMarsalek/Advent-of-code/tree/master/2021/Nim)
+  which has also a great setup specific for aoc.
+- [pmunch](https://github.com/PMunch/aoc2021) shared his repo and is back streaming for another year! 🥳
+
+from [subreddit](https://www.reddit.com/r/adventofcode/):
+
+- a [fake day 3](https://www.reddit.com/r/adventofcode/comments/r77mkv/these_problems_are_harder_than_i_remembered/) about _wreath numbers_
+- a crazy [Unreal engine rendering of first day](https://www.reddit.com/r/adventofcode/comments/r71sss/2021_day_1_ue4_short_intro_video/)
+- a [solution in Piet](https://www.reddit.com/r/adventofcode/comments/r6v23p/day_1_part_1_a_solution_in_piet_a_language_where/)
+  an esoteric language where programs look like abstract paintings
+
+I would also have wanted to do a visualization with [nanim](https://github.com/EriKWDev/nanim)
+but did not have yet time, maybe I will add it later, stay tuned and happy Advent of Nim! 🎄👑 
+&quot;&quot;&quot;</span>
+
+nbSave
+</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
