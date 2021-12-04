@@ -61,7 +61,23 @@ section#source {
 </div>
 <hr>
 </header><main>
-<h2>Day 3: <a href="https://adventofcode.com/2021/day/3">Binary Diagnostic</a></h2>
+<h2>Day 3: <a href="https://adventofcode.com/2021/day/3">Binary Diagnostic</a> 👯🎛️</h2>
+<p>I had to catch a plane this morning and the puzzle unlocked
+while getting onto the plane. Luckily I was able to solve part1 in the few
+minutes from the moment I sat on the plane to the moment they asked us
+to turn off the devices, so I could get also the text for part2 and had
+plenty of time during flight to solve it.</p>
+<p>Today is also the day in which I finally realize a dream I have been having
+since last edition of Advent Of Code: I want to be able to <em>listen to a puzzle input</em>
+and I want to do it using the genuinely bizarre and bizarrely ingenious library <a href="https://github.com/paranim/paramidi">paramidi</a>
+by one of my favorite Nim authors:
+<a href="https://github.com/oakes">oakes</a> (who is also responsible for <a href="https://github.com/oakes/vim_cubed">vim_cubed</a>,
+which I think is the most starred Nim repository after Nim compiler).</p>
+<p>In order to do that, I accidentally released <a href="https://pietroppeter.github.io/paramidib/">paramidib</a> (not a typo) library,
+which is just two templates to have better access to paramidi through nimib.
+You can now follow along reading my rather dull solution for today
+or head directly for <a href="#whale_music">Part 3: Whale Music 🐳🎶</a>.</p>
+<p>Enjoy <a href="https://forum.nim-lang.org/t/8657">Advent of Nim</a>! 🎄👑</p>
 <h3>Part 1</h3>
 <blockquote>
 <p>The diagnostic report (your puzzle input) consists of a list of binary numbers which, when decoded properly, can tell you many useful things about the conditions of the submarine. The first parameter to check is the <em>power consumption</em>.</p>
@@ -89,17 +105,12 @@ section#source {
 <p>The epsilon rate is calculated in a similar way; rather than use the most common bit, the least common bit from each position is used. So, the epsilon rate is 01001, or <em>9</em> in decimal. Multiplying the gamma rate (22) by the epsilon rate (9) produces the power consumption, <em>198</em>.</p>
 <p>Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. <em>What is the power consumption of the submarine?</em></p>
 </blockquote>
-<p>I had to catch a plane this morning and the puzzle unlocked
-while getting onto the plane. Luckily I was able to solve part1 in the few
-minutes from the moment I sat on the plane to the moment they asked us
-to turn off the devices, so I could get also the text for part2 and had
-plenty of time during flight to solve it.</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">let</span>
   testNums = testInput.splitLines.toSeq
   puzzleNums = <span class="hljs-string">&quot;2021/input03.txt&quot;</span>.lines.toSeq</code></pre>
 <pre><code class="nim hljs"><span class="hljs-keyword">func</span> getGamma(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-built_in">int</span> =
   <span class="hljs-keyword">var</span>
-    gamma = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment"># I can reuse identifier</span>
+    gamma = <span class="hljs-string">&quot;&quot;</span>
     countOnes: <span class="hljs-built_in">int</span>
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. nums[<span class="hljs-number">0</span>].<span class="hljs-keyword">high</span>:
     countOnes = <span class="hljs-number">0</span>
@@ -180,9 +191,212 @@ part2 puzzleNums = 2555739
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 </blockquote>
-<p>Later I will add more comments, highlights and I have
-in mind something special for the &quot;visualization&quot; part (if I get to it).</p>
-<p>Stay tuned and enjoy Advent of Nim! 🎄👑</p>
+<h3>Part 3: <a name="whale_music">Whale Music 🐳🎶</a></h3>
+<blockquote>
+<p>on top of the odd creaking noises that the submarine has been making in its descent,
+you start to hear a more pleasant melody that vibrates all through the hull.
+By looking outside the small circular windows you realize that you are surrounded
+by <a href="https://www.nationalgeographic.com/magazine/graphics/here-is-how-whales-sing-from-yaps-to-fin-slaps-feature">singing whales</a>!</p>
+<p>Having already completed your star collection for the day,
+you decide to dedicate the rest of the day (and night) to learn more about this songs.</p>
+<p>Luckily, the <em>library of the submarnim</em> has a small booklet by one mysterious
+<a href="https://sekao.net">Kaz Cohaes</a> entitled
+<a href="https://it.wikipedia.org/wiki/Paralipomeni_della_Batracomiomachia">paralipomena of phalenotragoùdia</a>
+that promises through the <a href="https://github.com/oakes/ansiwave">lost art of midi</a> to
+allow you to be able to communicate with the singing whales!</p>
+<p>You are definitely in luck today, since it appears that the key ingredient to make
+such a communication possible is a <em>diagnostic report</em> like the one produced by your submarine!
+You also happen to have the
+latest version of terminal <em>N.I.M.I.B.</em> (Natural Inducer of Music for Interesting Balenas)
+which you will use to solve the exercises proposed by the booklet.</p>
+<p>The first chapter of PoP (short for Paralipomena of phalenotragoùdia) starts with the basic
+assumption of whale singing. Communication happen through <em>musical scales</em> and
+the utmost expressiveness is reached through <em>alternating moments of music and moments of silence</em>.
+Your first exercise is to translate your test diagnostic report into music.</p>
+<p><em>Each line of the report is the repetition of the same scale, with the zeros representing
+moments of silence, while when a <em>1</em> is present the note must be emitted</em>.</p>
+</blockquote>
+<p>We will use library <a href="https://github.com/paranim/paramidi">paramidi</a> to produce the music, but we import it as <a href="https://github.com/pietroppeter/paramidib">paramidib</a> (not a typo).
+This is a convenience thin layer that exposes two templates to save a paramidi score
+to a wave file and then to expose such a wave file through an html audio control.</p>
+<p>Since the test diagnostic report is made of strings of 5 digits we will use a
+<a href="https://en.wikipedia.org/wiki/Pentatonic_scale">pentatonic scale</a>.
+The primary way to write a paramidi music score is through a bizarre data structure
+which is a rather freely constructed hierarchy of tuples.
+If you find an instrument in the tuple, it means that what follows will be played
+with that instrument, a tempo annotation sets the tempo, a ratio of integers sets the
+length of next note, then finally come the notes which have the usual syntax through
+letter of the alphabet (there are ways also to change octave and to write chromatic notes).
+A letter <em>r</em> denotes a moment of rest (silence).</p>
+<p>For the first exercise we will encode manually the score.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> paramidib
+saveMusic(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>):
+  (piano,
+    (tempo: <span class="hljs-number">109</span>), <span class="hljs-comment"># allegretto</span>
+    <span class="hljs-number">1</span>/<span class="hljs-number">5</span>, 
+  <span class="hljs-comment"># A C D E G    </span>
+  <span class="hljs-comment"># 0 0 1 0 0</span>
+    r,r,d,r,r,
+  <span class="hljs-comment"># 1 1 1 1 0</span>
+    a,c,d,e,r,
+  <span class="hljs-comment"># 1 0 1 1 0</span>
+    a,r,d,e,r,
+  <span class="hljs-comment"># 1 0 1 1 1</span>
+    a,r,d,e,g,
+  <span class="hljs-comment"># 1 0 1 0 1</span>
+    a,r,d,r,g,
+  <span class="hljs-comment"># 0 1 1 1 1</span>
+    r,c,d,e,g,
+  <span class="hljs-comment"># 0 0 1 1 1</span>
+    r,r,d,e,g,
+  <span class="hljs-comment"># 1 1 1 0 0</span>
+    a,c,d,r,r,
+  <span class="hljs-comment"># 1 0 0 0 0</span>
+    a,r,r,r,r,
+  <span class="hljs-comment"># 1 1 0 0 1</span>
+    a,c,r,r,g,
+  <span class="hljs-comment"># 0 0 0 1 0</span>
+    r,r,r,e,r,
+  <span class="hljs-comment"># 0 1 0 1 0</span>
+    r,c,r,e,r   
+  )</code></pre>
+<audio controls>
+  <source src="../2021/day03test.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<p>Good job on producing the first piece of music!</p>
+<blockquote>
+<p>The second chapter of PoP tells you that longer sequence of digits
+may represent <a href="https://en.wiktionary.org/wiki/arpeggio">arpeggios</a> of scales
+going up and down</p>
+<p>The third chapter tells you that whale are apparently fond a <a href="https://en.wikipedia.org/wiki/Bebop">bop</a>
+and they like the color <a href="https://en.wikipedia.org/wiki/Blue">blue</a>.</p>
+</blockquote>
+<p>Since the puzzle input is made of sequences of 12 digits, we will use
+a <a href="https://en.wikipedia.org/wiki/Blues_scale">blues scale</a> which is made of 6 notes
+and we will go up and down the scale with an arpeggio.</p>
+<p>Here is how this scale sound:</p>
+<pre><code class="nim hljs"><span class="hljs-comment"># blues scale: A C D Eb E G</span>
+saveMusic(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>):
+  (altosax,
+    (tempo: <span class="hljs-number">234</span>), <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,
+    -a, c, d, e♭, e, g,
+     a, g, e, e♭, d, c,
+    -a, c, d, e♭, e, g,
+     a, g, e, e♭, d, c,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+  )</code></pre>
+<audio controls>
+  <source src="../2021/blues_scale.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<p>Note that:</p>
+<ul>
+<li>we pass from a straight ryhthm to <a href="https://en.wikipedia.org/wiki/Swing_(jazz_performance_style)">triplet swing</a></li>
+<li>the instrument is a sax alto and the tempo is the same of Charlie Bird's <a href="https://getsongbpm.com/song/ornithology/MjKLP5">Ornithology</a> (<em>prestissimo</em>)</li>
+<li><code>-a</code> is used for a <code>a</code> one octave lower</li>
+<li><code>dx</code> is actually substituted through a <a href="https://nim-lang.org/docs/filters.html">source code filter</a> to <code>dx</code> which represents <code>d#</code></li>
+</ul>
+<p>Now let's try to see how this would look with the moments of silence on zeros.
+We take the forst two lines of puzzle input to test how it sounds:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">1</span>]</code></pre>
+<pre><samp>@[&quot;111111010011&quot;, &quot;110011001100&quot;]
+</samp></pre>
+<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>):
+  (altosax,
+    (tempo: <span class="hljs-number">234</span>),
+   <span class="hljs-comment">#       1        1        1        1         1        1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+   <span class="hljs-comment">#       0        1        0        0         1        1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+
+   <span class="hljs-comment">#       1        1        0        0         1        1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+   <span class="hljs-comment">#       0        0        1        1         0        0</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r,
+  )</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<p>A tuple is an immutable data structure and since Nim is strongly typed it
+is not the most flexible tool to write a score at runtime.
+Luckily paramidi offers another way to write scores using <code>json</code> variant objects.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">let</span> puzzleHead =
+  %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>},
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>,
+  ]
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>, puzzle_head)</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head_alt.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<p>Note that:</p>
+<ul>
+<li>instead of <code>altosax</code> we need to use <code>alto-sax</code></li>
+<li>instead of <code>-a</code> we use <code>a-</code></li>
+<li>instead of <code>dx</code> we use <code>d#</code>
+In fact all this alternative syntax is the most natural one since it derives</li>
+</ul>
+<p>from the C library that paramidi used to produce the sound.
+See the list of available constants <a href="https://github.com/paranim/paramidi/blob/master/src/paramidi/constants.nim">here</a>.</p>
+<p>Now we are ready to create the score starting from a list of inputs in an automatic way:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> getScore(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>], denominator=<span class="hljs-number">12</span>): <span class="hljs-type">JsonNode</span> =
+  <span class="hljs-keyword">const</span> arpeggio = @[<span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>]
+  <span class="hljs-literal">result</span> = %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>}]
+  <span class="hljs-keyword">var</span>
+    beat = <span class="hljs-literal">true</span>
+    i = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> nums:
+    <span class="hljs-keyword">for</span> digit <span class="hljs-keyword">in</span> num:
+      <span class="hljs-keyword">if</span> beat:
+        <span class="hljs-literal">result</span>.add %(<span class="hljs-number">2</span>/denominator)
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add %(<span class="hljs-number">1</span>/denominator)
+      <span class="hljs-keyword">if</span> digit == <span class="hljs-string">'1'</span>:
+        <span class="hljs-literal">result</span>.add %(arpeggio[i <span class="hljs-keyword">mod</span> <span class="hljs-number">12</span>])
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add %<span class="hljs-string">&quot;r&quot;</span>
+      inc i
+      beat = <span class="hljs-keyword">not</span> beat
+
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]))
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">20</span>], denominator=<span class="hljs-number">24</span>))</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head_longer.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<audio controls>
+  <source src="../2021/day03puzzle_head_faster.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<p>We can also decide that we want to hear stuff at double the velocity.</p>
+<p>Finally, I cannot put the full song since it is too big for github, but here
+is a 10 minute excerpt (full song is around 25 minutes):</p>
+<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>]))
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>], denominator=<span class="hljs-number">24</span>))</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<audio controls>
+  <source src="../2021/day03puzzle_faster.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<blockquote>
+<p>you spend most of the night talking with whales through music,
+it is one of the <em>most magical nights of your advent of code adventures</em>.</p>
+</blockquote>
+<p>Gotta be honest I did not expect the final music to be so good!
+I used it as soundtrack in loop while I was finishing writing the blogpost.</p>
+<p>What <em>a magical night with whale music and what a great Adventure Advent of Code</em> is!</p>
 
 </main>
 <footer>
@@ -194,11 +408,37 @@ in mind something special for the &quot;visualization&quot; part (if I get to it
 </div>
 </footer>
 <section id="source">
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+<pre><code class="nim hljs"><span class="hljs-comment">#? replace(sub=&quot;e♭&quot;, by=&quot;dx&quot;)</span>
+<span class="hljs-keyword">import</span> nimib, animu
 
 nbInit(theme=useAdventOfNim)
 
-nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 3: [Binary Diagnostic](https://adventofcode.com/2021/day/3)
+nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 3: [Binary Diagnostic](https://adventofcode.com/2021/day/3) 👯🎛️
+
+I had to catch a plane this morning and the puzzle unlocked
+while getting onto the plane. Luckily I was able to solve part1 in the few
+minutes from the moment I sat on the plane to the moment they asked us
+to turn off the devices, so I could get also the text for part2 and had
+plenty of time during flight to solve it.
+
+Today is also the day in which I finally realize a dream I have been having
+since last edition of Advent Of Code: I want to be able to _listen to a puzzle input_
+and I want to do it using the genuinely bizarre and bizarrely ingenious library [paramidi]
+by one of my favorite Nim authors:
+[oakes] (who is also responsible for [vim_cubed],
+which I think is the most starred Nim repository after Nim compiler).
+
+In order to do that, I accidentally released [paramidib] (not a typo) library,
+which is just two templates to have better access to paramidi through nimib.
+You can now follow along reading my rather dull solution for today
+or head directly for [Part 3: Whale Music 🐳🎶](#whale_music).
+
+Enjoy [Advent of Nim](https://forum.nim-lang.org/t/8657)! 🎄👑
+
+[paramidi]: https://github.com/paranim/paramidi
+[oakes]: https://github.com/oakes
+[vim_cubed]: https://github.com/oakes/vim_cubed
+[paramidib]: https://pietroppeter.github.io/paramidib/
 
 ### Part 1
 
@@ -237,11 +477,6 @@ nbText: <span class="hljs-string">&quot;&quot;&quot;
 &gt;
 &gt; Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. _What is the power consumption of the submarine?_
 
-I had to catch a plane this morning and the puzzle unlocked
-while getting onto the plane. Luckily I was able to solve part1 in the few
-minutes from the moment I sat on the plane to the moment they asked us
-to turn off the devices, so I could get also the text for part2 and had
-plenty of time during flight to solve it.
 &quot;&quot;&quot;</span>
 nbCode:
   <span class="hljs-keyword">let</span>
@@ -251,7 +486,7 @@ nbCode:
 nbCode:
   <span class="hljs-keyword">func</span> getGamma(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-built_in">int</span> =
     <span class="hljs-keyword">var</span>
-      gamma = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment"># I can reuse identifier</span>
+      gamma = <span class="hljs-string">&quot;&quot;</span>
       countOnes: <span class="hljs-built_in">int</span>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. nums[<span class="hljs-number">0</span>].<span class="hljs-keyword">high</span>:
       countOnes = <span class="hljs-number">0</span>
@@ -326,14 +561,223 @@ nbCode:
 
 gotTheStar
 
-nbText: <span class="hljs-string">&quot;&quot;&quot;
-Later I will add more comments, highlights and I have
-in mind something special for the &quot;visualization&quot; part (if I get to it).
+<span class="hljs-comment"># add an anchor</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 3: &lt;a name=&quot;whale_music&quot;&gt;Whale Music 🐳🎶&lt;/a&gt;
 
-Stay tuned and enjoy Advent of Nim! 🎄👑
+&gt; on top of the odd creaking noises that the submarine has been making in its descent,
+&gt; you start to hear a more pleasant melody that vibrates all through the hull.
+&gt; By looking outside the small circular windows you realize that you are surrounded
+&gt; by [singing whales](https://www.nationalgeographic.com/magazine/graphics/here-is-how-whales-sing-from-yaps-to-fin-slaps-feature)!
+&gt;
+&gt; Having already completed your star collection for the day,
+&gt; you decide to dedicate the rest of the day (and night) to learn more about this songs.
+&gt;
+&gt; Luckily, the _library of the submarnim_ has a small booklet by one mysterious
+&gt; [Kaz Cohaes](https://sekao.net) entitled
+&gt; [paralipomena of phalenotragoùdia](https://it.wikipedia.org/wiki/Paralipomeni_della_Batracomiomachia)
+&gt; that promises through the [lost art of midi](https://github.com/oakes/ansiwave) to
+&gt; allow you to be able to communicate with the singing whales!
+&gt;
+&gt; You are definitely in luck today, since it appears that the key ingredient to make
+&gt; such a communication possible is a _diagnostic report_ like the one produced by your submarine!
+&gt; You also happen to have the
+&gt; latest version of terminal _N.I.M.I.B._ (Natural Inducer of Music for Interesting Balenas)
+&gt; which you will use to solve the exercises proposed by the booklet.
+&gt;
+&gt; The first chapter of PoP (short for Paralipomena of phalenotragoùdia) starts with the basic
+&gt; assumption of whale singing. Communication happen through _musical scales_ and
+&gt; the utmost expressiveness is reached through _alternating moments of music and moments of silence_.
+&gt; Your first exercise is to translate your test diagnostic report into music.
+&gt;
+&gt; _Each line of the report is the repetition of the same scale, with the zeros representing
+&gt; moments of silence, while when a _1_ is present the note must be emitted_.
+
+We will use library [paramidi] to produce the music, but we import it as [paramidib] (not a typo).
+This is a convenience thin layer that exposes two templates to save a paramidi score
+to a wave file and then to expose such a wave file through an html audio control.
+
+Since the test diagnostic report is made of strings of 5 digits we will use a
+[pentatonic scale](https://en.wikipedia.org/wiki/Pentatonic_scale).
+The primary way to write a paramidi music score is through a bizarre data structure
+which is a rather freely constructed hierarchy of tuples.
+If you find an instrument in the tuple, it means that what follows will be played
+with that instrument, a tempo annotation sets the tempo, a ratio of integers sets the
+length of next note, then finally come the notes which have the usual syntax through
+letter of the alphabet (there are ways also to change octave and to write chromatic notes).
+A letter _r_ denotes a moment of rest (silence).
+
+For the first exercise we will encode manually the score.
+
+[paramidi]: https://github.com/paranim/paramidi
+[paramidib]: https://github.com/pietroppeter/paramidib
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> paramidib
+  saveMusic(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>):
+    (piano,
+      (tempo: <span class="hljs-number">109</span>), <span class="hljs-comment"># allegretto</span>
+      <span class="hljs-number">1</span>/<span class="hljs-number">5</span>, 
+    <span class="hljs-comment"># A C D E G    </span>
+    <span class="hljs-comment"># 0 0 1 0 0</span>
+      r,r,d,r,r,
+    <span class="hljs-comment"># 1 1 1 1 0</span>
+      a,c,d,e,r,
+    <span class="hljs-comment"># 1 0 1 1 0</span>
+      a,r,d,e,r,
+    <span class="hljs-comment"># 1 0 1 1 1</span>
+      a,r,d,e,g,
+    <span class="hljs-comment"># 1 0 1 0 1</span>
+      a,r,d,r,g,
+    <span class="hljs-comment"># 0 1 1 1 1</span>
+      r,c,d,e,g,
+    <span class="hljs-comment"># 0 0 1 1 1</span>
+      r,r,d,e,g,
+    <span class="hljs-comment"># 1 1 1 0 0</span>
+      a,c,d,r,r,
+    <span class="hljs-comment"># 1 0 0 0 0</span>
+      a,r,r,r,r,
+    <span class="hljs-comment"># 1 1 0 0 1</span>
+      a,c,r,r,g,
+    <span class="hljs-comment"># 0 0 0 1 0</span>
+      r,r,r,e,r,
+    <span class="hljs-comment"># 0 1 0 1 0</span>
+      r,c,r,e,r   
+    )
+nbAudio(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Good job on producing the first piece of music!
+
+&gt; The second chapter of PoP tells you that longer sequence of digits
+&gt; may represent [arpeggios](https://en.wiktionary.org/wiki/arpeggio) of scales
+&gt; going up and down
+&gt;
+&gt; The third chapter tells you that whale are apparently fond a [bop](https://en.wikipedia.org/wiki/Bebop)
+&gt; and they like the color [blue](https://en.wikipedia.org/wiki/Blue).
+
+Since the puzzle input is made of sequences of 12 digits, we will use
+a [blues scale](https://en.wikipedia.org/wiki/Blues_scale) which is made of 6 notes
+and we will go up and down the scale with an arpeggio.
+
+Here is how this scale sound:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-comment"># blues scale: A C D Eb E G</span>
+  saveMusic(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>):
+    (altosax,
+      (tempo: <span class="hljs-number">234</span>), <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+    )
+nbAudio(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>)
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Note that:
+  - we pass from a straight ryhthm to [triplet swing](https://en.wikipedia.org/wiki/Swing_(jazz_performance_style))
+  - the instrument is a sax alto and the tempo is the same of Charlie Bird's [Ornithology](https://getsongbpm.com/song/ornithology/MjKLP5) (_prestissimo_)
+  - `-a` is used for a `a` one octave lower
+  - `e♭` is actually substituted through a [source code filter](https://nim-lang.org/docs/filters.html) to `dx` which represents `d#`
+
+Now let's try to see how this would look with the moments of silence on zeros.
+We take the forst two lines of puzzle input to test how it sounds:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">echo</span> puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">1</span>]
+
+nbCode:
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>):
+    (altosax,
+      (tempo: <span class="hljs-number">234</span>),
+     <span class="hljs-comment">#       1        1        1        1         1        1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+     <span class="hljs-comment">#       0        1        0        0         1        1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+
+     <span class="hljs-comment">#       1        1        0        0         1        1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+     <span class="hljs-comment">#       0        0        1        1         0        0</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r,
+    )
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+A tuple is an immutable data structure and since Nim is strongly typed it
+is not the most flexible tool to write a score at runtime.
+Luckily paramidi offers another way to write scores using `json` variant objects.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> json
+  <span class="hljs-keyword">let</span> puzzleHead =
+    %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>},
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>,
+    ]
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>, puzzle_head)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>)
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Note that:
+  - instead of `altosax` we need to use `alto-sax`
+  - instead of `-a` we use `a-`
+  - instead of `dx` we use `d#`
+In fact all this alternative syntax is the most natural one since it derives
+from the C library that paramidi used to produce the sound.
+See the list of available constants [here](https://github.com/paranim/paramidi/blob/master/src/paramidi/constants.nim).
+
+Now we are ready to create the score starting from a list of inputs in an automatic way:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> getScore(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>], denominator=<span class="hljs-number">12</span>): <span class="hljs-type">JsonNode</span> =
+    <span class="hljs-keyword">const</span> arpeggio = @[<span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>]
+    <span class="hljs-literal">result</span> = %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>}]
+    <span class="hljs-keyword">var</span>
+      beat = <span class="hljs-literal">true</span>
+      i = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> nums:
+      <span class="hljs-keyword">for</span> digit <span class="hljs-keyword">in</span> num:
+        <span class="hljs-keyword">if</span> beat:
+          <span class="hljs-literal">result</span>.add %(<span class="hljs-number">2</span>/denominator)
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-literal">result</span>.add %(<span class="hljs-number">1</span>/denominator)
+        <span class="hljs-keyword">if</span> digit == <span class="hljs-string">'1'</span>:
+          <span class="hljs-literal">result</span>.add %(arpeggio[i <span class="hljs-keyword">mod</span> <span class="hljs-number">12</span>])
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-literal">result</span>.add %<span class="hljs-string">&quot;r&quot;</span>
+        inc i
+        beat = <span class="hljs-keyword">not</span> beat
+  
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">20</span>], denominator=<span class="hljs-number">24</span>))
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>)
+nbText: <span class="hljs-string">&quot;&quot;&quot;We can also decide that we want to hear stuff at double the velocity.
+
+Finally, I cannot put the full song since it is too big for github, but here
+is a 10 minute excerpt (full song is around 25 minutes):&quot;&quot;&quot;</span>
+nbCode:
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>]))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>], denominator=<span class="hljs-number">24</span>))
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+&gt; you spend most of the night talking with whales through music,
+&gt; it is one of the _most magical nights of your advent of code adventures_.
+
+Gotta be honest I did not expect the final music to be so good!
+I used it as soundtrack in loop while I was finishing writing the blogpost.
+
+What _a magical night with whale music and what a great Adventure Advent of Code_ is!
 &quot;&quot;&quot;</span>
 
 nbSave
+
 
 </code></pre>
 </section><script>
