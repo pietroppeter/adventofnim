@@ -348,10 +348,10 @@ nbAudio("2021/day03puzzle_head_longer.wav")
 nbAudio("2021/day03puzzle_head_faster.wav")
 nbText: """We can also decide that we want to hear stuff at double the velocity.
 
-Finally, here is the full song:"""
+Finally, here is the full song (not really since it is too big for github):"""
 nbCode:
-  saveMusic("2021/day03puzzle.wav", getScore(puzzleNums))
-  saveMusic("2021/day03puzzle_faster.wav", getScore(puzzleNums, denominator=24))
+  saveMusic("2021/day03puzzle.wav", getScore(puzzleNums[0 .. 400]))
+  saveMusic("2021/day03puzzle_faster.wav", getScore(puzzleNums[0 .. 400], denominator=24))
 nbAudio("2021/day03puzzle.wav")
 nbAudio("2021/day03puzzle_faster.wav")
 

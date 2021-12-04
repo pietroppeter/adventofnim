@@ -378,9 +378,9 @@ Your browser does not support the audio element.
 Your browser does not support the audio element.
 </audio>
 <p>We can also decide that we want to hear stuff at double the velocity.</p>
-<p>Finally, here is the full song:</p>
-<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums))
-saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums, denominator=<span class="hljs-number">24</span>))</code></pre>
+<p>Finally, here is the full song (not really since it is too big for github):</p>
+<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>]))
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>], denominator=<span class="hljs-number">24</span>))</code></pre>
 <audio controls>
   <source src="../2021/day03puzzle.wav" type="audio/wav">
 Your browser does not support the audio element.
@@ -757,10 +757,10 @@ nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</
 nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>)
 nbText: <span class="hljs-string">&quot;&quot;&quot;We can also decide that we want to hear stuff at double the velocity.
 
-Finally, here is the full song:&quot;&quot;&quot;</span>
+Finally, here is the full song (not really since it is too big for github):&quot;&quot;&quot;</span>
 nbCode:
-  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums))
-  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums, denominator=<span class="hljs-number">24</span>))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>]))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> .. <span class="hljs-number">400</span>], denominator=<span class="hljs-number">24</span>))
 nbAudio(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>)
 nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>)
 
