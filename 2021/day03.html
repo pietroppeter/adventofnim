@@ -99,7 +99,7 @@ plenty of time during flight to solve it.</p>
   puzzleNums = <span class="hljs-string">&quot;2021/input03.txt&quot;</span>.lines.toSeq</code></pre>
 <pre><code class="nim hljs"><span class="hljs-keyword">func</span> getGamma(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-built_in">int</span> =
   <span class="hljs-keyword">var</span>
-    gamma = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment"># I can reuse identifier</span>
+    gamma = <span class="hljs-string">&quot;&quot;</span>
     countOnes: <span class="hljs-built_in">int</span>
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. nums[<span class="hljs-number">0</span>].<span class="hljs-keyword">high</span>:
     countOnes = <span class="hljs-number">0</span>
@@ -180,6 +180,129 @@ part2 puzzleNums = 2555739
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 </blockquote>
+<h3>Part 3: Whale Music 🐳🎶</h3>
+<p><a href="https://github.com/paranim/paramidi">paramidi</a> -&gt; <a href="https://github.com/pietroppeter/paramidib">paramidib</a></p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> paramidib
+saveMusic(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>):
+  (piano,
+    (tempo: <span class="hljs-number">109</span>), <span class="hljs-comment"># allegretto</span>
+    <span class="hljs-number">1</span>/<span class="hljs-number">5</span>, 
+  <span class="hljs-comment"># A C D E G    </span>
+  <span class="hljs-comment"># 0 0 1 0 0</span>
+    r,r,d,r,r,
+  <span class="hljs-comment"># 1 1 1 1 0</span>
+    a,c,d,e,r,
+  <span class="hljs-comment"># 1 0 1 1 0</span>
+    a,r,d,e,r,
+  <span class="hljs-comment"># 1 0 1 1 1</span>
+    a,r,d,e,g,
+  <span class="hljs-comment"># 1 0 1 0 1</span>
+    a,r,d,r,g,
+  <span class="hljs-comment"># 0 1 1 1 1</span>
+    r,c,d,e,g,
+  <span class="hljs-comment"># 0 0 1 1 1</span>
+    r,r,d,e,g,
+  <span class="hljs-comment"># 1 1 1 0 0</span>
+    a,c,d,r,r,
+  <span class="hljs-comment"># 1 0 0 0 0</span>
+    a,r,r,r,r,
+  <span class="hljs-comment"># 1 1 0 0 1</span>
+    a,c,r,r,g,
+  <span class="hljs-comment"># 0 0 0 1 0</span>
+    r,r,r,e,r,
+  <span class="hljs-comment"># 0 1 0 1 0</span>
+    r,c,r,e,r   
+  )</code></pre>
+<audio controls>
+  <source src="../2021/day03test.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<pre><code class="nim hljs"><span class="hljs-comment"># A C D Eb E G</span>
+saveMusic(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>):
+  (altosax,
+    (tempo: <span class="hljs-number">234</span>), <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,
+    -a, c, d, e♭, e, g,
+     a, g, e, e♭, d, c,
+    -a, c, d, e♭, e, g,
+     a, g, e, e♭, d, c,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+  )</code></pre>
+<audio controls>
+  <source src="../2021/blues_scale.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>):
+  (altosax,
+    (tempo: <span class="hljs-number">234</span>),
+    <span class="hljs-comment">#       1         1         1         1          1         1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-comment">#       0         1         0         0          1         1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+
+    <span class="hljs-comment">#       1         1         0         0          1         1</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+    <span class="hljs-comment">#       0         0         1         1          0         0</span>
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r,
+  )</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">let</span> puzzleHead =
+  %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>},
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+    <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>,
+  ]
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>, puzzle_head)</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head_alt.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> getScore(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>], denominator=<span class="hljs-number">12</span>): <span class="hljs-type">JsonNode</span> =
+  <span class="hljs-keyword">const</span> scale = @[<span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>]
+  <span class="hljs-literal">result</span> = %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>}]
+  <span class="hljs-keyword">var</span>
+    beat = <span class="hljs-literal">true</span>
+    i = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> nums:
+    <span class="hljs-keyword">for</span> digit <span class="hljs-keyword">in</span> num:
+      <span class="hljs-keyword">if</span> beat:
+        <span class="hljs-literal">result</span>.add %(<span class="hljs-number">2</span>/denominator)
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add %(<span class="hljs-number">1</span>/denominator)
+      <span class="hljs-keyword">if</span> digit == <span class="hljs-string">'1'</span>:
+        <span class="hljs-literal">result</span>.add %(scale[i <span class="hljs-keyword">mod</span> <span class="hljs-number">12</span>])
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add %<span class="hljs-string">&quot;r&quot;</span>
+      inc i
+      beat = <span class="hljs-keyword">not</span> beat
+
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]))
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">20</span>], denominator=<span class="hljs-number">24</span>))</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle_head_longer.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<audio controls>
+  <source src="../2021/day03puzzle_head_faster.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<pre><code class="nim hljs">saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums))
+saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums, denominator=<span class="hljs-number">24</span>))</code></pre>
+<audio controls>
+  <source src="../2021/day03puzzle.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
+<audio controls>
+  <source src="../2021/day03puzzle_faster.wav" type="audio/wav">
+Your browser does not support the audio element.
+</audio>
 <p>Later I will add more comments, highlights and I have
 in mind something special for the &quot;visualization&quot; part (if I get to it).</p>
 <p>Stay tuned and enjoy Advent of Nim! 🎄👑</p>
@@ -194,7 +317,8 @@ in mind something special for the &quot;visualization&quot; part (if I get to it
 </div>
 </footer>
 <section id="source">
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, animu
+<pre><code class="nim hljs"><span class="hljs-comment">#? replace(sub=&quot;e♭&quot;, by=&quot;dx&quot;)</span>
+<span class="hljs-keyword">import</span> nimib, animu
 
 nbInit(theme=useAdventOfNim)
 
@@ -251,7 +375,7 @@ nbCode:
 nbCode:
   <span class="hljs-keyword">func</span> getGamma(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]): <span class="hljs-built_in">int</span> =
     <span class="hljs-keyword">var</span>
-      gamma = <span class="hljs-string">&quot;&quot;</span>  <span class="hljs-comment"># I can reuse identifier</span>
+      gamma = <span class="hljs-string">&quot;&quot;</span>
       countOnes: <span class="hljs-built_in">int</span>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. nums[<span class="hljs-number">0</span>].<span class="hljs-keyword">high</span>:
       countOnes = <span class="hljs-number">0</span>
@@ -325,6 +449,130 @@ nbCode:
   dump part2 puzzleNums
 
 gotTheStar
+
+<span class="hljs-comment"># add an anchor</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 3: Whale Music 🐳🎶
+
+[paramidi] -&gt; [paramidib]
+
+[paramidi]: https://github.com/paranim/paramidi
+[paramidib]: https://github.com/pietroppeter/paramidib
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> paramidib
+  saveMusic(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>):
+    (piano,
+      (tempo: <span class="hljs-number">109</span>), <span class="hljs-comment"># allegretto</span>
+      <span class="hljs-number">1</span>/<span class="hljs-number">5</span>, 
+    <span class="hljs-comment"># A C D E G    </span>
+    <span class="hljs-comment"># 0 0 1 0 0</span>
+      r,r,d,r,r,
+    <span class="hljs-comment"># 1 1 1 1 0</span>
+      a,c,d,e,r,
+    <span class="hljs-comment"># 1 0 1 1 0</span>
+      a,r,d,e,r,
+    <span class="hljs-comment"># 1 0 1 1 1</span>
+      a,r,d,e,g,
+    <span class="hljs-comment"># 1 0 1 0 1</span>
+      a,r,d,r,g,
+    <span class="hljs-comment"># 0 1 1 1 1</span>
+      r,c,d,e,g,
+    <span class="hljs-comment"># 0 0 1 1 1</span>
+      r,r,d,e,g,
+    <span class="hljs-comment"># 1 1 1 0 0</span>
+      a,c,d,r,r,
+    <span class="hljs-comment"># 1 0 0 0 0</span>
+      a,r,r,r,r,
+    <span class="hljs-comment"># 1 1 0 0 1</span>
+      a,c,r,r,g,
+    <span class="hljs-comment"># 0 0 0 1 0</span>
+      r,r,r,e,r,
+    <span class="hljs-comment"># 0 1 0 1 0</span>
+      r,c,r,e,r   
+    )
+nbAudio(<span class="hljs-string">&quot;2021/day03test.wav&quot;</span>)
+
+  <span class="hljs-comment"># blues scale: https://en.wikipedia.org/wiki/Blues_scale</span>
+  <span class="hljs-comment">#12 notes so it is up and down</span>
+  <span class="hljs-comment">#A C D Eb E G</span>
+  <span class="hljs-comment">#rhythm is triplet swing: https://en.wikipedia.org/wiki/Swing_(jazz_performance_style)</span>
+  <span class="hljs-comment">#instrument is saxophone (alto)</span>
+  <span class="hljs-comment">#tempo: 234 Charlie Parker Ornithology (prestissimo)</span>
+nbCode:
+  <span class="hljs-comment"># A C D Eb E G</span>
+  saveMusic(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>):
+    (altosax,
+      (tempo: <span class="hljs-number">234</span>), <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+    )
+nbAudio(<span class="hljs-string">&quot;2021/blues_scale.wav&quot;</span>)
+nbCode:
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>):
+    (altosax,
+      (tempo: <span class="hljs-number">234</span>),
+      <span class="hljs-comment">#       1         1         1         1          1         1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-comment">#       0         1         0         0          1         1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, d, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c,
+
+      <span class="hljs-comment">#       1         1         0         0          1         1</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, -a, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, c, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, g,
+      <span class="hljs-comment">#       0         0         1         1          0         0</span>
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, e, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, e♭, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, r, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, r,
+    )
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head.wav&quot;</span>)
+
+nbCode:
+  <span class="hljs-keyword">import</span> json
+  <span class="hljs-keyword">let</span> puzzleHead =
+    %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>},
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span> , <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;g&quot;</span>,
+      <span class="hljs-number">2</span>/<span class="hljs-number">12</span>,  <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-number">2</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>, <span class="hljs-number">1</span>/<span class="hljs-number">12</span>, <span class="hljs-string">&quot;r&quot;</span>,
+    ]
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>, puzzle_head)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_alt.wav&quot;</span>)
+<span class="hljs-comment"># json:</span>
+<span class="hljs-comment"># altosax -&gt; alto-sax</span>
+<span class="hljs-comment"># -a -&gt; a-</span>
+<span class="hljs-comment"># dx -&gt; d#</span>
+nbCode:
+  <span class="hljs-keyword">func</span> getScore(nums: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>], denominator=<span class="hljs-number">12</span>): <span class="hljs-type">JsonNode</span> =
+    <span class="hljs-keyword">const</span> scale = @[<span class="hljs-string">&quot;a-&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;g&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;d#&quot;</span>, <span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>]
+    <span class="hljs-literal">result</span> = %*[<span class="hljs-string">&quot;alto-sax&quot;</span>, {<span class="hljs-string">&quot;tempo&quot;</span>: <span class="hljs-number">234</span>}]
+    <span class="hljs-keyword">var</span>
+      beat = <span class="hljs-literal">true</span>
+      i = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> nums:
+      <span class="hljs-keyword">for</span> digit <span class="hljs-keyword">in</span> num:
+        <span class="hljs-keyword">if</span> beat:
+          <span class="hljs-literal">result</span>.add %(<span class="hljs-number">2</span>/denominator)
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-literal">result</span>.add %(<span class="hljs-number">1</span>/denominator)
+        <span class="hljs-keyword">if</span> digit == <span class="hljs-string">'1'</span>:
+          <span class="hljs-literal">result</span>.add %(scale[i <span class="hljs-keyword">mod</span> <span class="hljs-number">12</span>])
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-literal">result</span>.add %<span class="hljs-string">&quot;r&quot;</span>
+        inc i
+        beat = <span class="hljs-keyword">not</span> beat
+  
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">10</span>]))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>, getScore(puzzleNums[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">20</span>], denominator=<span class="hljs-number">24</span>))
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_longer.wav&quot;</span>)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_head_faster.wav&quot;</span>)
+nbCode:
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>, getScore(puzzleNums))
+  saveMusic(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>, getScore(puzzleNums, denominator=<span class="hljs-number">24</span>))
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle.wav&quot;</span>)
+nbAudio(<span class="hljs-string">&quot;2021/day03puzzle_faster.wav&quot;</span>)
 
 nbText: <span class="hljs-string">&quot;&quot;&quot;
 Later I will add more comments, highlights and I have

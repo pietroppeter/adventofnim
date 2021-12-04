@@ -1,3 +1,4 @@
+#? replace(sub="e♭", by="dx")
 import nimib, animu
 
 nbInit(theme=useAdventOfNim)
@@ -55,7 +56,7 @@ nbCode:
 nbCode:
   func getGamma(nums: seq[string]): int =
     var
-      gamma = ""  # I can reuse identifier
+      gamma = ""
       countOnes: int
     for i in 0 .. nums[0].high:
       countOnes = 0
@@ -129,6 +130,130 @@ nbCode:
   dump part2 puzzleNums
 
 gotTheStar
+
+# add an anchor
+nbText: """### Part 3: Whale Music 🐳🎶
+
+[paramidi] -> [paramidib]
+
+[paramidi]: https://github.com/paranim/paramidi
+[paramidib]: https://github.com/pietroppeter/paramidib
+"""
+nbCode:
+  import paramidib
+  saveMusic("2021/day03test.wav"):
+    (piano,
+      (tempo: 109), # allegretto
+      1/5, 
+    # A C D E G    
+    # 0 0 1 0 0
+      r,r,d,r,r,
+    # 1 1 1 1 0
+      a,c,d,e,r,
+    # 1 0 1 1 0
+      a,r,d,e,r,
+    # 1 0 1 1 1
+      a,r,d,e,g,
+    # 1 0 1 0 1
+      a,r,d,r,g,
+    # 0 1 1 1 1
+      r,c,d,e,g,
+    # 0 0 1 1 1
+      r,r,d,e,g,
+    # 1 1 1 0 0
+      a,c,d,r,r,
+    # 1 0 0 0 0
+      a,r,r,r,r,
+    # 1 1 0 0 1
+      a,c,r,r,g,
+    # 0 0 0 1 0
+      r,r,r,e,r,
+    # 0 1 0 1 0
+      r,c,r,e,r   
+    )
+nbAudio("2021/day03test.wav")
+
+  # blues scale: https://en.wikipedia.org/wiki/Blues_scale
+  #12 notes so it is up and down
+  #A C D Eb E G
+  #rhythm is triplet swing: https://en.wikipedia.org/wiki/Swing_(jazz_performance_style)
+  #instrument is saxophone (alto)
+  #tempo: 234 Charlie Parker Ornithology (prestissimo)
+nbCode:
+  # A C D Eb E G
+  saveMusic("2021/blues_scale.wav"):
+    (altosax,
+      (tempo: 234), 2/12,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      -a, c, d, e♭, e, g,
+       a, g, e, e♭, d, c,
+      2/12, -a, 1/12, c, 2/12, d, 1/12, e♭, 2/12, e, 1/12, g,
+      2/12,  a, 1/12, g, 2/12, e, 1/12, e♭, 2/12, d, 1/12, c,
+      2/12, -a, 1/12, c, 2/12, d, 1/12, e♭, 2/12, e, 1/12, g,
+      2/12,  a, 1/12, g, 2/12, e, 1/12, e♭, 2/12, d, 1/12, c,
+    )
+nbAudio("2021/blues_scale.wav")
+nbCode:
+  saveMusic("2021/day03puzzle_head.wav"):
+    (altosax,
+      (tempo: 234),
+      #       1         1         1         1          1         1
+      2/12, -a, 1/12, c, 2/12, d, 1/12, e♭, 2/12, e, 1/12, g,
+      #       0         1         0         0          1         1
+      2/12,  r, 1/12, g, 2/12, r, 1/12, r , 2/12, d, 1/12, c,
+
+      #       1         1         0         0          1         1
+      2/12, -a, 1/12, c, 2/12, r, 1/12, r , 2/12, e, 1/12, g,
+      #       0         0         1         1          0         0
+      2/12,  r, 1/12, r, 2/12, e, 1/12, e♭, 2/12, r, 1/12, r,
+    )
+nbAudio("2021/day03puzzle_head.wav")
+
+nbCode:
+  import json
+  let puzzleHead =
+    %*["alto-sax", {"tempo": 234},
+      2/12, "a-", 1/12, "c", 2/12, "d", 1/12, "d#", 2/12, "e", 1/12, "g",
+      2/12,  "r", 1/12, "g", 2/12, "r", 1/12, "r" , 2/12, "d", 1/12, "c",
+      2/12, "a-", 1/12, "c", 2/12, "r", 1/12, "r" , 2/12, "e", 1/12, "g",
+      2/12,  "r", 1/12, "r", 2/12, "e", 1/12, "d#", 2/12, "r", 1/12, "r",
+    ]
+  saveMusic("2021/day03puzzle_head_alt.wav", puzzle_head)
+nbAudio("2021/day03puzzle_head_alt.wav")
+# json:
+# altosax -> alto-sax
+# -a -> a-
+# dx -> d#
+nbCode:
+  func getScore(nums: seq[string], denominator=12): JsonNode =
+    const arpeggio = @["a-", "c", "d", "d#", "e", "g", "a", "g", "e", "d#", "d", "c"]
+    result = %*["alto-sax", {"tempo": 234}]
+    var
+      beat = true
+      i = 0
+    for num in nums:
+      for digit in num:
+        if beat:
+          result.add %(2/denominator)
+        else:
+          result.add %(1/denominator)
+        if digit == '1':
+          result.add %(arpeggio[i mod 12])
+        else:
+          result.add %"r"
+        inc i
+        beat = not beat
+  
+  saveMusic("2021/day03puzzle_head_longer.wav", getScore(puzzleNums[0 ..< 10]))
+  saveMusic("2021/day03puzzle_head_faster.wav", getScore(puzzleNums[0 ..< 20], denominator=24))
+nbAudio("2021/day03puzzle_head_longer.wav")
+nbAudio("2021/day03puzzle_head_faster.wav")
+nbCode:
+  saveMusic("2021/day03puzzle.wav", getScore(puzzleNums))
+  saveMusic("2021/day03puzzle_faster.wav", getScore(puzzleNums, denominator=24))
+nbAudio("2021/day03puzzle.wav")
+nbAudio("2021/day03puzzle_faster.wav")
 
 nbText: """
 Later I will add more comments, highlights and I have
