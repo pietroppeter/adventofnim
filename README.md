@@ -1,6 +1,6 @@
 # 🎄👑 adventofnim
 
-nim solutions for advent of code ([home](index.html)):
+my nim solutions for advent of code ([home](index.html)):
 
 * 2021
   - [day01.html](2021/day01.html)
@@ -24,6 +24,11 @@ nim solutions for advent of code ([home](index.html)):
   - [day15.html](2020/day15.html)
   - [day17.html](2020/day17.html)
 
+
+
+useful links:
+- [search solutions by language](https://aocweb.yulrizka.com/?year=2021&day=1&language=Nim)
+- [jittered scatterplot of leaderboard times](http://www.maurits.vdschee.nl/scatterplot/)
 
 how to:
 

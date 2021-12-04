@@ -9,7 +9,7 @@ nbDoc.title = ":christmas_tree::crown:".emojize
 nbText: """
 # :christmas_tree::crown: adventofnim
 
-nim solutions for advent of code ([home](index.html)):""".emojize
+my nim solutions for advent of code ([home](index.html)):""".emojize
 
 let years = ["2021", "2020"]
 type Content = Table[string, seq[string]]
@@ -35,6 +35,11 @@ proc `$`(c: Content): string =
 nbText: $content
 
 nbText: """
+
+useful links:
+- [search solutions by language](https://aocweb.yulrizka.com/?year=2021&day=1&language=Nim)
+- [jittered scatterplot of leaderboard times](http://www.maurits.vdschee.nl/scatterplot/)
+
 how to:
 
 * generate README.md and index.html: `nim r index`
