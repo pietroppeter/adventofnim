@@ -78,19 +78,25 @@ section#source {
   <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
     <span class="hljs-literal">result</span>[i] = abs(crab - i)
+
 <span class="hljs-keyword">func</span> cost(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
   <span class="hljs-keyword">let</span> max = max(crabs)
   <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
   <span class="hljs-keyword">for</span> crab <span class="hljs-keyword">in</span> crabs:
     <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> cost(crab, max):
       <span class="hljs-literal">result</span>[i] += c
-<span class="hljs-keyword">func</span> part1(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+
+<span class="hljs-keyword">func</span> part1(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
   <span class="hljs-keyword">let</span> c = cost(crabs)
-  min(c)
-dump part1(testInput)
-dump part1(puzzleInput)</code></pre>
-<pre><samp>part1(testInput) = 37
-part1(puzzleInput) = 339321
+  (min(c), minIndex(c))
+
+<span class="hljs-keyword">let</span>
+  testResult = part1(testInput)
+  puzzleResult = part1(puzzleInput)
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1(test): &quot;</span>, $testResult[<span class="hljs-number">0</span>]
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1(puzzle): &quot;</span>, $puzzleResult[<span class="hljs-number">0</span>]</code></pre>
+<pre><samp>part1(test): 37
+part1(puzzle): 339321
 </samp></pre>
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
@@ -100,29 +106,87 @@ part1(puzzleInput) = 339321
   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
     <span class="hljs-keyword">let</span> n = abs(crab - i)
     <span class="hljs-literal">result</span>[i] = n * (n + <span class="hljs-number">1</span>) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span> 
+
 <span class="hljs-keyword">func</span> cost2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
   <span class="hljs-keyword">let</span> max = max(crabs)
   <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
   <span class="hljs-keyword">for</span> crab <span class="hljs-keyword">in</span> crabs:
     <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> cost2(crab, max):
       <span class="hljs-literal">result</span>[i] += c
-<span class="hljs-keyword">func</span> part2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+
+<span class="hljs-keyword">func</span> part2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
   <span class="hljs-keyword">let</span> c = cost2(crabs)
-  min(c)
-dump cost2(<span class="hljs-number">16</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-dump cost2(<span class="hljs-number">0</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-dump cost2(<span class="hljs-number">7</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-dump part2(testInput)
-dump part2(puzzleInput)</code></pre>
-<pre><samp>cost2(16, 16)[5] = 66
-cost2(0, 16)[5] = 15
-cost2(7, 16)[5] = 3
-part2(testInput) = 168
-part2(puzzleInput) = 95476244
+  (min(c), minIndex(c))
+
+<span class="hljs-keyword">let</span>
+  testResult2 = part2(testInput)
+  puzzleResult2 = part2(puzzleInput)
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(test): &quot;</span>, $testResult2[<span class="hljs-number">0</span>]
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(puzzle): &quot;</span>, $puzzleResult2[<span class="hljs-number">0</span>]</code></pre>
+<pre><samp>part2(test): 168
+part2(puzzle): 95476244
 </samp></pre>
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
 </blockquote>
+<h3>Visualization: Crab Dance 🦀🕺</h3>
+<p>I will animate the crab dance using <a href="https://github.com/EriKWDev/nanim">nanim</a>, a <a href="https://github.com/3b1b/manim/">manim</a> inspired library to produce animations.</p>
+<p>Colors:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nanim
+
+<span class="hljs-keyword">proc</span> crabDance(startPos: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], endPos: <span class="hljs-built_in">int</span>, endPos2: <span class="hljs-built_in">int</span>,
+  scale=<span class="hljs-number">20.0</span>, fixFactor=<span class="hljs-number">4.0</span>, fixLagX=<span class="hljs-number">2</span>, fixLagX2=<span class="hljs-number">0</span>, fixLagY=<span class="hljs-number">1</span>): <span class="hljs-type">Scene</span> =
+  <span class="hljs-keyword">let</span>
+    colors = colorsFromCoolors(<span class="hljs-string">&quot;https://coolors.co/202b38-009900-ffff66-dea584-b5453a&quot;</span>)
+    dark = colors[<span class="hljs-number">0</span>]
+    rust = colors[<span class="hljs-number">3</span>]
+    crab = colors[<span class="hljs-number">4</span>]
+
+  <span class="hljs-keyword">var</span> scene = newScene() <span class="hljs-comment"># a ref object, let would be also fine</span>
+  scene.setBackgroundColor(dark)
+  <span class="hljs-comment"># will need to handle a scale for puzzle input</span>
+  scene.width = <span class="hljs-built_in">int</span>(max(startPos).<span class="hljs-built_in">float</span>*scale) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span>
+  scene.height = <span class="hljs-built_in">int</span>(len(startPos).<span class="hljs-built_in">float</span>*scale) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span>
+
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. startPos.<span class="hljs-keyword">high</span>:
+    <span class="hljs-keyword">let</span> square = newSquare(side=fixFactor*scale, centered=<span class="hljs-literal">false</span>)
+    square.fill(crab)
+    <span class="hljs-keyword">discard</span> square.move(fixFactor*(startPos[i] - fixLagX).<span class="hljs-built_in">float</span>*scale, fixFactor*(i + fixLagY).<span class="hljs-built_in">float</span>*scale )
+    scene.add(square)
+
+    scene.onTrack i:
+      scene.wait <span class="hljs-number">500</span>
+      scene.play(square.move(fixFactor*(endPos - startPos[i]).<span class="hljs-built_in">float</span>*scale, <span class="hljs-number">0</span>).with(duration=<span class="hljs-number">5000</span>))
+      scene.wait <span class="hljs-number">500</span>
+
+    <span class="hljs-keyword">let</span> square2 = newSquare(side=fixFactor*scale, centered=<span class="hljs-literal">false</span>)
+    square2.fill(rust)
+    <span class="hljs-keyword">discard</span> square2.move(fixFactor*(max(startPos) - startPos[i] - fixLagX - fixLagX2).<span class="hljs-built_in">float</span>*scale, fixFactor*(i + fixLagY).<span class="hljs-built_in">float</span>*scale )
+    scene.add(square2)
+
+    scene.onTrack i + len(startPos):
+      scene.wait <span class="hljs-number">500</span>
+      scene.play(square2.move(fixFactor*(startPos[i] - endPos2).<span class="hljs-built_in">float</span>*scale, <span class="hljs-number">0</span>).with(duration=<span class="hljs-number">5000</span>))
+      scene.wait <span class="hljs-number">500</span>
+
+  <span class="hljs-keyword">return</span> scene
+
+render(crabDance(testInput, testResult[<span class="hljs-number">1</span>], testResult2[<span class="hljs-number">1</span>]), <span class="hljs-string">&quot;2021/test_dance.mp4&quot;</span>)</code></pre>
+<pre><samp>[[38;5;63mInfo[0m]: Width: 160, Height: 100 (ratio: 1.60:1.00), FPS: 60.0
+[[38;5;63mInfo[0m]: Launching FFmpeg subprocess with: ffmpeg -y -f rawvideo -pix_fmt rgba -s 320x200 -r 60.0 -i - -vf vflip -an -c:v libx264 -preset medium -profile:v high -crf 17 -coder 1 -tune animation -pix_fmt yuv420p -movflags +faststart -g 30 -bf 2 2021/test_dance.mp4
+</samp></pre>
+<video controls>
+  <source src="../2021/test_dance.mp4" type="video/mp4">
+Your browser does not support the video element.
+</video>
+<pre><code class="nim hljs">render(crabDance(puzzleInput, puzzleResult[<span class="hljs-number">1</span>], puzzleResult[<span class="hljs-number">1</span>], scale=<span class="hljs-number">0.5</span>, fixLagX=<span class="hljs-number">250</span>, fixLagX2=<span class="hljs-number">1000</span>), <span class="hljs-string">&quot;2021/crab_dance.mp4&quot;</span>)</code></pre>
+<pre><samp>[[38;5;63mInfo[0m]: Width: 484, Height: 250 (ratio: 1.94:1.00), FPS: 60.0
+[[38;5;63mInfo[0m]: Launching FFmpeg subprocess with: ffmpeg -y -f rawvideo -pix_fmt rgba -s 968x500 -r 60.0 -i - -vf vflip -an -c:v libx264 -preset medium -profile:v high -crf 17 -coder 1 -tune animation -pix_fmt yuv420p -movflags +faststart -g 30 -bf 2 2021/crab_dance.mp4
+</samp></pre>
+<video controls>
+  <source src="../2021/crab_dance.mp4" type="video/mp4">
+Your browser does not support the video element.
+</video>
 
 </main>
 <footer>
@@ -140,6 +204,15 @@ part2(puzzleInput) = 95476244
 ]#</span>
 <span class="hljs-keyword">import</span> animu, nimib
 nbInit(theme=useAdventOfNim)
+
+<span class="hljs-comment"># this and nbAudio should end up in nimib!</span>
+<span class="hljs-keyword">template</span> nbVideo(mp4url: <span class="hljs-built_in">string</span>) = nbText <span class="hljs-string">&quot;&quot;&quot;
+&lt;video controls&gt;
+  &lt;source src=&quot;&quot;&quot;&quot;</span> &amp; joinPath(nb.srcDirRel.<span class="hljs-built_in">string</span>, mp4url) &amp; <span class="hljs-string">&quot;&quot;&quot;&quot; type=&quot;video/mp4&quot;&gt;
+Your browser does not support the video element.
+&lt;/video&gt;
+&quot;&quot;&quot;</span>
+
 nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 7: [The Treachery of Whales]
 [The Treachery of Whales]: https://adventofcode.com/2021/day/7
 
@@ -158,17 +231,23 @@ nbCode:
     <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
       <span class="hljs-literal">result</span>[i] = abs(crab - i)
+
   <span class="hljs-keyword">func</span> cost(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
     <span class="hljs-keyword">let</span> max = max(crabs)
     <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
     <span class="hljs-keyword">for</span> crab <span class="hljs-keyword">in</span> crabs:
       <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> cost(crab, max):
         <span class="hljs-literal">result</span>[i] += c
-  <span class="hljs-keyword">func</span> part1(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+
+  <span class="hljs-keyword">func</span> part1(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
     <span class="hljs-keyword">let</span> c = cost(crabs)
-    min(c)
-  dump part1(testInput)
-  dump part1(puzzleInput)
+    (min(c), minIndex(c))
+
+  <span class="hljs-keyword">let</span>
+    testResult = part1(testInput)
+    puzzleResult = part1(puzzleInput)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1(test): &quot;</span>, $testResult[<span class="hljs-number">0</span>]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part1(puzzle): &quot;</span>, $puzzleResult[<span class="hljs-number">0</span>]
 
 gotTheStar
 
@@ -178,24 +257,91 @@ nbCode:
     <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. <span class="hljs-literal">result</span>.<span class="hljs-keyword">high</span>:
       <span class="hljs-keyword">let</span> n = abs(crab - i)
       <span class="hljs-literal">result</span>[i] = n * (n + <span class="hljs-number">1</span>) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span> 
+
   <span class="hljs-keyword">func</span> cost2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>] =
     <span class="hljs-keyword">let</span> max = max(crabs)
     <span class="hljs-literal">result</span> = newSeqWith(len=max + <span class="hljs-number">1</span>): <span class="hljs-number">0</span>
     <span class="hljs-keyword">for</span> crab <span class="hljs-keyword">in</span> crabs:
       <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> cost2(crab, max):
         <span class="hljs-literal">result</span>[i] += c
-  <span class="hljs-keyword">func</span> part2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): <span class="hljs-built_in">int</span> =
+
+  <span class="hljs-keyword">func</span> part2(crabs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]): (<span class="hljs-built_in">int</span>, <span class="hljs-built_in">int</span>) =
     <span class="hljs-keyword">let</span> c = cost2(crabs)
-    min(c)
-  dump cost2(<span class="hljs-number">16</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-  dump cost2(<span class="hljs-number">0</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-  dump cost2(<span class="hljs-number">7</span>, <span class="hljs-number">16</span>)[<span class="hljs-number">5</span>]
-  dump part2(testInput)
-  dump part2(puzzleInput)
+    (min(c), minIndex(c))
+
+  <span class="hljs-keyword">let</span>
+    testResult2 = part2(testInput)
+    puzzleResult2 = part2(puzzleInput)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(test): &quot;</span>, $testResult2[<span class="hljs-number">0</span>]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(puzzle): &quot;</span>, $puzzleResult2[<span class="hljs-number">0</span>]
 
 gotTheStar
 
-nbSave</code></pre>
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization: Crab Dance 🦀🕺
+
+I will animate the crab dance using [nanim], a [manim] inspired library to produce animations.
+
+[nanim]: https://github.com/EriKWDev/nanim
+[manim]: https://github.com/3b1b/manim/
+
+Colors:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> nanim
+
+  <span class="hljs-keyword">proc</span> crabDance(startPos: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], endPos: <span class="hljs-built_in">int</span>, endPos2: <span class="hljs-built_in">int</span>,
+    scale=<span class="hljs-number">20.0</span>, fixFactor=<span class="hljs-number">4.0</span>, fixLagX=<span class="hljs-number">2</span>, fixLagX2=<span class="hljs-number">0</span>, fixLagY=<span class="hljs-number">1</span>): <span class="hljs-type">Scene</span> =
+    <span class="hljs-keyword">let</span>
+      colors = colorsFromCoolors(<span class="hljs-string">&quot;https://coolors.co/202b38-009900-ffff66-dea584-b5453a&quot;</span>)
+      dark = colors[<span class="hljs-number">0</span>]
+      rust = colors[<span class="hljs-number">3</span>]
+      crab = colors[<span class="hljs-number">4</span>]
+
+    <span class="hljs-keyword">var</span> scene = newScene() <span class="hljs-comment"># a ref object, let would be also fine</span>
+    scene.setBackgroundColor(dark)
+    <span class="hljs-comment"># will need to handle a scale for puzzle input</span>
+    scene.width = <span class="hljs-built_in">int</span>(max(startPos).<span class="hljs-built_in">float</span>*scale) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span>
+    scene.height = <span class="hljs-built_in">int</span>(len(startPos).<span class="hljs-built_in">float</span>*scale) <span class="hljs-keyword">div</span> <span class="hljs-number">2</span>
+
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. startPos.<span class="hljs-keyword">high</span>:
+      <span class="hljs-keyword">let</span> square = newSquare(side=fixFactor*scale, centered=<span class="hljs-literal">false</span>)
+      square.fill(crab)
+      <span class="hljs-keyword">discard</span> square.move(fixFactor*(startPos[i] - fixLagX).<span class="hljs-built_in">float</span>*scale, fixFactor*(i + fixLagY).<span class="hljs-built_in">float</span>*scale )
+      scene.add(square)
+
+      scene.onTrack i:
+        scene.wait <span class="hljs-number">500</span>
+        scene.play(square.move(fixFactor*(endPos - startPos[i]).<span class="hljs-built_in">float</span>*scale, <span class="hljs-number">0</span>).with(duration=<span class="hljs-number">5000</span>))
+        scene.wait <span class="hljs-number">500</span>
+
+      <span class="hljs-keyword">let</span> square2 = newSquare(side=fixFactor*scale, centered=<span class="hljs-literal">false</span>)
+      square2.fill(rust)
+      <span class="hljs-keyword">discard</span> square2.move(fixFactor*(max(startPos) - startPos[i] - fixLagX - fixLagX2).<span class="hljs-built_in">float</span>*scale, fixFactor*(i + fixLagY).<span class="hljs-built_in">float</span>*scale )
+      scene.add(square2)
+
+      scene.onTrack i + len(startPos):
+        scene.wait <span class="hljs-number">500</span>
+        scene.play(square2.move(fixFactor*(startPos[i] - endPos2).<span class="hljs-built_in">float</span>*scale, <span class="hljs-number">0</span>).with(duration=<span class="hljs-number">5000</span>))
+        scene.wait <span class="hljs-number">500</span>
+
+    <span class="hljs-keyword">return</span> scene
+  
+  render(crabDance(testInput, testResult[<span class="hljs-number">1</span>], testResult2[<span class="hljs-number">1</span>]), <span class="hljs-string">&quot;2021/test_dance.mp4&quot;</span>)
+nbVideo(<span class="hljs-string">&quot;2021/test_dance.mp4&quot;</span>)
+
+nbCode:
+  render(crabDance(puzzleInput, puzzleResult[<span class="hljs-number">1</span>], puzzleResult[<span class="hljs-number">1</span>], scale=<span class="hljs-number">0.5</span>, fixLagX=<span class="hljs-number">250</span>, fixLagX2=<span class="hljs-number">1000</span>), <span class="hljs-string">&quot;2021/crab_dance.mp4&quot;</span>)
+nbVideo(<span class="hljs-string">&quot;2021/crab_dance.mp4&quot;</span>)
+nbSave
+
+<span class="hljs-comment">#[
+  highlights:
+    - median and mean see https://www.reddit.com/r/adventofcode/comments/rawxad/2021_day_7_part_2_i_wrote_a_paper_on_todays/
+      and references by Michal there
+    - viz fumettosa: https://www.reddit.com/r/adventofcode/comments/rayjaa/2021_day_2_part_2_dart_crabs_together_strong/
+    - viz both parts dots: https://www.reddit.com/r/adventofcode/comments/raw9sg/2021_day_7_crabs_unite/
+
+]#</span></code></pre>
 </section><script>
 function toggleSourceDisplay() {
   var btn = document.getElementById("show")
