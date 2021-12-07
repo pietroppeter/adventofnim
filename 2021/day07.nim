@@ -16,6 +16,17 @@ Your browser does not support the video element.
 nbText: """## Day 7: [The Treachery of Whales]
 [The Treachery of Whales]: https://adventofcode.com/2021/day/7
 
+Today was easier then past days and there is not much to
+comment on puzzle solution. I did instead break my head to try and
+get out a decent animation using [nanim] and I was able to
+come out with something uing a celebrated technique in programming:
+the _accumulation of wrong fixes_! More on that below.
+
+[nanim]: https://github.com/EriKWDev/nanim
+
+### Part 1
+
+`minIndex` is returned as part of result to use it for visualization.
 """
 nbCode:
   let
@@ -51,6 +62,14 @@ nbCode:
 
 gotTheStar
 
+nbText: """### Part 2
+
+Same as above but the single cost function for the crab is not aboslute value
+but you need to remember Gauss's formula to sum up first n numbers. On that matter
+I remember reading (possibly in Bühler's Biography) that the famous task by the teacher
+was not about first 100 number but to sum the 100 numbers after a big number (e.g. 4097).
+I cannot find any reference to this unfotunately.
+"""
 nbCode:
   func cost2(crab: int, max: int): seq[int] =
     result = newSeqWith(len=max + 1): 0
@@ -84,7 +103,42 @@ I will animate the crab dance using [nanim], a [manim] inspired library to produ
 [nanim]: https://github.com/EriKWDev/nanim
 [manim]: https://github.com/3b1b/manim/
 
-Colors:
+- I took my time picking _colors_: rust color is taken from [languist], crab color
+  is the result of applying a color quantization technique based on k means clustering
+  to a picture of [famous red crabs] (and the color quantization [library] is itself in rust);
+  did you know that on mac there is a nice [Digital Color Meter] to find colors used in images?
+- the way to create a video in nanim relies on command line options. In order to be able to
+  have a more ergonomic way to generate videos and include them in nimib, I refactored
+  the rendering apporach of nanim ([PR pending])
+
+All seemed to go well, but I was not able to generate a canvas of the appropriate size
+with correct position. It might be a bug ([Opened Issue]), or it might be something fundamental
+I am not understanding. Unfortunately this severly impacted my ability to
+create my animations. So I decided to solider on and apply (wrong) fixes over (wrong) fixes
+in what I am calling the technique of _accumulation of wrong fixes:
+
+- with a [first wrong fix] I was able to align canvas in generated video with the live preview
+  provided by nanim (but it did not make sense)
+- then I went on to implement the `crabDance` procedure below. It is likely that the base implementation
+  contained bugs, but I fixed them all adding ad-hoc `fix` factors and hammering out my precioussss animations via trial-and-error!
+
+What do the animations show?
+
+- first animation uses the test input data, it has the crabs for part1 as red squares, and the crabs for part2
+  as rusty squares. Part 2 is position symmetrically with respect to the vertical axis.
+- second animation is the same but on real input and with a lot of hand picked fix factors.
+
+but first here are the color-quantized crabs:
+
+![a photo of Christmas Island red crabs with color quantization](crabs-quantized.png)
+
+[languist]: https://github.com/github/linguist/blob/0afc7507fc995da3f9b73073cc64c719fcd79384/lib/linguist/languages.yml#L5330
+[library]: https://github.com/okaneco/kmeans-colors
+[amous red crabs]: https://en.wikipedia.org/wiki/Christmas_Island_red_crab
+[Digital Color Meter]: https://support.apple.com/guide/digital-color-meter/welcome/mac
+[PR pending]: https://github.com/EriKWDev/nanim/pull/17
+[Opened Issue]: https://github.com/EriKWDev/nanim/issues/16
+[first wrong fix]: https://github.com/EriKWDev/nanim/pull/17/commits/9650e0afd83a3f5303b755541bc1201b646c0e06
 """
 nbCode:
   import nanim
@@ -132,13 +186,18 @@ nbVideo("2021/test_dance.mp4")
 nbCode:
   render(crabDance(puzzleInput, puzzleResult[1], puzzleResult[1], scale=0.5, fixLagX=250, fixLagX2=1000), "2021/crab_dance.mp4")
 nbVideo("2021/crab_dance.mp4")
+
+nbText: """### highlights
+
+- the median was the exact solution for part 1 and the mean almost the exact solution for part 2,
+  see [this] (and references therein)
+- a nice [easter egg] based on intcode
+- a [comic like] visualization and [one that] looks like mine
+
+[this]: https://www.reddit.com/r/adventofcode/comments/rawxad/2021_day_7_part_2_i_wrote_a_paper_on_todays/
+[easter egg]: https://www.reddit.com/r/adventofcode/comments/rau12d/2021_day_7_easter_egg_in_inputs/
+[comic like]: https://www.reddit.com/r/adventofcode/comments/rayjaa/2021_day_2_part_2_dart_crabs_together_strong/
+[one that]: https://www.reddit.com/r/adventofcode/comments/raw9sg/2021_day_7_crabs_unite/
+"""
+
 nbSave
-
-#[
-  highlights:
-    - median and mean see https://www.reddit.com/r/adventofcode/comments/rawxad/2021_day_7_part_2_i_wrote_a_paper_on_todays/
-      and references by Michal there
-    - viz fumettosa: https://www.reddit.com/r/adventofcode/comments/rayjaa/2021_day_2_part_2_dart_crabs_together_strong/
-    - viz both parts dots: https://www.reddit.com/r/adventofcode/comments/raw9sg/2021_day_7_crabs_unite/
-
-]#
