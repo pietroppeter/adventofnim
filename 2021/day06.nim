@@ -7,7 +7,9 @@ that creats a header with link name day-6-lanternfish
 and could add a headers section in context with...
 well I am just picking a different api for the toc example of the cheatsheet...
 ]# 
-nbText: """## Day 6: Lanternfish 🎣🔆
+nbText: """## Day 6: [Lanternfish] 🎣🔆
+
+[Lanternfish]: https://adventofcode.com/2021/day/6
 
 Today is the classical case of: "simple (brute force) approach
 will work for part1 but it will not work for part2. Also it
