@@ -5,3 +5,5 @@
 *.exe
 
 x_*
+
+.DS_Store
