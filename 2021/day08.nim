@@ -83,6 +83,11 @@ func solve(entry: Entry): int =
   checkFound(9)
   # 5 is the only five that contains (3 - 7) + (7 - 1) + (9 - 3)
   let almostFive = (pattern[3] - pattern[7]) + (pattern[7] - pattern[1]) + (pattern[9] - pattern[3])
+  debugEcho "finding 5:"
+  debugEcho "  3 - 7: ", $(pattern[3] - pattern[7])
+  debugEcho "  7 - 1: ", $(pattern[7] - pattern[1])
+  debugEcho "  9 - 3: ", $(pattern[9] - pattern[3])
+  debugEcho "  almostFive:", $almostFive
   for five in fives:
     if five > almostFive:
       pattern[5] = five
@@ -94,9 +99,9 @@ func solve(entry: Entry): int =
       pattern[2] = five
       break
   checkFound(2)
-  # 6 is the only six that contains 5
+  # 6 is the only six that contains 5 - wrong, also 9 contains 5!!!!
   for six in sixes:
-    if pattern[5] < six:
+    if pattern[5] < six and six != pattern[9]:
       pattern[6] = six
       break
   checkFound(6)
@@ -141,4 +146,4 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
 dump part2(testInput)
 echo "====================="
-#dump part2(puzzleInput)
+dump part2(puzzleInput)
