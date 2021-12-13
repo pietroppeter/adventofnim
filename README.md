@@ -8,6 +8,7 @@ my nim solutions for advent of code ([home](index.html)):
   - [day03.html](2021/day03.html)
   - [day06.html](2021/day06.html)
   - [day07.html](2021/day07.html)
+  - [day13.html](2021/day13.html)
 * 2020
   - [day01.html](2020/day01.html)
   - [day02.html](2020/day02.html)
