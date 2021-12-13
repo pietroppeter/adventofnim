@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2021/day13.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+</style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous" onload="renderMathInElement(document.body,{delimiters:[{left: '$$', right: '$$', display: true},{left: '$', right: '$', display: false}]});"></script>
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2021/day13.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<h2>Day 13: Transparent Origami</h2>
+<p>Last days I got lazy and forgot to blogpost after solving the puzzle.
+Today I will <em>write the blogpost while I solve the puzzle</em>.</p>
+<h3>Part 1</h3>
+<p>Let's first understand how to fold, we will implement parse stuff later.</p>
+<p>To fold a dot $(x, y)$ along $y=7$, the $x$ coordinate will not change
+while the $y$ coordinate will change only if bigger than $7$
+and it will be below $7$ by the same amount that it was above $7$:</p>
+<p>$$7 - (y - 7) = 2*7 - y$$.</p>
+<p>Below I will make a single <code>foldAlong</code> that will work both for $x$ and $y$</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span> <span class="hljs-type">Dot</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+
+<span class="hljs-keyword">func</span> foldAlong(d: <span class="hljs-type">Dot</span>, y = <span class="hljs-number">0</span>, x = <span class="hljs-number">0</span>): <span class="hljs-type">Dot</span> =
+  <span class="hljs-keyword">if</span> y &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> d.y &gt; y:
+    (d.x, <span class="hljs-number">2</span>*y - d.y)
+  <span class="hljs-keyword">elif</span> x &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> d.x &gt; x:
+    (<span class="hljs-number">2</span>*x - d.x, d.y)
+  <span class="hljs-keyword">else</span>:
+    d
+
+<span class="hljs-keyword">echo</span> foldAlong(d=(<span class="hljs-number">2</span>, <span class="hljs-number">14</span>), y=<span class="hljs-number">7</span>)</code></pre>
+<pre><samp>(x: 2, y: 0)
+</samp></pre>
+<p>And now we fold a sequence of point, making sure at the end that we
+remove duplicates. I could use <code>deduplicate</code> from <code>std / sequtils</code>
+but since it does not do anything fancy, I implement it inside here</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> foldAlong(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>], y = <span class="hljs-number">0</span>, x = <span class="hljs-number">0</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+  <span class="hljs-keyword">var</span> e: <span class="hljs-type">Dot</span>
+  <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> dots:
+    e = foldAlong(d, y = y, x = x)
+    <span class="hljs-keyword">if</span> e <span class="hljs-keyword">not_in</span> <span class="hljs-literal">result</span>:
+      <span class="hljs-literal">result</span>.add e
+
+<span class="hljs-keyword">echo</span> foldAlong(dots = @[(<span class="hljs-number">3</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">0</span>)], x = <span class="hljs-number">4</span>)</code></pre>
+<pre><samp>@[(x: 3, y: 0)]
+</samp></pre>
+<p>Now it make sense to parse stuff. When the input is made of two parts
+I prefer to use copy and paste and split the parts manually.
+The first instruction I can also parse manually.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    <span class="hljs-keyword">let</span> l = line.strip.split(<span class="hljs-string">','</span>)
+    <span class="hljs-literal">result</span>.add (parseInt(l[<span class="hljs-number">0</span>]), parseInt(l[<span class="hljs-number">1</span>]))
+
+<span class="hljs-keyword">let</span> testInput = <span class="hljs-string">&quot;&quot;&quot;
+6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0&quot;&quot;&quot;</span>
+
+<span class="hljs-keyword">let</span> testDots = parse testInput
+dump testDots.len
+<span class="hljs-keyword">echo</span> testDots[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">3</span>], <span class="hljs-string">&quot; ... &quot;</span>, testDots[^<span class="hljs-number">3</span> .. ^<span class="hljs-number">1</span>]
+
+dump foldAlong(testDots, y=<span class="hljs-number">7</span>).len</code></pre>
+<pre><samp>testDots.len = 18
+@[(x: 6, y: 10), (x: 0, y: 14), (x: 9, y: 10)] ... @[(x: 2, y: 14), (x: 8, y: 10), (x: 9, y: 0)]
+foldAlong(testDots, y = 7).len = 17
+</samp></pre>
+<p>Test input ok, let's proceed for puzzle input</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span>
+  puzzleInput = readFile(<span class="hljs-string">&quot;2021/input13.txt&quot;</span>)
+  puzzleDots = parse puzzleInput
+dump puzzleDots.len
+<span class="hljs-keyword">echo</span> puzzleDots[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">3</span>], <span class="hljs-string">&quot; ... &quot;</span>, puzzleDots[^<span class="hljs-number">3</span> .. ^<span class="hljs-number">1</span>]
+dump foldAlong(puzzleDots, x=<span class="hljs-number">655</span>).len</code></pre>
+<pre><samp>puzzleDots.len = 1020
+@[(x: 1233, y: 302), (x: 454, y: 539), (x: 1051, y: 301)] ... @[(x: 641, y: 536), (x: 152, y: 142), (x: 376, y: 373)]
+foldAlong(puzzleDots, x = 655).len = 850
+</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
+<h3>Part 2</h3>
+<p>As expected, part 2 will ask me to complete folding and visualize the code.</p>
+<p>Since the folding instructions are not many, a manual fix and a template will do:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span> dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>]
+
+<span class="hljs-keyword">template</span> fold_along(x=<span class="hljs-number">0</span>, y=<span class="hljs-number">0</span>) =
+  dots = foldAlong(dots, y, x)
+
+<span class="hljs-keyword">template</span> foldTest =
+  dots = testDots
+  fold_along(y=<span class="hljs-number">7</span>)
+  fold_along(x=<span class="hljs-number">5</span>)
+
+<span class="hljs-keyword">template</span> foldPuzzle =
+  dots = puzzleDots
+  fold_along(x=<span class="hljs-number">655</span>)
+  fold_along(y=<span class="hljs-number">447</span>)
+  fold_along(x=<span class="hljs-number">327</span>)
+  fold_along(y=<span class="hljs-number">223</span>)
+  fold_along(x=<span class="hljs-number">163</span>)
+  fold_along(y=<span class="hljs-number">111</span>)
+  fold_along(x=<span class="hljs-number">81</span>)
+  fold_along(y=<span class="hljs-number">55</span>)
+  fold_along(x=<span class="hljs-number">40</span>)
+  fold_along(y=<span class="hljs-number">27</span>)
+  fold_along(y=<span class="hljs-number">13</span>)
+  fold_along(y=<span class="hljs-number">6</span>)
+
+foldTest
+<span class="hljs-keyword">echo</span> dots.len
+<span class="hljs-keyword">echo</span> dots</code></pre>
+<pre><samp>16
+@[(x: 4, y: 4), (x: 0, y: 0), (x: 1, y: 4), (x: 0, y: 3), (x: 0, y: 4), (x: 4, y: 3), (x: 4, y: 0), (x: 4, y: 2), (x: 4, y: 1), (x: 0, y: 1), (x: 0, y: 2), (x: 3, y: 4), (x: 3, y: 0), (x: 2, y: 4), (x: 2, y: 0), (x: 1, y: 0)]
+</samp></pre>
+<p>to visualize we will first sort to have smallest y first (same y will start with smallest x).
+Note that sorting could also be a performance hack: we could remove the if check in foldAlong
+and deduplicate by checking <code>!=</code> with previous (as <code>deduplicate</code> in <code>sequtils</code> does).</p>
+<p>I remember that sorting requires a compare function that gives me a int but I can
+never remember if positive means first bigger than second (spoiler: yes) or the other way around
+(this probably should an info that belongs to
+<a href="https://nim-lang.org/docs/algorithm.html#%2A%2Cint%2CSortOrder">sorting docs</a>, you can find it
+in <a href="https://nim-lang.org/docs/system.html#cmp%2CT%2CT">system.cmp docs</a>, should make a PR)</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> cmpAlongY(d, e: <span class="hljs-type">Dot</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-literal">result</span> = (d.y - e.y)
+  <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span> == <span class="hljs-number">0</span>:
+    <span class="hljs-literal">result</span> = (d.x - e.x)
+
+dump cmpAlongY((<span class="hljs-number">4</span>, <span class="hljs-number">10</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">8</span>))
+dump cmpAlongY((<span class="hljs-number">4</span>, <span class="hljs-number">8</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">8</span>))
+
+<span class="hljs-keyword">func</span> sortedAlongY(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+  sorted(dots, cmpAlongY)
+
+dump testDots.sortedAlongY[<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>]</code></pre>
+<pre><samp>cmpAlongY((4, 10), (6, 8)) = 2
+cmpAlongY((4, 8), (6, 8)) = -2
+testDots.sortedAlongY[0 .. 5] = @[(x: 3, y: 0), (x: 6, y: 0), (x: 9, y: 0), (x: 4, y: 1), (x: 0, y: 3), (x: 3, y: 4)]
+</samp></pre>
+<p>and finally it is showtime!</p>
+<p>The following <code>show</code> function will work correctly only
+if input is sorted along Y axis and yMax and xMax get the whole area</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> show(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>], yMax=<span class="hljs-number">7</span>, xMax=<span class="hljs-number">50</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. yMax:
+    <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. xMax:
+      <span class="hljs-keyword">if</span> i &lt; dots.len <span class="hljs-keyword">and</span> dots[i] == (x, y):
+        <span class="hljs-literal">result</span>.add <span class="hljs-string">'#'</span>
+        inc i
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add <span class="hljs-string">'.'</span>
+    <span class="hljs-literal">result</span>.add <span class="hljs-string">'\n'</span>
+
+<span class="hljs-comment"># dots currently is results of folding testDots</span>
+<span class="hljs-keyword">echo</span> show(dots.sortedAlongY)</code></pre>
+<pre><samp>#####..............................................
+#...#..............................................
+#...#..............................................
+#...#..............................................
+#####..............................................
+...................................................
+...................................................
+...................................................
+
+</samp></pre>
+<p>looks good, let's go with the puzzle:</p>
+<pre><code class="nim hljs">foldPuzzle
+<span class="hljs-keyword">echo</span> show(dots.sortedAlongY) <span class="hljs-comment">#AHGCPGAU</span></code></pre>
+<pre><samp>.##..#..#..##...##..###...##...##..#..#............
+#..#.#..#.#..#.#..#.#..#.#..#.#..#.#..#............
+#..#.####.#....#....#..#.#....#..#.#..#............
+####.#..#.#.##.#....###..#.##.####.#..#............
+#..#.#..#.#..#.#..#.#....#..#.#..#.#..#............
+#..#.#..#..###..##..#.....###.#..#..##.............
+...................................................
+...................................................
+
+</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
+
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> animu, nimib
+
+nbInit(theme=useAdventOfNim)
+nb.useLatex
+nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 13: Transparent Origami
+
+Last days I got lazy and forgot to blogpost after solving the puzzle.
+Today I will _write the blogpost while I solve the puzzle_.
+
+### Part 1
+
+Let's first understand how to fold, we will implement parse stuff later.
+
+To fold a dot $(x, y)$ along $y=7$, the $x$ coordinate will not change
+while the $y$ coordinate will change only if bigger than $7$
+and it will be below $7$ by the same amount that it was above $7$:
+
+$$7 - (y - 7) = 2*7 - y$$.
+
+Below I will make a single `foldAlong` that will work both for $x$ and $y$
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">type</span> <span class="hljs-type">Dot</span> = <span class="hljs-keyword">tuple</span>[x, y: <span class="hljs-built_in">int</span>]
+
+  <span class="hljs-keyword">func</span> foldAlong(d: <span class="hljs-type">Dot</span>, y = <span class="hljs-number">0</span>, x = <span class="hljs-number">0</span>): <span class="hljs-type">Dot</span> =
+    <span class="hljs-keyword">if</span> y &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> d.y &gt; y:
+      (d.x, <span class="hljs-number">2</span>*y - d.y)
+    <span class="hljs-keyword">elif</span> x &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> d.x &gt; x:
+      (<span class="hljs-number">2</span>*x - d.x, d.y)
+    <span class="hljs-keyword">else</span>:
+      d
+
+  <span class="hljs-keyword">echo</span> foldAlong(d=(<span class="hljs-number">2</span>, <span class="hljs-number">14</span>), y=<span class="hljs-number">7</span>)
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+And now we fold a sequence of point, making sure at the end that we
+remove duplicates. I could use `deduplicate` from `std / sequtils`
+but since it does not do anything fancy, I implement it inside here
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> foldAlong(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>], y = <span class="hljs-number">0</span>, x = <span class="hljs-number">0</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+    <span class="hljs-keyword">var</span> e: <span class="hljs-type">Dot</span>
+    <span class="hljs-keyword">for</span> d <span class="hljs-keyword">in</span> dots:
+      e = foldAlong(d, y = y, x = x)
+      <span class="hljs-keyword">if</span> e <span class="hljs-keyword">not_in</span> <span class="hljs-literal">result</span>:
+        <span class="hljs-literal">result</span>.add e
+
+  <span class="hljs-keyword">echo</span> foldAlong(dots = @[(<span class="hljs-number">3</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">0</span>)], x = <span class="hljs-number">4</span>)      
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+Now it make sense to parse stuff. When the input is made of two parts
+I prefer to use copy and paste and split the parts manually.
+The first instruction I can also parse manually.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      <span class="hljs-keyword">let</span> l = line.strip.split(<span class="hljs-string">','</span>)
+      <span class="hljs-literal">result</span>.add (parseInt(l[<span class="hljs-number">0</span>]), parseInt(l[<span class="hljs-number">1</span>]))
+
+  <span class="hljs-keyword">let</span> testInput = <span class="hljs-string">&quot;&quot;&quot;
+6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0&quot;&quot;&quot;</span>
+
+  <span class="hljs-keyword">let</span> testDots = parse testInput
+  dump testDots.len
+  <span class="hljs-keyword">echo</span> testDots[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">3</span>], <span class="hljs-string">&quot; ... &quot;</span>, testDots[^<span class="hljs-number">3</span> .. ^<span class="hljs-number">1</span>]
+
+  dump foldAlong(testDots, y=<span class="hljs-number">7</span>).len
+
+nbText: <span class="hljs-string">&quot;Test input ok, let's proceed for puzzle input&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span>
+    puzzleInput = readFile(<span class="hljs-string">&quot;2021/input13.txt&quot;</span>)
+    puzzleDots = parse puzzleInput
+  dump puzzleDots.len
+  <span class="hljs-keyword">echo</span> puzzleDots[<span class="hljs-number">0</span> ..&lt; <span class="hljs-number">3</span>], <span class="hljs-string">&quot; ... &quot;</span>, puzzleDots[^<span class="hljs-number">3</span> .. ^<span class="hljs-number">1</span>]
+  dump foldAlong(puzzleDots, x=<span class="hljs-number">655</span>).len
+
+gotTheStar
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
+As expected, part 2 will ask me to complete folding and visualize the code.
+
+Since the folding instructions are not many, a manual fix and a template will do:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">var</span> dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>]
+
+  <span class="hljs-keyword">template</span> fold_along(x=<span class="hljs-number">0</span>, y=<span class="hljs-number">0</span>) =
+    dots = foldAlong(dots, y, x)
+
+  <span class="hljs-keyword">template</span> foldTest =
+    dots = testDots
+    fold_along(y=<span class="hljs-number">7</span>)
+    fold_along(x=<span class="hljs-number">5</span>)
+
+  <span class="hljs-keyword">template</span> foldPuzzle =
+    dots = puzzleDots
+    fold_along(x=<span class="hljs-number">655</span>)
+    fold_along(y=<span class="hljs-number">447</span>)
+    fold_along(x=<span class="hljs-number">327</span>)
+    fold_along(y=<span class="hljs-number">223</span>)
+    fold_along(x=<span class="hljs-number">163</span>)
+    fold_along(y=<span class="hljs-number">111</span>)
+    fold_along(x=<span class="hljs-number">81</span>)
+    fold_along(y=<span class="hljs-number">55</span>)
+    fold_along(x=<span class="hljs-number">40</span>)
+    fold_along(y=<span class="hljs-number">27</span>)
+    fold_along(y=<span class="hljs-number">13</span>)
+    fold_along(y=<span class="hljs-number">6</span>)
+  
+  foldTest
+  <span class="hljs-keyword">echo</span> dots.len
+  <span class="hljs-keyword">echo</span> dots
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+to visualize we will first sort to have smallest y first (same y will start with smallest x).
+Note that sorting could also be a performance hack: we could remove the if check in foldAlong
+and deduplicate by checking `!=` with previous (as `deduplicate` in `sequtils` does).
+
+I remember that sorting requires a compare function that gives me a int but I can
+never remember if positive means first bigger than second (spoiler: yes) or the other way around
+(this probably should an info that belongs to
+[sorting docs](https://nim-lang.org/docs/algorithm.html#%2A%2Cint%2CSortOrder), you can find it
+in [system.cmp docs](https://nim-lang.org/docs/system.html#cmp%2CT%2CT), should make a PR)
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> cmpAlongY(d, e: <span class="hljs-type">Dot</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-literal">result</span> = (d.y - e.y)
+    <span class="hljs-keyword">if</span> <span class="hljs-literal">result</span> == <span class="hljs-number">0</span>:
+      <span class="hljs-literal">result</span> = (d.x - e.x)
+
+  dump cmpAlongY((<span class="hljs-number">4</span>, <span class="hljs-number">10</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">8</span>))
+  dump cmpAlongY((<span class="hljs-number">4</span>, <span class="hljs-number">8</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">8</span>))
+
+  <span class="hljs-keyword">func</span> sortedAlongY(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>]): <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>] =
+    sorted(dots, cmpAlongY)
+  
+  dump testDots.sortedAlongY[<span class="hljs-number">0</span> .. <span class="hljs-number">5</span>]
+nbText: <span class="hljs-string">&quot;&quot;&quot;and finally it is showtime!
+
+The following `show` function will work correctly only
+if input is sorted along Y axis and yMax and xMax get the whole area
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> show(dots: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Dot</span>], yMax=<span class="hljs-number">7</span>, xMax=<span class="hljs-number">50</span>): <span class="hljs-built_in">string</span> =
+    <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> y <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. yMax:
+      <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-number">0</span> .. xMax:
+        <span class="hljs-keyword">if</span> i &lt; dots.len <span class="hljs-keyword">and</span> dots[i] == (x, y):
+          <span class="hljs-literal">result</span>.add <span class="hljs-string">'#'</span>
+          inc i
+        <span class="hljs-keyword">else</span>:
+          <span class="hljs-literal">result</span>.add <span class="hljs-string">'.'</span>
+      <span class="hljs-literal">result</span>.add <span class="hljs-string">'\n'</span>
+
+  <span class="hljs-comment"># dots currently is results of folding testDots</span>
+  <span class="hljs-keyword">echo</span> show(dots.sortedAlongY)
+
+nbText: <span class="hljs-string">&quot;looks good, let's go with the puzzle:&quot;</span>
+nbCode:
+  foldPuzzle
+  <span class="hljs-keyword">echo</span> show(dots.sortedAlongY) <span class="hljs-comment">#AHGCPGAU</span>
+gotTheStar
+nbSave
+</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
