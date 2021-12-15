@@ -179,6 +179,18 @@ my algorithm for sure is not going to find it.
 
 So I really need to implement some [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 or [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithm!
+
+But first let me give a minimal example that makes it clear why I need
+the better approach:
 """
+nbCode:
+  let
+    hintInput = "19999\n19111\n11191"
+    hintGrid = parse hintInput
+    hintGridRisk = computeGridRisk hintGrid
+  
+  echo show hintGrid, "\n", show hintGridRisk
+
+
 
 nbSave
