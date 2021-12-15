@@ -166,14 +166,19 @@ nbCode:
   echo show testGridRisk
 
   dump part1 testGridRisk
-  dump part1 puzzleGridRisk # 719 wrong
-
-  echo show puzzleGridRisk
-
-  echo "\n\n", show puzzleGrid
+  dump part1 puzzleGridRisk # 719 wrong, too high!
 nbText: """
 I am stuck at the moment with _a correct test result and an incorrect
 puzzle result_. Not really sure how to debug.
+
+... after looking at our discord aoc I got a useful hint (thanks @Michal58!),
+the example only gives a path where the solution only goes down and to the right
+and this was also my (wrong) assumption! It is indeed possible
+for a minimal solution to wiggle around all directions but
+my algorithm for sure is not going to find it.
+
+So I really need to implement some [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+or [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithm!
 """
 
 nbSave
