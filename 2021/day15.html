@@ -456,6 +456,9 @@ with the priority queue might be key to have a working solution now.</p>
 <pre><samp>part2(test): (risk: 315, dir: right)
 part2(puzzle): (risk: 2993, dir: down)
 </samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
 
 </main>
 <footer>
@@ -787,6 +790,7 @@ nbCode:
     puzzleGridBiggerDijkstra = puzzleGridBigger.dijkstra
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(test): &quot;</span>, testGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]
   <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(puzzle): &quot;</span>, puzzleGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]
+gotTheStar
 nbSave
 </code></pre>
 </section><script>
