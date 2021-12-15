@@ -177,7 +177,7 @@ and this was also my (wrong) assumption! It is indeed possible
 for a minimal solution to wiggle around all directions but
 my algorithm for sure is not going to find it.
 
-So I really need to implement some [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+So I really need to implement [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 or [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithm!
 
 But first let me give a minimal example that makes it clear why I need
@@ -190,7 +190,17 @@ nbCode:
     hintGridRisk = computeGridRisk hintGrid
   
   echo show hintGrid, "\n", show hintGridRisk
+nbText: """
+... _(a few hours later) back to writing the blogpost and writing my solution_.
 
+This morning I shared the hint on [advent of code subreddit](https://www.reddit.com/r/adventofcode/comments/rgszh7/2021_day_15_part_1_hint_if_you_get_correct_answer/)
+and it has been quite popular! The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.
+
+I will implement Dijkstra's algorithm because it is simpler than A* (although in general less powerful) and also because of its
+[compelling history](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper)
+(did you open last link on a chromium based browser? did you know what [text-fragments](https://web.dev/text-fragments/) are?
+I didn't but having seen some weird highlighted stuff after google results I got curious...).
+""""
 
 
 nbSave

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2021/day15.nim</title>
+  <title>2021\day15.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -56,7 +56,7 @@ section#source {
 <header>
 <div class="nb-box">
   <span><a href="..">🏡</a></span>
-  <span><code>2021/day15.nim</code></span>
+  <span><code>2021\day15.nim</code></span>
   <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
 </div>
 <hr>
@@ -265,6 +265,16 @@ the better approach:</p>
    2   3   4  13  14
 
 </samp></pre>
+<p>&quot;
+... <em>(a few hours later) back to writing the blogpost and writing my solution</em>.</p>
+<p>This morning I shared the hint on <a href="https://www.reddit.com/r/adventofcode/comments/rgszh7/2021_day_15_part_1_hint_if_you_get_correct_answer/">advent of code subreddit</a>
+and it has been quite popular!</p>
+<p>The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.</p>
+<p>I will implement Dijkstra's algorithm because it is simpler than A* (although in general less powerful) and also because of its
+<a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper">compelling history</a>
+(did you open last link on a chromium based browser? did you know what <a href="https://web.dev/text-fragments/">text-fragments</a> are?
+I didn't but having seen some weird highlighted stuff after google results I got curious...).
+&quot;</p>
 
 </main>
 <footer>
@@ -468,7 +478,19 @@ nbCode:
     hintGridRisk = computeGridRisk hintGrid
   
   <span class="hljs-keyword">echo</span> show hintGrid, <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show hintGridRisk
+nbText: <span class="hljs-string">&quot;&quot;&quot;&quot;
+... _(a few hours later) back to writing the blogpost and writing my solution_.
 
+This morning I shared the hint on [advent of code subreddit](https://www.reddit.com/r/adventofcode/comments/rgszh7/2021_day_15_part_1_hint_if_you_get_correct_answer/)
+and it has been quite popular!
+
+The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.
+
+I will implement Dijkstra's algorithm because it is simpler than A* (although in general less powerful) and also because of its
+[compelling history](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper)
+(did you open last link on a chromium based browser? did you know what [text-fragments](https://web.dev/text-fragments/) are?
+I didn't but having seen some weird highlighted stuff after google results I got curious...).
+&quot;&quot;&quot;&quot;</span>
 
 
 nbSave
