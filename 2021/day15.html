@@ -248,6 +248,23 @@ for a minimal solution to wiggle around all directions but
 my algorithm for sure is not going to find it.</p>
 <p>So I really need to implement some <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra</a>
 or <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a> algorithm!</p>
+<p>But first let me give a minimal example that makes it clear why I need
+the better approach:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span>
+  hintInput = <span class="hljs-string">&quot;19999</span><span class="hljs-meta">\n</span><span class="hljs-string">19111</span><span class="hljs-meta">\n</span><span class="hljs-string">11191&quot;</span>
+  hintGrid = parse hintInput
+  hintGridRisk = computeGridRisk hintGrid
+
+<span class="hljs-keyword">echo</span> show hintGrid, <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show hintGridRisk</code></pre>
+<pre><samp>19999
+19111
+11191
+
+   0   9  18  27  36
+   1  10  11  12  13
+   2   3   4  13  14
+
+</samp></pre>
 
 </main>
 <footer>
@@ -440,7 +457,19 @@ my algorithm for sure is not going to find it.
 
 So I really need to implement some [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 or [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithm!
+
+But first let me give a minimal example that makes it clear why I need
+the better approach:
 &quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span>
+    hintInput = <span class="hljs-string">&quot;19999</span><span class="hljs-meta">\n</span><span class="hljs-string">19111</span><span class="hljs-meta">\n</span><span class="hljs-string">11191&quot;</span>
+    hintGrid = parse hintInput
+    hintGridRisk = computeGridRisk hintGrid
+  
+  <span class="hljs-keyword">echo</span> show hintGrid, <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show hintGridRisk
+
+
 
 nbSave
 </code></pre>
