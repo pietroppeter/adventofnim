@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2021\day15.nim</title>
+  <title>2021/day15.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -56,7 +56,7 @@ section#source {
 <header>
 <div class="nb-box">
   <span><a href="..">🏡</a></span>
-  <span><code>2021\day15.nim</code></span>
+  <span><code>2021/day15.nim</code></span>
   <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
 </div>
 <hr>
@@ -113,6 +113,12 @@ for stuff outside the grid that is a high value.</p>
     g.sentinel
   <span class="hljs-keyword">else</span>:
     g.data[i]
+
+<span class="hljs-comment"># added today</span>
+<span class="hljs-keyword">func</span> `[]=`[<span class="hljs-type">T</span>](g: <span class="hljs-keyword">var</span> <span class="hljs-type">Grid</span>[<span class="hljs-type">T</span>], c: <span class="hljs-type">Coord</span>, value: <span class="hljs-type">T</span>) =
+  <span class="hljs-keyword">let</span> i = g.toIndex(c)
+  <span class="hljs-keyword">if</span> i &gt;= <span class="hljs-number">0</span>:
+    g.data[i] = value
 
 <span class="hljs-keyword">func</span> parseInt(c: <span class="hljs-built_in">char</span>): <span class="hljs-built_in">int</span> =
   <span class="hljs-literal">result</span> = ord(c) - ord(<span class="hljs-string">'0'</span>)
@@ -171,7 +177,10 @@ me minimal total risk up to here and best direction I should come from.</p>
 
 <span class="hljs-keyword">func</span> show(g: <span class="hljs-type">GridRisk</span>, paddingCount=<span class="hljs-number">4</span>): <span class="hljs-built_in">string</span> =
   <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> g.coords:
-    <span class="hljs-literal">result</span>.add align($(g[c].risk), paddingCount)
+    <span class="hljs-keyword">if</span> g[c].risk &lt; g.sentinel.risk:
+      <span class="hljs-literal">result</span>.add align($(g[c].risk), paddingCount)
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-literal">result</span>.add align(<span class="hljs-string">&quot;*&quot;</span>, paddingCount)
     <span class="hljs-keyword">if</span> c.x == g.xLen - <span class="hljs-number">1</span>:
       <span class="hljs-literal">result</span>.add <span class="hljs-string">'\n'</span>
 
@@ -246,7 +255,7 @@ the example only gives a path where the solution only goes down and to the right
 and this was also my (wrong) assumption! It is indeed possible
 for a minimal solution to wiggle around all directions but
 my algorithm for sure is not going to find it.</p>
-<p>So I really need to implement some <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra</a>
+<p>So I really need to implement <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra</a>
 or <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A*</a> algorithm!</p>
 <p>But first let me give a minimal example that makes it clear why I need
 the better approach:</p>
@@ -265,16 +274,188 @@ the better approach:</p>
    2   3   4  13  14
 
 </samp></pre>
-<p>&quot;
-... <em>(a few hours later) back to writing the blogpost and writing my solution</em>.</p>
+<p>... <em>(a few hours later) back to writing the blogpost and writing my solution</em>.</p>
 <p>This morning I shared the hint on <a href="https://www.reddit.com/r/adventofcode/comments/rgszh7/2021_day_15_part_1_hint_if_you_get_correct_answer/">advent of code subreddit</a>
-and it has been quite popular!</p>
-<p>The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.</p>
+and it has been quite popular! The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.</p>
 <p>I will implement Dijkstra's algorithm because it is simpler than A* (although in general less powerful) and also because of its
 <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper">compelling history</a>
 (did you open last link on a chromium based browser? did you know what <a href="https://web.dev/text-fragments/">text-fragments</a> are?
-I didn't but having seen some weird highlighted stuff after google results I got curious...).
+I didn't but having seen some weird highlighted stuff after google results I got curious...).</p>
+<p>I will still be using my <code>GridRisk</code> type although it seems not completely appropriate...
+The <code>risk</code> value will be the distance, I will try also to set the correct distance.</p>
+<p>In the following implementation comments not in parenthesis are taken verbatim
+from wikipedia's description of the algorithm. An important change I make
+is to make sure I use a priority queue. Among the many Dijkstra implementations
+that have been written today, I dare say this must rank among the worst...
 &quot;</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> std / heapqueue  <span class="hljs-comment"># (not among my standard aoc imports)</span>
+
+<span class="hljs-keyword">type</span>
+  <span class="hljs-type">Node</span> = <span class="hljs-keyword">tuple</span>[coord: <span class="hljs-type">Coord</span>, risk: <span class="hljs-built_in">int</span>]
+
+<span class="hljs-keyword">proc</span> `&lt;`(a, b: <span class="hljs-type">Node</span>): <span class="hljs-built_in">bool</span> = a.risk &lt; b.risk
+
+<span class="hljs-keyword">iterator</span> neighbours[<span class="hljs-type">T</span>](g: <span class="hljs-type">Grid</span>[<span class="hljs-type">T</span>], c: <span class="hljs-type">Coord</span>): (<span class="hljs-type">Coord</span>, <span class="hljs-type">Dir</span>) =
+  <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> <span class="hljs-type">Dir</span>:
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> (c + dir).isOutside(g):
+     <span class="hljs-keyword">yield</span> (c + dir, dir)
+
+<span class="hljs-keyword">func</span> dijkstra(g: <span class="hljs-type">GridInt</span>): <span class="hljs-type">GridRisk</span> =
+  <span class="hljs-comment"># (0. initialize result)</span>
+  <span class="hljs-literal">result</span>.xLen = g.xLen
+  <span class="hljs-literal">result</span>.yLen = g.ylen
+  <span class="hljs-literal">result</span>.sentinel = (g.sentinel, up)
+
+  <span class="hljs-comment"># 1. Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.</span>
+  <span class="hljs-comment"># (I will instead create a visited set)</span>
+  <span class="hljs-comment"># (I will also create a priority queue for unvisited nodes, but I will start populating later)</span>
+  <span class="hljs-keyword">var</span>
+    visited = initHashSet[<span class="hljs-type">Coord</span>]()
+    unvisited = initHeapQueue[<span class="hljs-type">Node</span>]()
+
+  <span class="hljs-comment"># 2. Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes.</span>
+  <span class="hljs-literal">result</span>.data = @[(<span class="hljs-number">0</span>, up)]  <span class="hljs-comment"># risk for initial position does not count</span>
+  <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> g.coords:
+    <span class="hljs-keyword">if</span> c == (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>): <span class="hljs-keyword">continue</span>
+    <span class="hljs-literal">result</span>.data.add @[<span class="hljs-literal">result</span>.sentinel]
+  
+  <span class="hljs-comment"># 3. For the current node, consider all of its unvisited neighbors</span>
+  <span class="hljs-comment"># and calculate their tentative distances through the current node.</span>
+  <span class="hljs-comment"># Compare the newly calculated tentative distance to the current assigned value</span>
+  <span class="hljs-comment"># and assign the smaller one</span>
+  <span class="hljs-keyword">var</span>
+    current = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+    destination = (g.xLen - <span class="hljs-number">1</span>, g.yLen - <span class="hljs-number">1</span>)
+    risk: <span class="hljs-built_in">int</span>
+  <span class="hljs-comment"># 5. If the destination node has been marked visited then stop. The algorithm has finished.</span>
+  <span class="hljs-keyword">while</span> destination <span class="hljs-keyword">not_in</span> visited:
+    <span class="hljs-keyword">for</span> neighbour, dir <span class="hljs-keyword">in</span> g.neighbours(current):
+      <span class="hljs-keyword">if</span> neighbour <span class="hljs-keyword">in</span> visited:
+        <span class="hljs-keyword">continue</span>
+      risk = <span class="hljs-literal">result</span>[current].risk + g[neighbour]
+      <span class="hljs-keyword">if</span> risk &lt; <span class="hljs-literal">result</span>[neighbour].risk:
+        <span class="hljs-literal">result</span>[neighbour] = (risk, dir)
+        unvisited.push (neighbour, risk) <span class="hljs-comment"># (push to queue)</span>
+    <span class="hljs-comment"># 4. When we are done considering all of the unvisited neighbors of the current node,</span>
+    <span class="hljs-comment"># mark the current node as visited and remove it from the unvisited set</span>
+    visited.incl current
+    <span class="hljs-keyword">if</span> current == destination: <span class="hljs-keyword">break</span> <span class="hljs-comment"># seems I need this (for puzzle input)</span>
+
+    <span class="hljs-comment"># 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance,</span>
+    <span class="hljs-comment"># set it as the new current node, and go back to step 3.</span>
+    <span class="hljs-keyword">while</span> current <span class="hljs-keyword">in</span> visited: <span class="hljs-comment"># (I think it may happen that I pull from queue stuff already visited)</span>
+      <span class="hljs-keyword">if</span> len(unvisited) == <span class="hljs-number">0</span>:
+        debugEcho <span class="hljs-string">&quot;current: &quot;</span>, current
+        <span class="hljs-keyword">raise</span> <span class="hljs-type">ValueError</span>.newException <span class="hljs-string">&quot;whaaaat?&quot;</span>
+      current = unvisited.pop().coord <span class="hljs-comment"># (pull from queue)</span>
+
+<span class="hljs-keyword">echo</span> show dijkstra(hintGrid)
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show dijkstra(testGrid)</code></pre>
+<pre><samp>   0   9  14  15  16
+   1  10   5   6   7
+   2   3   4  13   8
+
+
+   0   1   7  10  17  22  23  30  34  36
+   1   4  12  11  14  21  23  29  32  34
+   3   4   7  13  18  19  20  23  25  33
+   6  10  16  17  26  22  21  26  31  38
+  13  14  20  20  24  23  28  27  28  29
+  14  17  18  27  25  25  33  28  31  36
+  15  18  23  32  34  26  28  32  33  34
+  18  19  21  26  30  28  29  35  36  43
+  19  21  30  29  30  31  37  40  38  39
+  21  24  25  26  35  35  39  44  46  40
+
+</samp></pre>
+<p>results look good!</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> puzzleGridDijkstra = dijkstra(puzzleGrid)
+<span class="hljs-keyword">echo</span> puzzleGridDijkstra.data[^<span class="hljs-number">1</span>]</code></pre>
+<pre><samp>(risk: 717, dir: down)
+</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
+<h3>Part 2</h3>
+<p>Now the map is bigger, and from what I hear around, the implementation
+with the priority queue might be key to have a working solution now.</p>
+<p>Let's create the bigger maps and solve part 2:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> biggerMap(g: <span class="hljs-type">GridInt</span>): <span class="hljs-type">GridInt</span> =
+  <span class="hljs-literal">result</span>.xLen = g.xLen*<span class="hljs-number">5</span>
+  <span class="hljs-literal">result</span>.yLen = g.yLen*<span class="hljs-number">5</span>
+  <span class="hljs-literal">result</span>.sentinel = g.sentinel
+  <span class="hljs-literal">result</span>.data = newSeqWith(len=g.data.len*<span class="hljs-number">25</span>): <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> coord <span class="hljs-keyword">in</span> <span class="hljs-literal">result</span>.coords:
+    <span class="hljs-keyword">let</span>
+      smallCoord = (coord.x <span class="hljs-keyword">mod</span> g.xLen, coord.y <span class="hljs-keyword">mod</span> g.yLen)
+      oneUps = (coord.x <span class="hljs-keyword">div</span> g.xLen) + (coord.y <span class="hljs-keyword">div</span> g.yLen)
+    <span class="hljs-literal">result</span>[coord] = (g[smallCoord] + oneUps - <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> <span class="hljs-number">9</span> + <span class="hljs-number">1</span>
+
+<span class="hljs-keyword">let</span>
+  testGridBigger = testGrid.biggerMap
+  puzzleGridBigger = puzzleGrid.biggerMap
+<span class="hljs-keyword">echo</span> show testGridBigger</code></pre>
+<pre><samp>11637517422274862853338597396444961841755517295286
+13813736722492484783351359589446246169155735727126
+21365113283247622439435873354154698446526571955763
+36949315694715142671582625378269373648937148475914
+74634171118574528222968563933317967414442817852555
+13191281372421239248353234135946434524615754563572
+13599124212461123532357223464346833457545794456865
+31254216394236532741534764385264587549637569865174
+12931385212314249632342535174345364628545647573965
+23119445813422155692453326671356443778246755488935
+22748628533385973964449618417555172952866628316397
+24924847833513595894462461691557357271266846838237
+32476224394358733541546984465265719557637682166874
+47151426715826253782693736489371484759148259586125
+85745282229685639333179674144428178525553928963666
+24212392483532341359464345246157545635726865674683
+24611235323572234643468334575457944568656815567976
+42365327415347643852645875496375698651748671976285
+23142496323425351743453646285456475739656758684176
+34221556924533266713564437782467554889357866599146
+33859739644496184175551729528666283163977739427418
+35135958944624616915573572712668468382377957949348
+43587335415469844652657195576376821668748793277985
+58262537826937364893714847591482595861259361697236
+96856393331796741444281785255539289636664139174777
+35323413594643452461575456357268656746837976785794
+35722346434683345754579445686568155679767926678187
+53476438526458754963756986517486719762859782187396
+34253517434536462854564757396567586841767869795287
+45332667135644377824675548893578665991468977611257
+44961841755517295286662831639777394274188841538529
+46246169155735727126684683823779579493488168151459
+54698446526571955763768216687487932779859814388196
+69373648937148475914825958612593616972361472718347
+17967414442817852555392896366641391747775241285888
+46434524615754563572686567468379767857948187896815
+46833457545794456865681556797679266781878137789298
+64587549637569865174867197628597821873961893298417
+45364628545647573965675868417678697952878971816398
+56443778246755488935786659914689776112579188722368
+55172952866628316397773942741888415385299952649631
+57357271266846838237795794934881681514599279262561
+65719557637682166874879327798598143881961925499217
+71484759148259586125936169723614727183472583829458
+28178525553928963666413917477752412858886352396999
+57545635726865674683797678579481878968159298917926
+57944568656815567976792667818781377892989248891319
+75698651748671976285978218739618932984172914319528
+56475739656758684176786979528789718163989182927419
+67554889357866599146897761125791887223681299833479
+
+</samp></pre>
+<p>looks good, let's go for the prize:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span>
+  testGridBiggerDijkstra = testGridBigger.dijkstra
+  puzzleGridBiggerDijkstra = puzzleGridBigger.dijkstra
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(test): &quot;</span>, testGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(puzzle): &quot;</span>, puzzleGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]</code></pre>
+<pre><samp>part2(test): (risk: 315, dir: right)
+part2(puzzle): (risk: 2993, dir: down)
+</samp></pre>
 
 </main>
 <footer>
@@ -350,6 +531,12 @@ nbCode:
     <span class="hljs-keyword">else</span>:
       g.data[i]
 
+  <span class="hljs-comment"># added today</span>
+  <span class="hljs-keyword">func</span> `[]=`[<span class="hljs-type">T</span>](g: <span class="hljs-keyword">var</span> <span class="hljs-type">Grid</span>[<span class="hljs-type">T</span>], c: <span class="hljs-type">Coord</span>, value: <span class="hljs-type">T</span>) =
+    <span class="hljs-keyword">let</span> i = g.toIndex(c)
+    <span class="hljs-keyword">if</span> i &gt;= <span class="hljs-number">0</span>:
+      g.data[i] = value
+
   <span class="hljs-keyword">func</span> parseInt(c: <span class="hljs-built_in">char</span>): <span class="hljs-built_in">int</span> =
     <span class="hljs-literal">result</span> = ord(c) - ord(<span class="hljs-string">'0'</span>)
     <span class="hljs-keyword">assert</span> <span class="hljs-literal">result</span> &gt;= <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-literal">result</span> &lt;= <span class="hljs-number">9</span>
@@ -410,7 +597,10 @@ nbCode:
 
   <span class="hljs-keyword">func</span> show(g: <span class="hljs-type">GridRisk</span>, paddingCount=<span class="hljs-number">4</span>): <span class="hljs-built_in">string</span> =
     <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> g.coords:
-      <span class="hljs-literal">result</span>.add align($(g[c].risk), paddingCount)
+      <span class="hljs-keyword">if</span> g[c].risk &lt; g.sentinel.risk:
+        <span class="hljs-literal">result</span>.add align($(g[c].risk), paddingCount)
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add align(<span class="hljs-string">&quot;*&quot;</span>, paddingCount)
       <span class="hljs-keyword">if</span> c.x == g.xLen - <span class="hljs-number">1</span>:
         <span class="hljs-literal">result</span>.add <span class="hljs-string">'\n'</span>
 
@@ -465,7 +655,7 @@ and this was also my (wrong) assumption! It is indeed possible
 for a minimal solution to wiggle around all directions but
 my algorithm for sure is not going to find it.
 
-So I really need to implement some [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+So I really need to implement [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
 or [A*](https://en.wikipedia.org/wiki/A*_search_algorithm) algorithm!
 
 But first let me give a minimal example that makes it clear why I need
@@ -478,21 +668,125 @@ nbCode:
     hintGridRisk = computeGridRisk hintGrid
   
   <span class="hljs-keyword">echo</span> show hintGrid, <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show hintGridRisk
-nbText: <span class="hljs-string">&quot;&quot;&quot;&quot;
+nbText: <span class="hljs-string">&quot;&quot;&quot;
 ... _(a few hours later) back to writing the blogpost and writing my solution_.
 
 This morning I shared the hint on [advent of code subreddit](https://www.reddit.com/r/adventofcode/comments/rgszh7/2021_day_15_part_1_hint_if_you_get_correct_answer/)
-and it has been quite popular!
-
-The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.
+and it has been quite popular! The irony is that I have not yet taken advantage of the hint and finalized my solution 😁, so let's get to it.
 
 I will implement Dijkstra's algorithm because it is simpler than A* (although in general less powerful) and also because of its
 [compelling history](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper)
 (did you open last link on a chromium based browser? did you know what [text-fragments](https://web.dev/text-fragments/) are?
 I didn't but having seen some weird highlighted stuff after google results I got curious...).
+
+I will still be using my `GridRisk` type although it seems not completely appropriate...
+The `risk` value will be the distance, I will try also to set the correct distance.
+
+In the following implementation comments not in parenthesis are taken verbatim
+from wikipedia's description of the algorithm. An important change I make
+is to make sure I use a priority queue. Among the many Dijkstra implementations
+that have been written today, I dare say this must rank among the worst...
 &quot;&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> std / heapqueue  <span class="hljs-comment"># (not among my standard aoc imports)</span>
 
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Node</span> = <span class="hljs-keyword">tuple</span>[coord: <span class="hljs-type">Coord</span>, risk: <span class="hljs-built_in">int</span>]
 
+  <span class="hljs-keyword">proc</span> `&lt;`(a, b: <span class="hljs-type">Node</span>): <span class="hljs-built_in">bool</span> = a.risk &lt; b.risk
+
+  <span class="hljs-keyword">iterator</span> neighbours[<span class="hljs-type">T</span>](g: <span class="hljs-type">Grid</span>[<span class="hljs-type">T</span>], c: <span class="hljs-type">Coord</span>): (<span class="hljs-type">Coord</span>, <span class="hljs-type">Dir</span>) =
+    <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> <span class="hljs-type">Dir</span>:
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> (c + dir).isOutside(g):
+       <span class="hljs-keyword">yield</span> (c + dir, dir)
+
+  <span class="hljs-keyword">func</span> dijkstra(g: <span class="hljs-type">GridInt</span>): <span class="hljs-type">GridRisk</span> =
+    <span class="hljs-comment"># (0. initialize result)</span>
+    <span class="hljs-literal">result</span>.xLen = g.xLen
+    <span class="hljs-literal">result</span>.yLen = g.ylen
+    <span class="hljs-literal">result</span>.sentinel = (g.sentinel, up)
+
+    <span class="hljs-comment"># 1. Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.</span>
+    <span class="hljs-comment"># (I will instead create a visited set)</span>
+    <span class="hljs-comment"># (I will also create a priority queue for unvisited nodes, but I will start populating later)</span>
+    <span class="hljs-keyword">var</span>
+      visited = initHashSet[<span class="hljs-type">Coord</span>]()
+      unvisited = initHeapQueue[<span class="hljs-type">Node</span>]()
+
+    <span class="hljs-comment"># 2. Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes.</span>
+    <span class="hljs-literal">result</span>.data = @[(<span class="hljs-number">0</span>, up)]  <span class="hljs-comment"># risk for initial position does not count</span>
+    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> g.coords:
+      <span class="hljs-keyword">if</span> c == (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>): <span class="hljs-keyword">continue</span>
+      <span class="hljs-literal">result</span>.data.add @[<span class="hljs-literal">result</span>.sentinel]
+    
+    <span class="hljs-comment"># 3. For the current node, consider all of its unvisited neighbors</span>
+    <span class="hljs-comment"># and calculate their tentative distances through the current node.</span>
+    <span class="hljs-comment"># Compare the newly calculated tentative distance to the current assigned value</span>
+    <span class="hljs-comment"># and assign the smaller one</span>
+    <span class="hljs-keyword">var</span>
+      current = (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+      destination = (g.xLen - <span class="hljs-number">1</span>, g.yLen - <span class="hljs-number">1</span>)
+      risk: <span class="hljs-built_in">int</span>
+    <span class="hljs-comment"># 5. If the destination node has been marked visited then stop. The algorithm has finished.</span>
+    <span class="hljs-keyword">while</span> destination <span class="hljs-keyword">not_in</span> visited:
+      <span class="hljs-keyword">for</span> neighbour, dir <span class="hljs-keyword">in</span> g.neighbours(current):
+        <span class="hljs-keyword">if</span> neighbour <span class="hljs-keyword">in</span> visited:
+          <span class="hljs-keyword">continue</span>
+        risk = <span class="hljs-literal">result</span>[current].risk + g[neighbour]
+        <span class="hljs-keyword">if</span> risk &lt; <span class="hljs-literal">result</span>[neighbour].risk:
+          <span class="hljs-literal">result</span>[neighbour] = (risk, dir)
+          unvisited.push (neighbour, risk) <span class="hljs-comment"># (push to queue)</span>
+      <span class="hljs-comment"># 4. When we are done considering all of the unvisited neighbors of the current node,</span>
+      <span class="hljs-comment"># mark the current node as visited and remove it from the unvisited set</span>
+      visited.incl current
+      <span class="hljs-keyword">if</span> current == destination: <span class="hljs-keyword">break</span> <span class="hljs-comment"># seems I need this (for puzzle input)</span>
+
+      <span class="hljs-comment"># 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance,</span>
+      <span class="hljs-comment"># set it as the new current node, and go back to step 3.</span>
+      <span class="hljs-keyword">while</span> current <span class="hljs-keyword">in</span> visited: <span class="hljs-comment"># (I think it may happen that I pull from queue stuff already visited)</span>
+        <span class="hljs-keyword">if</span> len(unvisited) == <span class="hljs-number">0</span>:
+          debugEcho <span class="hljs-string">&quot;current: &quot;</span>, current
+          <span class="hljs-keyword">raise</span> <span class="hljs-type">ValueError</span>.newException <span class="hljs-string">&quot;whaaaat?&quot;</span>
+        current = unvisited.pop().coord <span class="hljs-comment"># (pull from queue)</span>
+
+  <span class="hljs-keyword">echo</span> show dijkstra(hintGrid)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>, show dijkstra(testGrid)
+nbText: <span class="hljs-string">&quot;results look good!&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> puzzleGridDijkstra = dijkstra(puzzleGrid)
+  <span class="hljs-keyword">echo</span> puzzleGridDijkstra.data[^<span class="hljs-number">1</span>]
+gotTheStar
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+### Part 2
+
+Now the map is bigger, and from what I hear around, the implementation
+with the priority queue might be key to have a working solution now.
+
+Let's create the bigger maps and solve part 2:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> biggerMap(g: <span class="hljs-type">GridInt</span>): <span class="hljs-type">GridInt</span> =
+    <span class="hljs-literal">result</span>.xLen = g.xLen*<span class="hljs-number">5</span>
+    <span class="hljs-literal">result</span>.yLen = g.yLen*<span class="hljs-number">5</span>
+    <span class="hljs-literal">result</span>.sentinel = g.sentinel
+    <span class="hljs-literal">result</span>.data = newSeqWith(len=g.data.len*<span class="hljs-number">25</span>): <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> coord <span class="hljs-keyword">in</span> <span class="hljs-literal">result</span>.coords:
+      <span class="hljs-keyword">let</span>
+        smallCoord = (coord.x <span class="hljs-keyword">mod</span> g.xLen, coord.y <span class="hljs-keyword">mod</span> g.yLen)
+        oneUps = (coord.x <span class="hljs-keyword">div</span> g.xLen) + (coord.y <span class="hljs-keyword">div</span> g.yLen)
+      <span class="hljs-literal">result</span>[coord] = (g[smallCoord] + oneUps - <span class="hljs-number">1</span>) <span class="hljs-keyword">mod</span> <span class="hljs-number">9</span> + <span class="hljs-number">1</span>
+  
+  <span class="hljs-keyword">let</span>
+    testGridBigger = testGrid.biggerMap
+    puzzleGridBigger = puzzleGrid.biggerMap
+  <span class="hljs-keyword">echo</span> show testGridBigger
+nbText: <span class="hljs-string">&quot;looks good, let's go for the prize:&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span>
+    testGridBiggerDijkstra = testGridBigger.dijkstra
+    puzzleGridBiggerDijkstra = puzzleGridBigger.dijkstra
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(test): &quot;</span>, testGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;part2(puzzle): &quot;</span>, puzzleGridBiggerDijkstra.data[^<span class="hljs-number">1</span>]
 nbSave
 </code></pre>
 </section><script>
