@@ -62,6 +62,12 @@ nbCode:
     else:
       g.data[i]
 
+  # added today
+  func `[]=`[T](g: var Grid[T], c: Coord, value: T) =
+    let i = g.toIndex(c)
+    if i >= 0:
+      g.data[i] = value
+
   func parseInt(c: char): int =
     result = ord(c) - ord('0')
     assert result >= 0 and result <= 9
@@ -122,7 +128,10 @@ nbCode:
 
   func show(g: GridRisk, paddingCount=4): string =
     for c in g.coords:
-      result.add align($(g[c].risk), paddingCount)
+      if g[c].risk < g.sentinel.risk:
+        result.add align($(g[c].risk), paddingCount)
+      else:
+        result.add align("*", paddingCount)
       if c.x == g.xLen - 1:
         result.add '\n'
 
@@ -200,7 +209,114 @@ I will implement Dijkstra's algorithm because it is simpler than A* (although in
 [compelling history](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#History#:~:text=it%20was%20a%20twenty,pencil%20and%20paper)
 (did you open last link on a chromium based browser? did you know what [text-fragments](https://web.dev/text-fragments/) are?
 I didn't but having seen some weird highlighted stuff after google results I got curious...).
+
+I will still be using my `GridRisk` type although it seems not completely appropriate...
+The `risk` value will be the distance, I will try also to set the correct distance.
+
+In the following implementation comments not in parenthesis are taken verbatim
+from wikipedia's description of the algorithm. An important change I make
+is to make sure I use a priority queue. Among the many Dijkstra implementations
+that have been written today, I dare say this must rank among the worst...
 """"
+nbCode:
+  import std / heapqueue  # (not among my standard aoc imports)
 
+  type
+    Node = tuple[coord: Coord, risk: int]
 
+  proc `<`(a, b: Node): bool = a.risk < b.risk
+
+  iterator neighbours[T](g: Grid[T], c: Coord): (Coord, Dir) =
+    for dir in Dir:
+      if not (c + dir).isOutside(g):
+       yield (c + dir, dir)
+
+  func dijkstra(g: GridInt): GridRisk =
+    # (0. initialize result)
+    result.xLen = g.xLen
+    result.yLen = g.ylen
+    result.sentinel = (g.sentinel, up)
+
+    # 1. Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.
+    # (I will instead create a visited set)
+    # (I will also create a priority queue for unvisited nodes, but I will start populating later)
+    var
+      visited = initHashSet[Coord]()
+      unvisited = initHeapQueue[Node]()
+
+    # 2. Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes.
+    result.data = @[(0, up)]  # risk for initial position does not count
+    for c in g.coords:
+      if c == (0, 0): continue
+      result.data.add @[result.sentinel]
+    
+    # 3. For the current node, consider all of its unvisited neighbors
+    # and calculate their tentative distances through the current node.
+    # Compare the newly calculated tentative distance to the current assigned value
+    # and assign the smaller one
+    var
+      current = (0, 0)
+      destination = (g.xLen - 1, g.yLen - 1)
+      risk: int
+    # 5. If the destination node has been marked visited then stop. The algorithm has finished.
+    while destination not_in visited:
+      for neighbour, dir in g.neighbours(current):
+        if neighbour in visited:
+          continue
+        risk = result[current].risk + g[neighbour]
+        if risk < result[neighbour].risk:
+          result[neighbour] = (risk, dir)
+          unvisited.push (neighbour, risk) # (push to queue)
+      # 4. When we are done considering all of the unvisited neighbors of the current node,
+      # mark the current node as visited and remove it from the unvisited set
+      visited.incl current
+      if current == destination: break # seems I need this (for puzzle input)
+
+      # 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance,
+      # set it as the new current node, and go back to step 3.
+      while current in visited: # (I think it may happen that I pull from queue stuff already visited)
+        if len(unvisited) == 0:
+          debugEcho "current: ", current
+          raise ValueError.newException "whaaaat?"
+        current = unvisited.pop().coord # (pull from queue)
+
+  echo show dijkstra(hintGrid)
+  echo "\n", show dijkstra(testGrid)
+nbText: "results look good!"
+nbCode:
+  let puzzleGridDijkstra = dijkstra(puzzleGrid)
+  echo puzzleGridDijkstra.data[^1]
+gotTheStar
+nbText: """
+### Part 2
+
+Now the map is bigger, and from what I hear around, the implementation
+with the priority queue might be key to have a working solution now.
+
+Let's create the bigger maps and solve part 2:
+"""
+nbCode:
+  func biggerMap(g: GridInt): GridInt =
+    result.xLen = g.xLen*5
+    result.yLen = g.yLen*5
+    result.sentinel = g.sentinel
+    result.data = newSeqWith(len=g.data.len*25): 0
+    for coord in result.coords:
+      let
+        smallCoord = (coord.x mod g.xLen, coord.y mod g.yLen)
+        oneUps = (coord.x div g.xLen) + (coord.y div g.yLen)
+      result[coord] = (g[smallCoord] + oneUps - 1) mod 9 + 1
+  
+  let
+    testGridBigger = testGrid.biggerMap
+    puzzleGridBigger = puzzleGrid.biggerMap
+  echo show testGridBigger
+nbText: "looks good, let's go for the prize:"
+nbCode:
+  let
+    testGridBiggerDijkstra = testGridBigger.dijkstra
+    puzzleGridBiggerDijkstra = puzzleGridBigger.dijkstra
+  echo "part2(test): ", testGridBiggerDijkstra.data[^1]
+  echo "part2(puzzle): ", puzzleGridBiggerDijkstra.data[^1]
+gotTheStar
 nbSave
