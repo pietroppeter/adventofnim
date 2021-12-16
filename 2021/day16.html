@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2021/day16.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css/'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+</style>
+  
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2021/day16.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<h2>Day 16: <a href="https://adventofcode.com/2021/day/16">Packet Decoder</a></h2>
+<p>Today is about parsing a binary signal here is the first example
+signal to practice one of the basic function I will be using (<code>toBin</code>)</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> <span class="hljs-number">0xD2FE28</span>.toBin(len=<span class="hljs-number">24</span>)
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;VVVTTTAAAAABBBBBCCCCC&quot;</span></code></pre>
+<pre><samp>110100101111111000101000
+VVVTTTAAAAABBBBBCCCCC
+</samp></pre>
+<p>At first I thougth I could try
+with <a href="https://github.com/PMunch/binaryparse">binaryparse</a>:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> binaryparse, streams
+
+<span class="hljs-keyword">block</span>:
+  <span class="hljs-keyword">let</span> test1 = newStringStream(<span class="hljs-string">&quot;</span><span class="hljs-meta">\xD2</span><span class="hljs-meta">\xFE</span><span class="hljs-meta">\x28</span><span class="hljs-string">&quot;</span>)
+
+  createParser(packet):
+    u3: version
+    u3: typeId
+  
+  <span class="hljs-keyword">var</span> data = packet.get(test1)
+  dump data</code></pre>
+<pre><samp>data = (version: 6, typeId: 7)
+</samp></pre>
+<p>But the result is odd (<a href="https://github.com/PMunch/binaryparse/issues/18">bug?</a>). So then I could try with
+<a href="https://github.com/sealmove/binarylang">binarylang</a> and the first step went better:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> binarylang
+
+<span class="hljs-keyword">block</span>:
+  <span class="hljs-keyword">let</span> test1 = newStringBitStream(<span class="hljs-string">&quot;</span><span class="hljs-meta">\xD2</span><span class="hljs-meta">\xFE</span><span class="hljs-meta">\x28</span><span class="hljs-string">&quot;</span>)
+
+  struct(packet):
+    u3: version
+    u3: typeId
+
+  <span class="hljs-keyword">var</span> data = packet.get(test1)
+  <span class="hljs-comment"># data is an object without a $ proc defined</span>
+  <span class="hljs-keyword">echo</span> data.version
+  <span class="hljs-keyword">echo</span> data.typeId</code></pre>
+<pre><samp>6
+4
+</samp></pre>
+<p>But after this I was lost. I think it can be done with this library
+and it would be rather cool but what I could gather in limited time
+from documentation and code was not enough.</p>
+<p>So I decided to start from scratch. And let's start with parsing the input.
+It would be much nicer to use sequence of bytes and keep information compact,
+but it is much easier to pack a <code>char</code> for each bit (!). I will also
+be using our standard int for whatever small int comes my way...</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> parseHex(c: <span class="hljs-built_in">char</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">if</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">'0'</span> .. <span class="hljs-string">'9'</span>:
+    ord(c) - ord (<span class="hljs-string">'0'</span>)
+  <span class="hljs-keyword">elif</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">'A'</span> .. <span class="hljs-string">'F'</span>:
+    <span class="hljs-number">10</span> + ord(c) - ord (<span class="hljs-string">'A'</span>)
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-number">0</span>  <span class="hljs-comment"># should raise error</span>
+
+<span class="hljs-comment"># parse string to string and waste a lot of info...</span>
+<span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> text:
+    <span class="hljs-literal">result</span>.add c.parseHex.toBin(len=<span class="hljs-number">4</span>)
+
+<span class="hljs-keyword">echo</span> <span class="hljs-string">'A'</span>.parseHex
+<span class="hljs-keyword">echo</span> parse <span class="hljs-string">&quot;D2FE28&quot;</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;VVVTTTAAAAABBBBBCCCCC&quot;</span></code></pre>
+<pre><samp>10
+110100101111111000101000
+VVVTTTAAAAABBBBBCCCCC
+</samp></pre>
+<p>and then, slowly but surely I went on building my implementation bit by bit,
+adding debugging stuff and being as usual a bit too verbose.
+Packet type contains way too much info... but in the end I manage to dots all my _i_s...</p>
+<p>It is all spread here without a lot of commentary and possibly with too many outputs.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">PacketKind</span> = <span class="hljs-keyword">enum</span>
+    pkLiteral, pkOperator
+  <span class="hljs-type">Packet</span> = <span class="hljs-keyword">ref</span> <span class="hljs-keyword">object</span>
+    version: <span class="hljs-built_in">int</span>
+    typeId: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">case</span> kind: <span class="hljs-type">PacketKind</span>
+    <span class="hljs-keyword">of</span> pkLiteral:
+      value: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">of</span> pkOperator:
+      lengthTypeId: <span class="hljs-built_in">char</span>
+      totBits: <span class="hljs-built_in">int</span>
+      numPackets: <span class="hljs-built_in">int</span>
+      packets: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Packet</span>]
+
+<span class="hljs-keyword">func</span> `$`(p: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">string</span> =
+  <span class="hljs-literal">result</span> = &amp;<span class="hljs-string">&quot;Packet(version: {p.version}, typeId: {p.typeId}, kind: {p.kind}&quot;</span>
+  <span class="hljs-keyword">case</span> p.kind
+  <span class="hljs-keyword">of</span> pkLiteral:
+    <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;, value: {p.value})&quot;</span>
+  <span class="hljs-keyword">of</span> pkOperator:
+    <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;, lengthTypeId: {p.lengthTypeId}, totBits: {p.totBits}, numPackets: {p.numPackets}):</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+    <span class="hljs-keyword">for</span> packet <span class="hljs-keyword">in</span> p.packets:
+      <span class="hljs-literal">result</span> &amp;= indent($packet, <span class="hljs-number">2</span>) &amp; <span class="hljs-string">'\n'</span>
+
+<span class="hljs-keyword">var</span>
+  packet: <span class="hljs-type">Packet</span>
+  bits: <span class="hljs-built_in">string</span>
+
+<span class="hljs-keyword">func</span> parseLiteral(bits: <span class="hljs-built_in">string</span>, i: <span class="hljs-keyword">var</span> <span class="hljs-built_in">int</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">var</span>
+    valueBits: <span class="hljs-built_in">string</span>
+    next = <span class="hljs-literal">true</span>
+  <span class="hljs-keyword">while</span> next:
+    <span class="hljs-keyword">if</span> bits[i] == <span class="hljs-string">'0'</span>:
+      next = <span class="hljs-literal">false</span>
+    inc i
+    valueBits &amp;= bits[i ..&lt; i + <span class="hljs-number">4</span>]
+    inc i, <span class="hljs-number">4</span>
+  <span class="hljs-keyword">discard</span> valueBits.parseBin(<span class="hljs-literal">result</span>)
+
+<span class="hljs-keyword">template</span> check =
+  <span class="hljs-comment"># not sure if in the end this is actually an error</span>
+  <span class="hljs-keyword">if</span> i &gt;= bits.len:
+    <span class="hljs-comment">#debugEcho &quot;ERR&quot;</span>
+    <span class="hljs-comment">#debugEcho &quot;i: &quot;, i</span>
+    <span class="hljs-comment">#debugEcho &quot;bits.len: &quot;, bits.len</span>
+    <span class="hljs-comment">#debugEcho &quot;packet: &quot;, packet</span>
+    <span class="hljs-keyword">return</span> i
+
+<span class="hljs-keyword">proc</span> parsePacket(bits: <span class="hljs-built_in">string</span>, packet: <span class="hljs-keyword">var</span> <span class="hljs-type">Packet</span>, start: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">var</span> i = start
+  packet = <span class="hljs-type">Packet</span>()
+  check
+  i += bits.parseBin(packet.version, start=i, maxLen=<span class="hljs-number">3</span>)
+  check
+  i += bits.parseBin(packet.typeId, start=i, maxLen=<span class="hljs-number">3</span>)
+  check
+  <span class="hljs-keyword">if</span> packet.typeId == <span class="hljs-number">4</span>:
+    packet = <span class="hljs-type">Packet</span>(version: packet.version, typeId: packet.typeId, kind: pkLiteral)
+    packet.value = bits.parseLiteral(i)
+    check
+    <span class="hljs-keyword">return</span> i
+  packet = <span class="hljs-type">Packet</span>(version: packet.version, typeId: packet.typeId, kind: pkOperator)
+  packet.lengthTypeId = bits[i]
+  inc i
+  check
+  <span class="hljs-keyword">var</span> maxBits: <span class="hljs-built_in">int</span>
+  <span class="hljs-keyword">if</span> packet.lengthTypeId == <span class="hljs-string">'0'</span>:
+    i += bits.parseBin(packet.totBits, start=i, maxLen=<span class="hljs-number">15</span>)
+    check
+    maxBits = i + packet.totBits
+    packet.numPackets = <span class="hljs-number">100</span>
+  <span class="hljs-keyword">else</span>:
+    i += bits.parseBin(packet.numPackets, start=i, maxLen=<span class="hljs-number">11</span>)
+    check
+    maxBits = <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+  <span class="hljs-comment"># debugEcho &quot;i: &quot;, i, &quot;; maxBits: &quot;, maxBits, &quot;; numPackets: &quot;, packet.numPackets</span>
+  <span class="hljs-keyword">while</span> i &lt; maxBits <span class="hljs-keyword">and</span> packet.packets.len &lt; packet.numPackets:
+    <span class="hljs-keyword">var</span> newPacket = <span class="hljs-type">Packet</span>()
+    i = bits.parsePacket(newPacket, i)
+    <span class="hljs-comment">#debugEcho &quot;i: &quot;, i</span>
+    packet.packets.add newPacket
+    check
+  <span class="hljs-keyword">return</span> i
+
+<span class="hljs-keyword">func</span> sumVersions(packet: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-literal">result</span> += packet.version
+  <span class="hljs-keyword">if</span> packet.kind == pkOperator:
+    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> packet.packets:
+      <span class="hljs-literal">result</span> += sumVersions p
+
+<span class="hljs-keyword">func</span> pvalue(packet: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">int</span> = <span class="hljs-comment"># I already have value for literal</span>
+  <span class="hljs-keyword">case</span> packet.typeId
+  <span class="hljs-keyword">of</span> <span class="hljs-number">0</span>:
+    sum(packet.packets.mapIt(it.pvalue))
+  <span class="hljs-keyword">of</span> <span class="hljs-number">1</span>:
+    prod(packet.packets.mapIt(it.pvalue))
+  <span class="hljs-keyword">of</span> <span class="hljs-number">2</span>:
+    min(packet.packets.mapIt(it.pvalue))
+  <span class="hljs-keyword">of</span> <span class="hljs-number">3</span>:
+    max(packet.packets.mapIt(it.pvalue))
+  <span class="hljs-keyword">of</span> <span class="hljs-number">4</span>:
+    packet.value
+  <span class="hljs-keyword">of</span> <span class="hljs-number">5</span>:
+    <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+    <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue &gt; packet.packets[<span class="hljs-number">1</span>].pvalue:
+      <span class="hljs-number">1</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-number">0</span>
+  <span class="hljs-keyword">of</span> <span class="hljs-number">6</span>:
+    <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+    <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue &lt; packet.packets[<span class="hljs-number">1</span>].pvalue:
+      <span class="hljs-number">1</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-number">0</span>
+  <span class="hljs-keyword">of</span> <span class="hljs-number">7</span>:
+    <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+    <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue == packet.packets[<span class="hljs-number">1</span>].pvalue:
+      <span class="hljs-number">1</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-number">0</span>
+  <span class="hljs-keyword">else</span>:
+    <span class="hljs-number">0</span>
+
+<span class="hljs-keyword">template</span> example(text: <span class="hljs-built_in">string</span>) =
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;example: &quot;</span>, text
+  bits = parse text
+  <span class="hljs-keyword">discard</span> parsePacket(bits, packet, <span class="hljs-number">0</span>)
+  <span class="hljs-keyword">echo</span> packet
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;sumVersions: &quot;</span>, packet.sumVersions
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;pvalue: &quot;</span>, packet.pvalue
+
+example <span class="hljs-string">&quot;D2FE28&quot;</span></code></pre>
+<pre><samp>example: D2FE28
+Packet(version: 6, typeId: 4, kind: pkLiteral, value: 2021)
+sumVersions: 6
+pvalue: 2021
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;38006F45291200&quot;</span></code></pre>
+<pre><samp>example: 38006F45291200
+Packet(version: 1, typeId: 6, kind: pkOperator, lengthTypeId: 0, totBits: 27, numPackets: 100):
+  Packet(version: 6, typeId: 4, kind: pkLiteral, value: 10)
+  Packet(version: 2, typeId: 4, kind: pkLiteral, value: 20)
+
+sumVersions: 9
+pvalue: 1
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;EE00D40C823060&quot;</span></code></pre>
+<pre><samp>example: EE00D40C823060
+Packet(version: 7, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+  Packet(version: 2, typeId: 4, kind: pkLiteral, value: 1)
+  Packet(version: 4, typeId: 4, kind: pkLiteral, value: 2)
+  Packet(version: 1, typeId: 4, kind: pkLiteral, value: 3)
+
+sumVersions: 14
+pvalue: 3
+</samp></pre>
+<blockquote>
+<p>Here are a few more examples of hexadecimal-encoded transmissions:</p>
+<ul>
+<li><code>8A004A801A8002F478</code> represents an operator packet (version 4) which contains an operator packet (version 1) which contains an operator packet (version 5) which contains a literal value (version 6); this packet has a version sum of 16.</li>
+<li><code>620080001611562C8802118E34</code> represents an operator packet (version 3) which contains two sub-packets; each sub-packet is an operator packet that contains two literal values. This packet has a version sum of 12.</li>
+<li><code>C0015000016115A2E0802F182340</code> has the same structure as the previous example, but the outermost packet uses a different length type ID. This packet has a version sum of 23.</li>
+<li><code>A0016C880162017C3686B18A3D4780</code> is an operator packet that contains an operator packet that contains an operator packet that contains five literal values; it has a version sum of 31.</li>
+</ul>
+</blockquote>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;8A004A801A8002F478&quot;</span></code></pre>
+<pre><samp>example: 8A004A801A8002F478
+Packet(version: 4, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+  Packet(version: 1, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+    Packet(version: 5, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 11, numPackets: 100):
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 15)
+    
+  
+
+sumVersions: 16
+pvalue: 15
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;620080001611562C8802118E34&quot;</span></code></pre>
+<pre><samp>example: 620080001611562C8802118E34
+Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+  Packet(version: 0, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 22, numPackets: 100):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 10)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 11)
+  
+  Packet(version: 1, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 12)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 13)
+  
+
+sumVersions: 12
+pvalue: 46
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;C0015000016115A2E0802F182340&quot;</span></code></pre>
+<pre><samp>example: C0015000016115A2E0802F182340
+Packet(version: 6, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 84, numPackets: 100):
+  Packet(version: 0, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 22, numPackets: 100):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 10)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 11)
+  
+  Packet(version: 4, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 12)
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 13)
+  
+
+sumVersions: 23
+pvalue: 46
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;A0016C880162017C3686B18A3D4780&quot;</span></code></pre>
+<pre><samp>example: A0016C880162017C3686B18A3D4780
+Packet(version: 5, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 91, numPackets: 100):
+  Packet(version: 1, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+    Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 5):
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 6)
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 6)
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 12)
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 15)
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 15)
+    
+  
+
+sumVersions: 31
+pvalue: 54
+</samp></pre>
+<pre><code class="nim hljs">example readFile(<span class="hljs-string">&quot;2021/input16.txt&quot;</span>)</code></pre>
+<pre><samp>example: 220D69802BE00A0803711E1441B1006E39C318A12730C200DCE66D2CCE360FA0055652CD32966E3004677EDF600B0803B1361741510076254138D8A00E4FFF3E3393ABE4FC7AC10410010799D2A4430003764DBE281802F3102CA00D4840198430EE0E00021D04E3F41F84AE0154DFDE65A17CCBFAFA14ADA56854FE5E3FD5BCC53B0D2598027A00848C63F2B918C7E513DEC3290051B3867E009CCC5FE46BD520007FE5E8AD344B37583D0803E40085475887144C01A8C10FE2B9803B0720D45A3004652FD8FA05F80122CAF91E5F50E66BEF8AB000BB0F4802039C20917B920B9221200ABF0017B9C92CCDC76BD3A8C4012CCB13CB22CDB243E9C3D2002067440400D9BE62DAC4D2DC0249BF76B6F72BE459B279F759AE7BE42E0058801CC059B08018A0070012CEC045BA01006C03A8000D46C02FA000A8EA007200800E00618018E00410034220061801D36BF178C01796FC52B4017100763547E86000084C7E8910AC0027E9B029FE2F4952F96D81B34C8400C24AA8CDAF4F1E98027C00FACDE3BA86982570D13AA640195CD67B046F004662711E989C468C01F1007A10C4C8320008742287117C401A8C715A3FC2C8EB3777540048272DFE7DE1C0149AC8BC9E79D63200B674013978E8BE5E3A2E9AA3CCDD538C01193CFAB0A146006AA00087C3E88B130401D8E304A239802F39FAC922C0169EA3248DF2D600247C89BCDFE9CA7FFD8BB49686236C9FF9795D80C0139BEC4D6C017978CF78C5EB981FCE7D4D801FA9FB63B14789534584010B5802F3467346D2C1D1E080355B00424FC99290C7E5D729586504803A2D005E677F868C271AA479CEEB131592EE5450043A932697E6A92C6E164991EFC4268F25A294600B5002A3393B31CC834B972804D2F3A4FD72B928E59219C9C771EC3DC89D1802135C9806802729694A6E723FD6134C0129A019E600
+Packet(version: 1, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 53):
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 5, typeId: 7, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 4, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 8)
+        Packet(version: 7, typeId: 4, kind: pkLiteral, value: 5)
+        Packet(version: 0, typeId: 4, kind: pkLiteral, value: 3)
+      
+      Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 14)
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 6)
+        Packet(version: 1, typeId: 4, kind: pkLiteral, value: 10)
+      
+    
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 817)
+  
+  Packet(version: 4, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 110, numPackets: 100):
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 2519282017)
+    Packet(version: 7, typeId: 5, kind: pkOperator, lengthTypeId: 0, totBits: 42, numPackets: 100):
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 1133)
+      Packet(version: 1, typeId: 4, kind: pkLiteral, value: 1133)
+    
+  
+  Packet(version: 6, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 3581)
+    Packet(version: 7, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 6, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 9)
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 5)
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 2)
+      
+      Packet(version: 5, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 9)
+        Packet(version: 2, typeId: 4, kind: pkLiteral, value: 2)
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 13)
+      
+    
+  
+  Packet(version: 4, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 1047014)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 863)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 61916)
+  
+  Packet(version: 0, typeId: 4, kind: pkLiteral, value: 2)
+  Packet(version: 0, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 32, numPackets: 100):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 2474)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 8)
+  
+  Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 27, numPackets: 100):
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 61)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 10)
+  
+  Packet(version: 0, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 2053)
+    Packet(version: 4, typeId: 5, kind: pkOperator, lengthTypeId: 0, totBits: 106, numPackets: 100):
+      Packet(version: 2, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 1, typeId: 4, kind: pkLiteral, value: 4)
+        Packet(version: 1, typeId: 4, kind: pkLiteral, value: 7)
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 3)
+      
+      Packet(version: 4, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 2)
+        Packet(version: 3, typeId: 4, kind: pkLiteral, value: 15)
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 3)
+      
+    
+  
+  Packet(version: 7, typeId: 4, kind: pkLiteral, value: 4)
+  Packet(version: 5, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 5):
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 3071)
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 25896876792)
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 90333271)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 119514860)
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 53417)
+  
+  Packet(version: 3, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 3, typeId: 6, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 70133)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 70133)
+    
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 61068)
+  
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 81, numPackets: 100):
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 198)
+    Packet(version: 3, typeId: 7, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 2335)
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 5594)
+    
+  
+  Packet(version: 2, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 63, numPackets: 100):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 1866)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 164)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 46351)
+  
+  Packet(version: 2, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+    Packet(version: 7, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 14)
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 8)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 10)
+    
+    Packet(version: 1, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 12)
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 7)
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 10)
+    
+    Packet(version: 7, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 3)
+      Packet(version: 4, typeId: 4, kind: pkLiteral, value: 3)
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 11)
+    
+  
+  Packet(version: 2, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 75308549)
+    Packet(version: 7, typeId: 6, kind: pkOperator, lengthTypeId: 0, totBits: 72, numPackets: 100):
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 1512)
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 32762322674)
+    
+  
+  Packet(version: 5, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 11, numPackets: 100):
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 7)
+  
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 64, numPackets: 100):
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 196)
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 31)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 33)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 36)
+  
+  Packet(version: 1, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 85, numPackets: 100):
+    Packet(version: 7, typeId: 6, kind: pkOperator, lengthTypeId: 0, totBits: 47, numPackets: 100):
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 3115)
+      Packet(version: 1, typeId: 4, kind: pkLiteral, value: 45499)
+    
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 216)
+  
+  Packet(version: 6, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 75, numPackets: 100):
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 100)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 104)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 188)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 7)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 199)
+  
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 16, numPackets: 100):
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 210)
+  
+  Packet(version: 0, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 3162941497)
+  
+  Packet(version: 3, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 4):
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 819624592872)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 180)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 254)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 708340)
+  
+  Packet(version: 1, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+    Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+      Packet(version: 6, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 358, numPackets: 100):
+        Packet(version: 6, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+          Packet(version: 4, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+            Packet(version: 6, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 300, numPackets: 100):
+              Packet(version: 7, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 278, numPackets: 100):
+                Packet(version: 7, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 256, numPackets: 100):
+                  Packet(version: 3, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 234, numPackets: 100):
+                    Packet(version: 0, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 212, numPackets: 100):
+                      Packet(version: 3, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 190, numPackets: 100):
+                        Packet(version: 4, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 168, numPackets: 100):
+                          Packet(version: 7, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                            Packet(version: 6, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 128, numPackets: 100):
+                              Packet(version: 0, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                                Packet(version: 4, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                                  Packet(version: 4, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                                    Packet(version: 0, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 52, numPackets: 100):
+                                      Packet(version: 1, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                                        Packet(version: 4, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 1):
+                                          Packet(version: 6, typeId: 4, kind: pkLiteral, value: 187)
+                                        
+                                      
+                                    
+                                  
+                                
+                              
+                            
+                          
+                        
+                      
+                    
+                  
+                
+              
+            
+          
+        
+      
+    
+  
+  Packet(version: 7, typeId: 4, kind: pkLiteral, value: 11)
+  Packet(version: 6, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 28441)
+    Packet(version: 2, typeId: 6, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 7, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 13)
+        Packet(version: 2, typeId: 4, kind: pkLiteral, value: 15)
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 6)
+      
+      Packet(version: 0, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+        Packet(version: 1, typeId: 4, kind: pkLiteral, value: 15)
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 9)
+        Packet(version: 0, typeId: 4, kind: pkLiteral, value: 5)
+      
+    
+  
+  Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 79, numPackets: 100):
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 176)
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 4043)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 149405)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 1)
+  
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 172)
+  Packet(version: 4, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 48, numPackets: 100):
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 90)
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 187)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 231)
+  
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 3, typeId: 7, kind: pkOperator, lengthTypeId: 0, totBits: 62, numPackets: 100):
+      Packet(version: 5, typeId: 4, kind: pkLiteral, value: 193831084)
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 1421)
+    
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 218)
+  
+  Packet(version: 3, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 101, numPackets: 100):
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 695560)
+    Packet(version: 6, typeId: 7, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 1, typeId: 4, kind: pkLiteral, value: 33555)
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 33555)
+    
+  
+  Packet(version: 2, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+    Packet(version: 7, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 4)
+      Packet(version: 1, typeId: 4, kind: pkLiteral, value: 9)
+      Packet(version: 4, typeId: 4, kind: pkLiteral, value: 3)
+    
+    Packet(version: 1, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 4)
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 7)
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 11)
+    
+    Packet(version: 7, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+      Packet(version: 2, typeId: 4, kind: pkLiteral, value: 12)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 10)
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 15)
+    
+  
+  Packet(version: 7, typeId: 4, kind: pkLiteral, value: 5)
+  Packet(version: 4, typeId: 4, kind: pkLiteral, value: 14)
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 2942)
+  Packet(version: 5, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 36, numPackets: 100):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 13040895)
+  
+  Packet(version: 0, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 2706)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 236764)
+  
+  Packet(version: 3, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 91, numPackets: 100):
+    Packet(version: 1, typeId: 6, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 29093)
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 29093)
+    
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 2639)
+  
+  Packet(version: 1, typeId: 4, kind: pkLiteral, value: 2905)
+  Packet(version: 6, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 60706885)
+    Packet(version: 0, typeId: 6, kind: pkOperator, lengthTypeId: 0, totBits: 106, numPackets: 100):
+      Packet(version: 5, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+        Packet(version: 7, typeId: 4, kind: pkLiteral, value: 7)
+        Packet(version: 6, typeId: 4, kind: pkLiteral, value: 8)
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 9)
+      
+      Packet(version: 4, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+        Packet(version: 5, typeId: 4, kind: pkLiteral, value: 14)
+        Packet(version: 1, typeId: 4, kind: pkLiteral, value: 2)
+        Packet(version: 2, typeId: 4, kind: pkLiteral, value: 8)
+      
+    
+  
+  Packet(version: 7, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 849193)
+    Packet(version: 0, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 6, typeId: 4, kind: pkLiteral, value: 3660)
+      Packet(version: 4, typeId: 4, kind: pkLiteral, value: 6045)
+    
+  
+  Packet(version: 3, typeId: 0, kind: pkOperator, lengthTypeId: 0, totBits: 145, numPackets: 100):
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 22)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 821619064094)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 675)
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 13)
+    Packet(version: 5, typeId: 4, kind: pkLiteral, value: 66876028)
+  
+  Packet(version: 0, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 48406)
+    Packet(version: 5, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 7781281650951)
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 3322)
+    
+  
+  Packet(version: 3, typeId: 3, kind: pkOperator, lengthTypeId: 0, totBits: 63, numPackets: 100):
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 16157976)
+    Packet(version: 7, typeId: 4, kind: pkLiteral, value: 9)
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 165)
+  
+  Packet(version: 4, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 66, numPackets: 100):
+    Packet(version: 6, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 166)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 166)
+    
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 97)
+  
+  Packet(version: 6, typeId: 4, kind: pkLiteral, value: 15)
+  Packet(version: 0, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 106, numPackets: 100):
+    Packet(version: 5, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 1001)
+      Packet(version: 4, typeId: 4, kind: pkLiteral, value: 67695326)
+    
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 20632)
+  
+  Packet(version: 1, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 116, numPackets: 100):
+    Packet(version: 2, typeId: 6, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 7, typeId: 4, kind: pkLiteral, value: 10219686)
+      Packet(version: 0, typeId: 4, kind: pkLiteral, value: 205)
+    
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 483239986)
+  
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 11674)
+  Packet(version: 1, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 135, numPackets: 100):
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 52)
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 535330074729)
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 7666)
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 167)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 1561)
+  
+  Packet(version: 2, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 6, typeId: 5, kind: pkOperator, lengthTypeId: 0, totBits: 42, numPackets: 100):
+      Packet(version: 1, typeId: 4, kind: pkLiteral, value: 50028)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 144)
+    
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 117)
+  
+  Packet(version: 6, typeId: 2, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 4):
+    Packet(version: 6, typeId: 4, kind: pkLiteral, value: 120864373)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 8604)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 6)
+    Packet(version: 3, typeId: 4, kind: pkLiteral, value: 213436656663)
+  
+  Packet(version: 2, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 44080)
+    Packet(version: 0, typeId: 6, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 4596286)
+      Packet(version: 3, typeId: 4, kind: pkLiteral, value: 129673)
+    
+  
+  Packet(version: 5, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 160)
+    Packet(version: 1, typeId: 4, kind: pkLiteral, value: 236)
+  
+
+sumVersions: 1002
+pvalue: 1673210814091
+</samp></pre>
+<blockquote>
+<p>For example:</p>
+<ul>
+<li><code>C200B40A82</code> finds the sum of 1 and 2, resulting in the value 3.</li>
+<li><code>04005AC33890</code> finds the product of 6 and 9, resulting in the value 54.</li>
+<li><code>880086C3E88112</code> finds the minimum of 7, 8, and 9, resulting in the value 7.</li>
+<li><code>CE00C43D881120</code> finds the maximum of 7, 8, and 9, resulting in the value 9.</li>
+<li><code>D8005AC2A8F0</code> produces 1, because 5 is less than 15.</li>
+<li><code>F600BC2D8F</code> produces 0, because 5 is not greater than 15.</li>
+<li><code>9C005AC2F8F0</code> produces 0, because 5 is not equal to 15.</li>
+<li><code>9C0141080250320F1802104A08</code> produces 1, because 1 + 3 = 2 * 2.</li>
+</ul>
+</blockquote>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;C200B40A82&quot;</span></code></pre>
+<pre><samp>example: C200B40A82
+Packet(version: 6, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+  Packet(version: 6, typeId: 4, kind: pkLiteral, value: 1)
+  Packet(version: 2, typeId: 4, kind: pkLiteral, value: 2)
+
+sumVersions: 14
+pvalue: 3
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;04005AC33890&quot;</span></code></pre>
+<pre><samp>example: 04005AC33890
+Packet(version: 0, typeId: 1, kind: pkOperator, lengthTypeId: 0, totBits: 22, numPackets: 100):
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 6)
+  Packet(version: 3, typeId: 4, kind: pkLiteral, value: 9)
+
+sumVersions: 8
+pvalue: 54
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;880086C3E88112&quot;</span></code></pre>
+<pre><samp>example: 880086C3E88112
+Packet(version: 4, typeId: 2, kind: pkOperator, lengthTypeId: 0, totBits: 33, numPackets: 100):
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 7)
+  Packet(version: 6, typeId: 4, kind: pkLiteral, value: 8)
+  Packet(version: 0, typeId: 4, kind: pkLiteral, value: 9)
+
+sumVersions: 15
+pvalue: 7
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;CE00C43D881120&quot;</span></code></pre>
+<pre><samp>example: CE00C43D881120
+Packet(version: 6, typeId: 3, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 3):
+  Packet(version: 0, typeId: 4, kind: pkLiteral, value: 7)
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 8)
+  Packet(version: 0, typeId: 4, kind: pkLiteral, value: 9)
+
+sumVersions: 11
+pvalue: 9
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;D8005AC2A8F0&quot;</span></code></pre>
+<pre><samp>example: D8005AC2A8F0
+Packet(version: 6, typeId: 6, kind: pkOperator, lengthTypeId: 0, totBits: 22, numPackets: 100):
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 5)
+  Packet(version: 2, typeId: 4, kind: pkLiteral, value: 15)
+
+sumVersions: 13
+pvalue: 1
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;F600BC2D8F&quot;</span></code></pre>
+<pre><samp>example: F600BC2D8F
+Packet(version: 7, typeId: 5, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+  Packet(version: 7, typeId: 4, kind: pkLiteral, value: 5)
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 15)
+
+sumVersions: 19
+pvalue: 0
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;9C005AC2F8F0&quot;</span></code></pre>
+<pre><samp>example: 9C005AC2F8F0
+Packet(version: 4, typeId: 7, kind: pkOperator, lengthTypeId: 0, totBits: 22, numPackets: 100):
+  Packet(version: 5, typeId: 4, kind: pkLiteral, value: 5)
+  Packet(version: 7, typeId: 4, kind: pkLiteral, value: 15)
+
+sumVersions: 16
+pvalue: 0
+</samp></pre>
+<pre><code class="nim hljs">example <span class="hljs-string">&quot;9C0141080250320F1802104A08&quot;</span></code></pre>
+<pre><samp>example: 9C0141080250320F1802104A08
+Packet(version: 4, typeId: 7, kind: pkOperator, lengthTypeId: 0, totBits: 80, numPackets: 100):
+  Packet(version: 2, typeId: 0, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 1)
+    Packet(version: 4, typeId: 4, kind: pkLiteral, value: 3)
+  
+  Packet(version: 6, typeId: 1, kind: pkOperator, lengthTypeId: 1, totBits: 0, numPackets: 2):
+    Packet(version: 0, typeId: 4, kind: pkLiteral, value: 2)
+    Packet(version: 2, typeId: 4, kind: pkLiteral, value: 2)
+  
+
+sumVersions: 20
+pvalue: 1
+</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to saving your vacation.</p>
+</blockquote>
+
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> animu, nimib
+
+nbInit(theme=useAdventOfNim)
+nbText: <span class="hljs-string">&quot;&quot;&quot;## Day 16: [Packet Decoder](https://adventofcode.com/2021/day/16)
+
+Today is about parsing a binary signal here is the first example
+signal to practice one of the basic function I will be using (`toBin`)
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">echo</span> <span class="hljs-number">0xD2FE28</span>.toBin(len=<span class="hljs-number">24</span>)
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;VVVTTTAAAAABBBBBCCCCC&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+At first I thougth I could try
+with [binaryparse](https://github.com/PMunch/binaryparse):
+&quot;&quot;&quot;</span>
+
+nbCode:
+  <span class="hljs-keyword">import</span> binaryparse, streams
+
+  <span class="hljs-keyword">block</span>:
+    <span class="hljs-keyword">let</span> test1 = newStringStream(<span class="hljs-string">&quot;</span><span class="hljs-meta">\xD2</span><span class="hljs-meta">\xFE</span><span class="hljs-meta">\x28</span><span class="hljs-string">&quot;</span>)
+
+    createParser(packet):
+      u3: version
+      u3: typeId
+    
+    <span class="hljs-keyword">var</span> data = packet.get(test1)
+    dump data
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+But the result is odd ([bug?](https://github.com/PMunch/binaryparse/issues/18)). So then I could try with
+[binarylang](https://github.com/sealmove/binarylang) and the first step went better:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">import</span> binarylang
+
+  <span class="hljs-keyword">block</span>:
+    <span class="hljs-keyword">let</span> test1 = newStringBitStream(<span class="hljs-string">&quot;</span><span class="hljs-meta">\xD2</span><span class="hljs-meta">\xFE</span><span class="hljs-meta">\x28</span><span class="hljs-string">&quot;</span>)
+
+    struct(packet):
+      u3: version
+      u3: typeId
+
+    <span class="hljs-keyword">var</span> data = packet.get(test1)
+    <span class="hljs-comment"># data is an object without a $ proc defined</span>
+    <span class="hljs-keyword">echo</span> data.version
+    <span class="hljs-keyword">echo</span> data.typeId
+nbText: <span class="hljs-string">&quot;&quot;&quot;But after this I was lost. I think it can be done with this library
+and it would be rather cool but what I could gather in limited time
+from documentation and code was not enough.
+
+So I decided to start from scratch. And let's start with parsing the input.
+It would be much nicer to use sequence of bytes and keep information compact,
+but it is much easier to pack a `char` for each bit (!). I will also
+be using our standard int for whatever small int comes my way...
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> parseHex(c: <span class="hljs-built_in">char</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">if</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">'0'</span> .. <span class="hljs-string">'9'</span>:
+      ord(c) - ord (<span class="hljs-string">'0'</span>)
+    <span class="hljs-keyword">elif</span> c <span class="hljs-keyword">in</span> <span class="hljs-string">'A'</span> .. <span class="hljs-string">'F'</span>:
+      <span class="hljs-number">10</span> + ord(c) - ord (<span class="hljs-string">'A'</span>)
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-number">0</span>  <span class="hljs-comment"># should raise error</span>
+
+  <span class="hljs-comment"># parse string to string and waste a lot of info...</span>
+  <span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> =
+    <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> text:
+      <span class="hljs-literal">result</span>.add c.parseHex.toBin(len=<span class="hljs-number">4</span>)
+
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">'A'</span>.parseHex
+  <span class="hljs-keyword">echo</span> parse <span class="hljs-string">&quot;D2FE28&quot;</span>
+  <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;VVVTTTAAAAABBBBBCCCCC&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+and then, slowly but surely I went on building my implementation bit by bit,
+adding debugging stuff and being as usual a bit too verbose.
+Packet type contains way too much info... but in the end I manage to dots all my _i_s...
+
+It is all spread here without a lot of commentary and possibly with too many outputs.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">PacketKind</span> = <span class="hljs-keyword">enum</span>
+      pkLiteral, pkOperator
+    <span class="hljs-type">Packet</span> = <span class="hljs-keyword">ref</span> <span class="hljs-keyword">object</span>
+      version: <span class="hljs-built_in">int</span>
+      typeId: <span class="hljs-built_in">int</span>
+      <span class="hljs-keyword">case</span> kind: <span class="hljs-type">PacketKind</span>
+      <span class="hljs-keyword">of</span> pkLiteral:
+        value: <span class="hljs-built_in">int</span>
+      <span class="hljs-keyword">of</span> pkOperator:
+        lengthTypeId: <span class="hljs-built_in">char</span>
+        totBits: <span class="hljs-built_in">int</span>
+        numPackets: <span class="hljs-built_in">int</span>
+        packets: <span class="hljs-built_in">seq</span>[<span class="hljs-type">Packet</span>]
+
+  <span class="hljs-keyword">func</span> `$`(p: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">string</span> =
+    <span class="hljs-literal">result</span> = &amp;<span class="hljs-string">&quot;Packet(version: {p.version}, typeId: {p.typeId}, kind: {p.kind}&quot;</span>
+    <span class="hljs-keyword">case</span> p.kind
+    <span class="hljs-keyword">of</span> pkLiteral:
+      <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;, value: {p.value})&quot;</span>
+    <span class="hljs-keyword">of</span> pkOperator:
+      <span class="hljs-literal">result</span> &amp;= &amp;<span class="hljs-string">&quot;, lengthTypeId: {p.lengthTypeId}, totBits: {p.totBits}, numPackets: {p.numPackets}):</span><span class="hljs-meta">\n</span><span class="hljs-string">&quot;</span>
+      <span class="hljs-keyword">for</span> packet <span class="hljs-keyword">in</span> p.packets:
+        <span class="hljs-literal">result</span> &amp;= indent($packet, <span class="hljs-number">2</span>) &amp; <span class="hljs-string">'\n'</span>
+
+  <span class="hljs-keyword">var</span>
+    packet: <span class="hljs-type">Packet</span>
+    bits: <span class="hljs-built_in">string</span>
+
+  <span class="hljs-keyword">func</span> parseLiteral(bits: <span class="hljs-built_in">string</span>, i: <span class="hljs-keyword">var</span> <span class="hljs-built_in">int</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">var</span>
+      valueBits: <span class="hljs-built_in">string</span>
+      next = <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">while</span> next:
+      <span class="hljs-keyword">if</span> bits[i] == <span class="hljs-string">'0'</span>:
+        next = <span class="hljs-literal">false</span>
+      inc i
+      valueBits &amp;= bits[i ..&lt; i + <span class="hljs-number">4</span>]
+      inc i, <span class="hljs-number">4</span>
+    <span class="hljs-keyword">discard</span> valueBits.parseBin(<span class="hljs-literal">result</span>)
+
+  <span class="hljs-keyword">template</span> check =
+    <span class="hljs-comment"># not sure if in the end this is actually an error</span>
+    <span class="hljs-keyword">if</span> i &gt;= bits.len:
+      <span class="hljs-comment">#debugEcho &quot;ERR&quot;</span>
+      <span class="hljs-comment">#debugEcho &quot;i: &quot;, i</span>
+      <span class="hljs-comment">#debugEcho &quot;bits.len: &quot;, bits.len</span>
+      <span class="hljs-comment">#debugEcho &quot;packet: &quot;, packet</span>
+      <span class="hljs-keyword">return</span> i
+
+  <span class="hljs-keyword">proc</span> parsePacket(bits: <span class="hljs-built_in">string</span>, packet: <span class="hljs-keyword">var</span> <span class="hljs-type">Packet</span>, start: <span class="hljs-built_in">int</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">var</span> i = start
+    packet = <span class="hljs-type">Packet</span>()
+    check
+    i += bits.parseBin(packet.version, start=i, maxLen=<span class="hljs-number">3</span>)
+    check
+    i += bits.parseBin(packet.typeId, start=i, maxLen=<span class="hljs-number">3</span>)
+    check
+    <span class="hljs-keyword">if</span> packet.typeId == <span class="hljs-number">4</span>:
+      packet = <span class="hljs-type">Packet</span>(version: packet.version, typeId: packet.typeId, kind: pkLiteral)
+      packet.value = bits.parseLiteral(i)
+      check
+      <span class="hljs-keyword">return</span> i
+    packet = <span class="hljs-type">Packet</span>(version: packet.version, typeId: packet.typeId, kind: pkOperator)
+    packet.lengthTypeId = bits[i]
+    inc i
+    check
+    <span class="hljs-keyword">var</span> maxBits: <span class="hljs-built_in">int</span>
+    <span class="hljs-keyword">if</span> packet.lengthTypeId == <span class="hljs-string">'0'</span>:
+      i += bits.parseBin(packet.totBits, start=i, maxLen=<span class="hljs-number">15</span>)
+      check
+      maxBits = i + packet.totBits
+      packet.numPackets = <span class="hljs-number">100</span>
+    <span class="hljs-keyword">else</span>:
+      i += bits.parseBin(packet.numPackets, start=i, maxLen=<span class="hljs-number">11</span>)
+      check
+      maxBits = <span class="hljs-built_in">int</span>.<span class="hljs-keyword">high</span>
+    <span class="hljs-comment"># debugEcho &quot;i: &quot;, i, &quot;; maxBits: &quot;, maxBits, &quot;; numPackets: &quot;, packet.numPackets</span>
+    <span class="hljs-keyword">while</span> i &lt; maxBits <span class="hljs-keyword">and</span> packet.packets.len &lt; packet.numPackets:
+      <span class="hljs-keyword">var</span> newPacket = <span class="hljs-type">Packet</span>()
+      i = bits.parsePacket(newPacket, i)
+      <span class="hljs-comment">#debugEcho &quot;i: &quot;, i</span>
+      packet.packets.add newPacket
+      check
+    <span class="hljs-keyword">return</span> i
+
+  <span class="hljs-keyword">func</span> sumVersions(packet: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-literal">result</span> += packet.version
+    <span class="hljs-keyword">if</span> packet.kind == pkOperator:
+      <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> packet.packets:
+        <span class="hljs-literal">result</span> += sumVersions p
+
+  <span class="hljs-keyword">func</span> pvalue(packet: <span class="hljs-type">Packet</span>): <span class="hljs-built_in">int</span> = <span class="hljs-comment"># I already have value for literal</span>
+    <span class="hljs-keyword">case</span> packet.typeId
+    <span class="hljs-keyword">of</span> <span class="hljs-number">0</span>:
+      sum(packet.packets.mapIt(it.pvalue))
+    <span class="hljs-keyword">of</span> <span class="hljs-number">1</span>:
+      prod(packet.packets.mapIt(it.pvalue))
+    <span class="hljs-keyword">of</span> <span class="hljs-number">2</span>:
+      min(packet.packets.mapIt(it.pvalue))
+    <span class="hljs-keyword">of</span> <span class="hljs-number">3</span>:
+      max(packet.packets.mapIt(it.pvalue))
+    <span class="hljs-keyword">of</span> <span class="hljs-number">4</span>:
+      packet.value
+    <span class="hljs-keyword">of</span> <span class="hljs-number">5</span>:
+      <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+      <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue &gt; packet.packets[<span class="hljs-number">1</span>].pvalue:
+        <span class="hljs-number">1</span>
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-number">0</span>
+    <span class="hljs-keyword">of</span> <span class="hljs-number">6</span>:
+      <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+      <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue &lt; packet.packets[<span class="hljs-number">1</span>].pvalue:
+        <span class="hljs-number">1</span>
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-number">0</span>
+    <span class="hljs-keyword">of</span> <span class="hljs-number">7</span>:
+      <span class="hljs-keyword">assert</span> packet.packets.len == <span class="hljs-number">2</span>
+      <span class="hljs-keyword">if</span> packet.packets[<span class="hljs-number">0</span>].pvalue == packet.packets[<span class="hljs-number">1</span>].pvalue:
+        <span class="hljs-number">1</span>
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-number">0</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-number">0</span>
+
+  <span class="hljs-keyword">template</span> example(text: <span class="hljs-built_in">string</span>) =
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;example: &quot;</span>, text
+    bits = parse text
+    <span class="hljs-keyword">discard</span> parsePacket(bits, packet, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">echo</span> packet
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;sumVersions: &quot;</span>, packet.sumVersions
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;pvalue: &quot;</span>, packet.pvalue
+
+  example <span class="hljs-string">&quot;D2FE28&quot;</span>
+
+nbCode: example <span class="hljs-string">&quot;38006F45291200&quot;</span>
+nbCode: example <span class="hljs-string">&quot;EE00D40C823060&quot;</span>
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+&gt; Here are a few more examples of hexadecimal-encoded transmissions:
+&gt; 
+&gt; - `8A004A801A8002F478` represents an operator packet (version 4) which contains an operator packet (version 1) which contains an operator packet (version 5) which contains a literal value (version 6); this packet has a version sum of 16.
+&gt; - `620080001611562C8802118E34` represents an operator packet (version 3) which contains two sub-packets; each sub-packet is an operator packet that contains two literal values. This packet has a version sum of 12.
+&gt; - `C0015000016115A2E0802F182340` has the same structure as the previous example, but the outermost packet uses a different length type ID. This packet has a version sum of 23.
+&gt; - `A0016C880162017C3686B18A3D4780` is an operator packet that contains an operator packet that contains an operator packet that contains five literal values; it has a version sum of 31.
+&quot;&quot;&quot;</span>
+nbCode: example <span class="hljs-string">&quot;8A004A801A8002F478&quot;</span>
+nbCode: example <span class="hljs-string">&quot;620080001611562C8802118E34&quot;</span>
+nbCode: example <span class="hljs-string">&quot;C0015000016115A2E0802F182340&quot;</span>
+nbCode: example <span class="hljs-string">&quot;A0016C880162017C3686B18A3D4780&quot;</span>
+nbCode: example readFile(<span class="hljs-string">&quot;2021/input16.txt&quot;</span>)
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+&gt; For example:
+&gt;
+&gt; - `C200B40A82` finds the sum of 1 and 2, resulting in the value 3.
+&gt; - `04005AC33890` finds the product of 6 and 9, resulting in the value 54.
+&gt; - `880086C3E88112` finds the minimum of 7, 8, and 9, resulting in the value 7.
+&gt; - `CE00C43D881120` finds the maximum of 7, 8, and 9, resulting in the value 9.
+&gt; - `D8005AC2A8F0` produces 1, because 5 is less than 15.
+&gt; - `F600BC2D8F` produces 0, because 5 is not greater than 15.
+&gt; - `9C005AC2F8F0` produces 0, because 5 is not equal to 15.
+&gt; - `9C0141080250320F1802104A08` produces 1, because 1 + 3 = 2 * 2.
+&quot;&quot;&quot;</span>
+nbCode: example <span class="hljs-string">&quot;C200B40A82&quot;</span>
+nbCode: example <span class="hljs-string">&quot;04005AC33890&quot;</span>
+nbCode: example <span class="hljs-string">&quot;880086C3E88112&quot;</span>
+nbCode: example <span class="hljs-string">&quot;CE00C43D881120&quot;</span>
+nbCode: example <span class="hljs-string">&quot;D8005AC2A8F0&quot;</span>
+nbCode: example <span class="hljs-string">&quot;F600BC2D8F&quot;</span>
+nbCode: example <span class="hljs-string">&quot;9C005AC2F8F0&quot;</span>
+nbCode: example <span class="hljs-string">&quot;9C0141080250320F1802104A08&quot;</span>
+gotTheStar
+gotTheStar
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
