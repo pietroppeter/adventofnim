@@ -64,9 +64,10 @@ nbCodeDisplay(nbP5Instance):
       l.r = l.r - 1
 
   proc show(l: var Light) =
-    ellipse(l.x, l.y, l.r)
+    p5Inst.ellipse(l.x, l.y, l.r)
 
   var l: Light
+  var t = 0
 
   setup:
     createCanvas(100, 100)
@@ -77,9 +78,16 @@ nbCodeDisplay(nbP5Instance):
   draw:
     l.move
     l.show
+    #[ frameCount not yet wrapped in instance mode and adding `p5inst.` does not work (nim code does not compile)
     if frameCount mod 100 == 50:
       l.isOn = true
     elif frameCount mod 100 == 0:
       l.isOn = false
-    #echo l
+
+    ]#
+    if t mod 100 == 50:
+      l.isOn = true
+    elif t mod 100 == 0:
+      l.isOn = false
+    inc t
 nbSave
