@@ -7,6 +7,8 @@ let day = Day(
 
 nbInit
 nbUseP5
+nbJsFromCode:
+  import p5aoc
 nb.darkMode
 nbText: day.mdTitle
 nbText: """
@@ -61,14 +63,63 @@ nbCode:
 gotTheStar
 nbText: """### Visualization
 
+Let's look at total food and number of elfs before visualizing.
 """
-#nbCodeDisplay(nbJsFromCode):
-nbJsFromCode:
-  #echo elfs
+nbCode:
+  echo sum elfs.mapIt(sum it)
+  echo len(elfs)
+
+template myJsWithCaptures(body: untyped) =
+  nbJsFromCode(elfs):
+    body
+
+nbText: """
+Here is a very simple visualization:
+  - plot a rectangle for every elf, with length proportional to the food
+  - every piece of food is colored with a color extracted from a palette
+  - list of palettes is taken from [takawo]
+  - I also wait a moment before starting and wait also at the end
+
+[takawo]: https://openprocessing.org/sketch/1751402
+"""
+nbCodeDisplay(myJsWithCaptures):
+  const
+    ratio = 100.0
+    hElf = 5
+    idxWait = 100
+  var idx = -20
+
+  proc showElf(x, y: float, food: seq[int], colors: seq[string]) =
+    push()
+    translate(x, y)
+    for i, f in food:
+      fill(colors[i mod colors.len])
+      rect(0, 0, f / ratio, hElf)
+      translate(f / ratio, 0)
+    pop()
+
+  echo elfs
   setup:
-    createCanvas(300, 300)
+    createCanvas(800, 2*hElf*len(elfs) + hElf)
+    #createCanvas(800, 800)
+    background(colDark)
+    frameRate(15)
+    noStroke()
   draw:
-    rect(10, 10, 30, 30)
+    if idx < elfs.len:
+      if idx >= 0: # wait before starting
+        showElf(hElf, hElf + (hElf + hElf)*idx, elfs[idx], palettes[idx mod len palettes])
+      inc idx
+    else:
+      # wait a moment
+      inc idx
+      if idx > elfs.len + idxWait:
+        background(colDark)
+        idx = -20
+nbJsFromCode():
+  keyPressed:
+    if $key == "s":
+      saveGif("day01", 3)
 nbSave
 #[
 this does not work, issue with capturing variables?
@@ -79,5 +130,7 @@ nbJsFromCode(elfs):
 
 another issue: SIGSEGV: Illegal storage access. (Attempt to read from nil?)
 
--> this might be a bug in orc (in my current nim)! if I remove orc it works!
+-> this might be a bug in orc (in my current nim 1.6.6)! if I remove orc it works!
+
+# saving gif does not work
 ]# 
