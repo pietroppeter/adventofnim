@@ -16,6 +16,8 @@ First day of new year of advent of code, happy to be back here having fun with [
 and [nimib] and blogging about it. The idea for this year is to try and make visualization
 with [p5nim].
 
+👇[shortcut for visualization](#viz)
+
 Another thing I will be doing is using [batteries] for importing common stdlib modules.
 This is a nice convenience module that was supposed to improve on pattern of doing `include prelude`
 but it was [decided not to] put it in stdlib and you can now install it with [nimble].
@@ -85,7 +87,7 @@ Here is a very simple visualization:
 nbCodeDisplay(myJsWithCaptures):
   const
     ratio = 100.0
-    hElf = 5
+    hElf = 2
     idxWait = 100
   var idx = -20
 
@@ -100,26 +102,28 @@ nbCodeDisplay(myJsWithCaptures):
 
   echo elfs
   setup:
-    createCanvas(800, 2*hElf*len(elfs) + hElf)
+    createCanvas(800, hElf*len(elfs))
     #createCanvas(800, 800)
     background(colDark)
-    frameRate(15)
+    frameRate(50)
     noStroke()
   draw:
     if idx < elfs.len:
       if idx >= 0: # wait before starting
-        showElf(hElf, hElf + (hElf + hElf)*idx, elfs[idx], palettes[idx mod len palettes])
+        showElf(0, hElf*idx, elfs[idx], palettes[idx mod len palettes])
       inc idx
     else:
       # wait a moment
       inc idx
       if idx > elfs.len + idxWait:
         background(colDark)
-        idx = -20
+        idx = -60
+nbRawHtml: "<a name=\"viz\"></a>"
 nbJsFromCode():
   keyPressed:
     if $key == "s":
       saveGif("day01", 3)
+nbText: "for an older version of this visualization go [here](day01_viz1.html)"
 nbSave
 #[
 this does not work, issue with capturing variables?
