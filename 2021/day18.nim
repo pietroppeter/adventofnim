@@ -45,8 +45,17 @@ nbCode:
         for _ in left.len ..< n.lefts[i].len:
           result.add '['
       elif left.len == n.lefts[i].len:
-        assert left[^1] == not n.lefts[i][^1]
+        assert left[^1] != n.lefts[i][^1]
+        var count = 0
+        for j in 1 .. left.len:
+          if left[^j] != n.lefts[i][^j]:
+            inc count
+          else:
+            break
+        assert count >= 1
+        result.add ']'.repeat(count - 1)
         result.add ','
+        result.add '['.repeat(count - 1)
       else:
         for _ in n.lefts[i].len ..< left.len:
           result.add ']'
@@ -67,6 +76,7 @@ nbCode:
 [[[9,[3,8]],[[0,9],6]],[[[3,7],[4,9]],3]]
 [[[[1,3],[5,3]],[[1,3],[8,7]]],[[[4,9],[6,9]],[[8,2],[7,3]]]]""".splitLines:
     echo line, " -> ", parse(line)
+    echo parse(line).lefts
 
 nbSave
 
