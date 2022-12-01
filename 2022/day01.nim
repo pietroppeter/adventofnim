@@ -79,4 +79,5 @@ nbJsFromCode(elfs):
 
 another issue: SIGSEGV: Illegal storage access. (Attempt to read from nil?)
 
+-> this might be a bug in orc (in my current nim)! if I remove orc it works!
 ]# 
