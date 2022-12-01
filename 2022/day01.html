@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2022\day01.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script><body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2022\day01.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+
+<h2><a href="https://adventofcode.com/2022/day/1">Day 1</a>: Calorie Counting</h2>
+<p>First day of new year of advent of code, happy to be back here having fun with <a href="https://github.com/nim-lang/nim">nim</a>
+and <a href="https://github.com/pietroppeter/nimib">nimib</a> and blogging about it. The idea for this year is to try and make visualization
+with <a href="https://github.com/pietroppeter/p5nim">p5nim</a>.</p>
+<p>Another thing I will be doing is using <a href="https://github.com/AngelEzquerra/nim-batteries">batteries</a> for importing common stdlib modules.
+This is a nice convenience module that was supposed to improve on pattern of doing <code>include prelude</code>
+but it was <a href="https://github.com/nim-lang/Nim/pull/20041">decided not to</a> put it in stdlib and you can now install it with <a href="https://github.com/nim-lang/nimble">nimble</a>.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> batteries</code></pre>
+<h3>Part 1</h3>
+<p>Solving any puzzle you take a lot of micro decision.
+Often I like to separate parsing and processing, but in cases like today
+it is very convenient to do both at once:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">var</span>
+  elfs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
+  elf: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+  maxCalories: <span class="hljs-built_in">int</span>
+
+<span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> day.filename.lines:
+  <span class="hljs-keyword">if</span> len(line.strip) &gt; <span class="hljs-number">0</span>:
+    elf.add parseInt(line)
+  <span class="hljs-keyword">else</span>:
+    elfs.add elf
+    <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
+      maxCalories = sum(elf)
+    elf = @[]
+<span class="hljs-comment"># at the end I still need to add last elf</span>
+<span class="hljs-keyword">if</span> len(elf) &gt; <span class="hljs-number">0</span>:
+  elfs.add elf
+  <span class="hljs-comment"># and maybe he is the one bringing most calories</span>
+  <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
+    maxCalories = sum(elf)
+
+<span class="hljs-keyword">echo</span> maxCalories</code></pre><pre class="nb-output"><samp>73211</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
+</blockquote>
+<h3>Part 2</h3>
+<p>Easiest (not most performant) to get top three is to sort:</p>
+<pre><code class="nim hljs">sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
+
+<span class="hljs-keyword">echo</span> sum elfs[<span class="hljs-number">0.</span>.<span class="hljs-number">2</span>].mapIt(sum it)</code></pre><pre class="nb-output"><samp>213958</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
+</blockquote>
+<h3>Visualization</h3>
+
+<script defer>/* Generated by the Nim Compiler v1.6.6 */
+var framePtr = null;
+var excHandler = 0;
+var lastJSError = null;
+if (!Math.trunc) {
+  Math.trunc = function(v) {
+    v = +v;
+    if (!isFinite(v)) return v;
+    return (v - v % 1) || (v < 0 ? -0 : v === 0 ? v : 0);
+  };
+}
+
+var objectID_637534370 = [0];
+
+function setup() {
+    createCanvas(300.0, 300.0);
+
+  
+}
+
+function draw() {
+    rect(10.0, 10.0, 30.0, 30.0);
+
+  
+}
+</script>
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> nimib, aoc22, p5
+<span class="hljs-keyword">let</span> day = <span class="hljs-type">Day</span>(
+  num: <span class="hljs-number">1</span>,
+  title: <span class="hljs-string">&quot;Calorie Counting&quot;</span>,
+  summary: <span class="hljs-string">&quot;&quot;</span>
+)
+
+nbInit
+nbUseP5
+nb.darkMode
+nbText: day.mdTitle
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+First day of new year of advent of code, happy to be back here having fun with [nim]
+and [nimib] and blogging about it. The idea for this year is to try and make visualization
+with [p5nim].
+
+Another thing I will be doing is using [batteries] for importing common stdlib modules.
+This is a nice convenience module that was supposed to improve on pattern of doing `include prelude`
+but it was [decided not to] put it in stdlib and you can now install it with [nimble].
+
+[decided not to]: https://github.com/nim-lang/Nim/pull/20041
+&quot;&quot;&quot;</span> &amp; mdRefs
+nbCode:
+  <span class="hljs-keyword">import</span> batteries
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 1
+Solving any puzzle you take a lot of micro decision.
+Often I like to separate parsing and processing, but in cases like today
+it is very convenient to do both at once:
+&quot;&quot;&quot;</span>
+<span class="hljs-comment">#nbCodeAnd(nbJsFromCode):</span>
+nbCode:
+  <span class="hljs-keyword">var</span>
+    elfs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
+    elf: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+    maxCalories: <span class="hljs-built_in">int</span>
+
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> day.filename.lines:
+    <span class="hljs-keyword">if</span> len(line.strip) &gt; <span class="hljs-number">0</span>:
+      elf.add parseInt(line)
+    <span class="hljs-keyword">else</span>:
+      elfs.add elf
+      <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
+        maxCalories = sum(elf)
+      elf = @[]
+  <span class="hljs-comment"># at the end I still need to add last elf</span>
+  <span class="hljs-keyword">if</span> len(elf) &gt; <span class="hljs-number">0</span>:
+    elfs.add elf
+    <span class="hljs-comment"># and maybe he is the one bringing most calories</span>
+    <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
+      maxCalories = sum(elf)
+
+  <span class="hljs-keyword">echo</span> maxCalories
+gotTheStar
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
+Easiest (not most performant) to get top three is to sort:
+&quot;&quot;&quot;</span>
+nbCode:
+  sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
+
+  <span class="hljs-keyword">echo</span> sum elfs[<span class="hljs-number">0.</span>.<span class="hljs-number">2</span>].mapIt(sum it)
+gotTheStar
+nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization
+
+&quot;&quot;&quot;</span>
+<span class="hljs-comment">#nbCodeDisplay(nbJsFromCode):</span>
+nbJsFromCode:
+  <span class="hljs-comment">#echo elfs</span>
+  setup:
+    createCanvas(<span class="hljs-number">300</span>, <span class="hljs-number">300</span>)
+  draw:
+    rect(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">30</span>, <span class="hljs-number">30</span>)
+nbSave
+<span class="hljs-comment">#[
+this does not work, issue with capturing variables?
+
+nbJsFromCode(elfs):
+  echo elfs
+- [ ] investigate and produce minimial repr example (and submit issue to nimib)
+]#</span> </code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
