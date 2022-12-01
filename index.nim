@@ -11,7 +11,7 @@ nbText: """
 
 my nim solutions for advent of code ([home](index.html)):""".emojize
 
-let years = ["2021", "2020"]
+let years = ["2022", "2021", "2020"]
 type Content = Table[string, seq[string]]
 var content: Content
 
@@ -47,6 +47,8 @@ how to:
 """
 
 nbSave
+#[
 nbDoc.filename = "README.md"
 nbDoc.render = renderMark
 nbSave
+]#

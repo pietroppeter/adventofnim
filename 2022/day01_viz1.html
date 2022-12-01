@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <title>2022\day01.nim</title>
+  <title>2022\day01_viz1.nim</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
   <meta content="text/html; charset=utf-8" http-equiv="content-type">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -60,7 +60,7 @@ section#source {
 <header>
 <div class="nb-box">
   <span><a href="..">🏡</a></span>
-  <span><code>2022\day01.nim</code></span>
+  <span><code>2022\day01_viz1.nim</code></span>
   <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
 </div>
 <hr>
@@ -68,99 +68,9 @@ section#source {
 
 
 <h2><a href="https://adventofcode.com/2022/day/1">Day 1</a>: Calorie Counting</h2>
-<p>First day of new year of advent of code, happy to be back here having fun with <a href="https://github.com/nim-lang/nim">nim</a>
-and <a href="https://github.com/pietroppeter/nimib">nimib</a> and blogging about it. The idea for this year is to try and make visualization
-with <a href="https://github.com/pietroppeter/p5nim">p5nim</a>.</p>
-<p>👇<a href="#viz">shortcut for visualization</a></p>
-<p>Another thing I will be doing is using <a href="https://github.com/AngelEzquerra/nim-batteries">batteries</a> for importing common stdlib modules.
-This is a nice convenience module that was supposed to improve on pattern of doing <code>include prelude</code>
-but it was <a href="https://github.com/nim-lang/Nim/pull/20041">decided not to</a> put it in stdlib and you can now install it with <a href="https://github.com/nim-lang/nimble">nimble</a>.</p>
-<pre><code class="nim hljs"><span class="hljs-keyword">import</span> batteries</code></pre>
-<h3>Part 1</h3>
-<p>Solving any puzzle you take a lot of micro decision.
-Often I like to separate parsing and processing, but in cases like today
-it is very convenient to do both at once:</p>
-<pre><code class="nim hljs"><span class="hljs-keyword">var</span>
-  elfs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
-  elf: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
-  maxCalories: <span class="hljs-built_in">int</span>
+<p>Older visualization for <a href="day01.html">day01</a></p>
 
-<span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> day.filename.lines:
-  <span class="hljs-keyword">if</span> len(line.strip) &gt; <span class="hljs-number">0</span>:
-    elf.add parseInt(line)
-  <span class="hljs-keyword">else</span>:
-    elfs.add elf
-    <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
-      maxCalories = sum(elf)
-    elf = @[]
-<span class="hljs-comment"># at the end I still need to add last elf</span>
-<span class="hljs-keyword">if</span> len(elf) &gt; <span class="hljs-number">0</span>:
-  elfs.add elf
-  <span class="hljs-comment"># and maybe he is the one bringing most calories</span>
-  <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
-    maxCalories = sum(elf)
 
-<span class="hljs-keyword">echo</span> maxCalories</code></pre><pre class="nb-output"><samp>73211</samp></pre>
-<blockquote>
-<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
-</blockquote>
-<h3>Part 2</h3>
-<p>Easiest (not most performant) to get top three is to sort:</p>
-<pre><code class="nim hljs">sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
-
-<span class="hljs-keyword">echo</span> sum elfs[<span class="hljs-number">0.</span>.<span class="hljs-number">2</span>].mapIt(sum it)</code></pre><pre class="nb-output"><samp>213958</samp></pre>
-<blockquote>
-<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
-</blockquote>
-<h3>Visualization</h3>
-<p>Let's look at total food and number of elfs before visualizing.</p>
-<pre><code class="nim hljs"><span class="hljs-keyword">echo</span> sum elfs.mapIt(sum it)
-<span class="hljs-keyword">echo</span> len(elfs)</code></pre><pre class="nb-output"><samp>11936991
-254</samp></pre>
-<p>Here is a very simple visualization:</p>
-<ul>
-<li>plot a rectangle for every elf, with length proportional to the food</li>
-<li>every piece of food is colored with a color extracted from a palette</li>
-<li>list of palettes is taken from <a href="https://openprocessing.org/sketch/1751402">takawo</a></li>
-<li>I also wait a moment before starting and wait also at the end</li>
-</ul>
-
-<pre><code class="nim hljs"><span class="hljs-keyword">const</span>
-  ratio = <span class="hljs-number">100.0</span>
-  hElf = <span class="hljs-number">2</span>
-  idxWait = <span class="hljs-number">100</span>
-<span class="hljs-keyword">var</span> idx = -<span class="hljs-number">20</span>
-
-<span class="hljs-keyword">proc</span> showElf(x, y: <span class="hljs-built_in">float</span>, food: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>], colors: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">string</span>]) =
-  push()
-  translate(x, y)
-  <span class="hljs-keyword">for</span> i, f <span class="hljs-keyword">in</span> food:
-    fill(colors[i <span class="hljs-keyword">mod</span> colors.len])
-    rect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, f / ratio, hElf)
-    translate(f / ratio, <span class="hljs-number">0</span>)
-  pop()
-
-<span class="hljs-keyword">echo</span> elfs
-setup:
-  createCanvas(<span class="hljs-number">800</span>, hElf*len(elfs))
-  <span class="hljs-comment">#createCanvas(800, 800)</span>
-  background(colDark)
-  frameRate(<span class="hljs-number">50</span>)
-  noStroke()
-draw:
-  <span class="hljs-keyword">if</span> idx &lt; elfs.len:
-    <span class="hljs-keyword">if</span> idx &gt;= <span class="hljs-number">0</span>: <span class="hljs-comment"># wait before starting</span>
-      showElf(<span class="hljs-number">0</span>, hElf*idx, elfs[idx], palettes[idx <span class="hljs-keyword">mod</span> len palettes])
-    inc idx
-  <span class="hljs-keyword">else</span>:
-    <span class="hljs-comment"># wait a moment</span>
-    inc idx
-    <span class="hljs-keyword">if</span> idx &gt; elfs.len + idxWait:
-      background(colDark)
-      idx = -<span class="hljs-number">60</span></code></pre>
-<a name="viz"></a>
-
-<p>for an older version of this visualization go <a href="day01_viz1.html">here</a></p>
 <script defer>/* Generated by the Nim Compiler v1.6.8 */
 var framePtr = null;
 var excHandler = 0;
@@ -2429,9 +2339,9 @@ function toFloat_1124073478(n_1124073479) {
 }
 
 function setup() {
-    createCanvas(800.0, toFloat_1124073478((2 * (elfs_469762158).length)));
+    createCanvas(800.0, toFloat_1124073478(((10 * (elfs_469762158).length) + 5)));
     background(toJSStr(colDark_1275068417));
-    frameRate(50.0);
+    frameRate(15.0);
     noStroke();
 
   
@@ -2451,7 +2361,7 @@ function showElf_469762223(x_469762224, y_469762225, food_469762226, colors_4697
             i_469762249 = i_469762487;
             f_469762250 = food_469762226[i_469762487];
             fill(toJSStr(colors_469762227[Math.trunc(i_469762249 % (colors_469762227).length)]));
-            rect(0.0, 0.0, (toFloat_1124073478(f_469762250) / 100.0), 2.0);
+            rect(0.0, 0.0, (toFloat_1124073478(f_469762250) / 100.0), 5.0);
             translate((toFloat_1124073478(f_469762250) / 100.0), 0.0);
             i_469762487 += 1;
           }
@@ -2465,7 +2375,7 @@ function showElf_469762223(x_469762224, y_469762225, food_469762226, colors_4697
 function draw() {
     if ((idx_469762162[0] < (elfs_469762158).length)) {
     if ((0 <= idx_469762162[0])) {
-    showElf_469762223(0.0, toFloat_1124073478((2 * idx_469762162[0])), elfs_469762158[idx_469762162[0]], palettes_1275068488[Math.trunc(idx_469762162[0] % 14)]);
+    showElf_469762223(5.0, toFloat_1124073478((5 + (10 * idx_469762162[0]))), elfs_469762158[idx_469762162[0]], palettes_1275068488[Math.trunc(idx_469762162[0] % 14)]);
     }
     
     idx_469762162[0] += 1;
@@ -2474,7 +2384,7 @@ function draw() {
       idx_469762162[0] += 1;
       if ((((elfs_469762158).length + 100) < idx_469762162[0])) {
       background(toJSStr(colDark_1275068417));
-      idx_469762162[0] = -60;
+      idx_469762162[0] = -20;
       }
       
     }
@@ -2517,82 +2427,37 @@ nbJsFromCode:
 nb.darkMode
 nbText: day.mdTitle
 nbText: <span class="hljs-string">&quot;&quot;&quot;
-First day of new year of advent of code, happy to be back here having fun with [nim]
-and [nimib] and blogging about it. The idea for this year is to try and make visualization
-with [p5nim].
-
-👇[shortcut for visualization](#viz)
-
-Another thing I will be doing is using [batteries] for importing common stdlib modules.
-This is a nice convenience module that was supposed to improve on pattern of doing `include prelude`
-but it was [decided not to] put it in stdlib and you can now install it with [nimble].
-
-[decided not to]: https://github.com/nim-lang/Nim/pull/20041
-&quot;&quot;&quot;</span> &amp; mdRefs
-nbCode:
-  <span class="hljs-keyword">import</span> batteries
-nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 1
-Solving any puzzle you take a lot of micro decision.
-Often I like to separate parsing and processing, but in cases like today
-it is very convenient to do both at once:
+Older visualization for [day01](day01.html)
 &quot;&quot;&quot;</span>
-<span class="hljs-comment">#nbCodeAnd(nbJsFromCode):</span>
-nbCode:
-  <span class="hljs-keyword">var</span>
-    elfs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
-    elf: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
-    maxCalories: <span class="hljs-built_in">int</span>
+<span class="hljs-keyword">import</span> batteries
 
-  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> day.filename.lines:
-    <span class="hljs-keyword">if</span> len(line.strip) &gt; <span class="hljs-number">0</span>:
-      elf.add parseInt(line)
-    <span class="hljs-keyword">else</span>:
-      elfs.add elf
-      <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
-        maxCalories = sum(elf)
-      elf = @[]
-  <span class="hljs-comment"># at the end I still need to add last elf</span>
-  <span class="hljs-keyword">if</span> len(elf) &gt; <span class="hljs-number">0</span>:
+<span class="hljs-keyword">var</span>
+  elfs: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]]
+  elf: <span class="hljs-built_in">seq</span>[<span class="hljs-built_in">int</span>]
+  maxCalories: <span class="hljs-built_in">int</span>
+
+<span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> day.filename.lines:
+  <span class="hljs-keyword">if</span> len(line.strip) &gt; <span class="hljs-number">0</span>:
+    elf.add parseInt(line)
+  <span class="hljs-keyword">else</span>:
     elfs.add elf
-    <span class="hljs-comment"># and maybe he is the one bringing most calories</span>
     <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
       maxCalories = sum(elf)
+    elf = @[]
+<span class="hljs-comment"># at the end I still need to add last elf</span>
+<span class="hljs-keyword">if</span> len(elf) &gt; <span class="hljs-number">0</span>:
+  elfs.add elf
+  <span class="hljs-comment"># and maybe he is the one bringing most calories</span>
+  <span class="hljs-keyword">if</span> sum(elf) &gt; maxCalories:
+    maxCalories = sum(elf)
 
-  <span class="hljs-keyword">echo</span> maxCalories
-gotTheStar
-nbText: <span class="hljs-string">&quot;&quot;&quot;### Part 2
-Easiest (not most performant) to get top three is to sort:
-&quot;&quot;&quot;</span>
-nbCode:
-  sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
 
-  <span class="hljs-keyword">echo</span> sum elfs[<span class="hljs-number">0.</span>.<span class="hljs-number">2</span>].mapIt(sum it)
-gotTheStar
-nbText: <span class="hljs-string">&quot;&quot;&quot;### Visualization
+sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
 
-Let's look at total food and number of elfs before visualizing.
-&quot;&quot;&quot;</span>
-nbCode:
-  <span class="hljs-keyword">echo</span> sum elfs.mapIt(sum it)
-  <span class="hljs-keyword">echo</span> len(elfs)
-
-<span class="hljs-keyword">template</span> myJsWithCaptures(body: <span class="hljs-built_in">untyped</span>) =
-  nbJsFromCode(elfs):
-    body
-
-nbText: <span class="hljs-string">&quot;&quot;&quot;
-Here is a very simple visualization:
-  - plot a rectangle for every elf, with length proportional to the food
-  - every piece of food is colored with a color extracted from a palette
-  - list of palettes is taken from [takawo]
-  - I also wait a moment before starting and wait also at the end
-
-[takawo]: https://openprocessing.org/sketch/1751402
-&quot;&quot;&quot;</span>
-nbCodeDisplay(myJsWithCaptures):
+nbJsFromCode(elfs):
   <span class="hljs-keyword">const</span>
     ratio = <span class="hljs-number">100.0</span>
-    hElf = <span class="hljs-number">2</span>
+    hElf = <span class="hljs-number">5</span>
     idxWait = <span class="hljs-number">100</span>
   <span class="hljs-keyword">var</span> idx = -<span class="hljs-number">20</span>
 
@@ -2607,42 +2472,28 @@ nbCodeDisplay(myJsWithCaptures):
 
   <span class="hljs-keyword">echo</span> elfs
   setup:
-    createCanvas(<span class="hljs-number">800</span>, hElf*len(elfs))
+    createCanvas(<span class="hljs-number">800</span>, <span class="hljs-number">2</span>*hElf*len(elfs) + hElf)
     <span class="hljs-comment">#createCanvas(800, 800)</span>
     background(colDark)
-    frameRate(<span class="hljs-number">50</span>)
+    frameRate(<span class="hljs-number">15</span>)
     noStroke()
   draw:
     <span class="hljs-keyword">if</span> idx &lt; elfs.len:
       <span class="hljs-keyword">if</span> idx &gt;= <span class="hljs-number">0</span>: <span class="hljs-comment"># wait before starting</span>
-        showElf(<span class="hljs-number">0</span>, hElf*idx, elfs[idx], palettes[idx <span class="hljs-keyword">mod</span> len palettes])
+        showElf(hElf, hElf + (hElf + hElf)*idx, elfs[idx], palettes[idx <span class="hljs-keyword">mod</span> len palettes])
       inc idx
     <span class="hljs-keyword">else</span>:
       <span class="hljs-comment"># wait a moment</span>
       inc idx
       <span class="hljs-keyword">if</span> idx &gt; elfs.len + idxWait:
         background(colDark)
-        idx = -<span class="hljs-number">60</span>
-nbRawHtml: <span class="hljs-string">&quot;&lt;a name=</span><span class="hljs-meta">\&quot;</span><span class="hljs-string">viz</span><span class="hljs-meta">\&quot;</span><span class="hljs-string">&gt;&lt;/a&gt;&quot;</span>
+        idx = -<span class="hljs-number">20</span>
 nbJsFromCode():
   keyPressed:
     <span class="hljs-keyword">if</span> $key == <span class="hljs-string">&quot;s&quot;</span>:
       saveGif(<span class="hljs-string">&quot;day01&quot;</span>, <span class="hljs-number">3</span>)
-nbText: <span class="hljs-string">&quot;for an older version of this visualization go [here](day01_viz1.html)&quot;</span>
 nbSave
-<span class="hljs-comment">#[
-this does not work, issue with capturing variables?
-
-nbJsFromCode(elfs):
-  echo elfs
-- [ ] investigate and produce minimial repr example (and submit issue to nimib)
-
-another issue: SIGSEGV: Illegal storage access. (Attempt to read from nil?)
-
--&gt; this might be a bug in orc (in my current nim 1.6.6)! if I remove orc it works!
-
-# saving gif does not work
-]#</span> </code></pre>
+</code></pre>
 </section><script>
 function toggleSourceDisplay() {
   var btn = document.getElementById("show")
