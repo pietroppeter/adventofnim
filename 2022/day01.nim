@@ -29,7 +29,7 @@ but it was [decided not to] put it in stdlib and you can now install it with [ni
 """ & mdRefs
 nbCode:
   import batteries
-nbText: """### <a name="part1">Part 1</a>
+nbText: """### <a name="part1" href="#part1">Part 1</a>
 Solving any puzzle you take a lot of micro decision.
 Often I like to separate parsing and processing, but in cases like today
 it is very convenient to do both at once:
@@ -58,7 +58,7 @@ nbCode:
 
   echo maxCalories
 gotTheStar
-nbText: """### <a name="part2">Part 2</a>
+nbText: """### <a name="part2" href="part2">Part 2</a>
 Easiest (not most performant) to get top three is to sort:
 """
 nbCode:
@@ -66,7 +66,7 @@ nbCode:
 
   echo sum elfs[0..2].mapIt(sum it)
 gotTheStar
-nbText: """### <a name="around">Seen around</a>
+nbText: """### <a name="around" href="#around">Seen around</a>
 Section "seen around" is where I gather interesting stuff seen around about advent of code for today:
 
 - [daily solution megathread](https://www.reddit.com/r/adventofcode/comments/z9ezjb/2022_day_1_solutions/) to post your solution (I did!).

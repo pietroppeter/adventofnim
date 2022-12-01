@@ -81,7 +81,7 @@ with <a href="https://github.com/pietroppeter/p5nim">p5nim</a>.</p>
 This is a nice convenience module that was supposed to improve on pattern of doing <code>include prelude</code>
 but it was <a href="https://github.com/nim-lang/Nim/pull/20041">decided not to</a> put it in stdlib and you can now install it with <a href="https://github.com/nim-lang/nimble">nimble</a>.</p>
 <pre><code class="nim hljs"><span class="hljs-keyword">import</span> batteries</code></pre>
-<h3><a name="part1">Part 1</a></h3>
+<h3><a name="part1" href="#part1">Part 1</a></h3>
 <p>Solving any puzzle you take a lot of micro decision.
 Often I like to separate parsing and processing, but in cases like today
 it is very convenient to do both at once:</p>
@@ -109,7 +109,7 @@ it is very convenient to do both at once:</p>
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
 </blockquote>
-<h3><a name="part2">Part 2</a></h3>
+<h3><a name="part2" href="part2">Part 2</a></h3>
 <p>Easiest (not most performant) to get top three is to sort:</p>
 <pre><code class="nim hljs">sort(elfs, ((elfA, elfB) =&gt; sum(elfA) - sum(elfB)), order=<span class="hljs-type">SortOrder</span>.<span class="hljs-type">Descending</span>)
 
@@ -117,7 +117,7 @@ it is very convenient to do both at once:</p>
 <blockquote>
 <p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
 </blockquote>
-<h3><a name="around">Seen around</a></h3>
+<h3><a name="around" href="#around">Seen around</a></h3>
 <p>Section &quot;seen around&quot; is where I gather interesting stuff seen around about advent of code for today:</p>
 <ul>
 <li>
@@ -2592,7 +2592,7 @@ but it was [decided not to] put it in stdlib and you can now install it with [ni
 &quot;&quot;&quot;</span> &amp; mdRefs
 nbCode:
   <span class="hljs-keyword">import</span> batteries
-nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;part1&quot;&gt;Part 1&lt;/a&gt;
+nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;part1&quot; href=&quot;#part1&quot;&gt;Part 1&lt;/a&gt;
 Solving any puzzle you take a lot of micro decision.
 Often I like to separate parsing and processing, but in cases like today
 it is very convenient to do both at once:
@@ -2621,7 +2621,7 @@ nbCode:
 
   <span class="hljs-keyword">echo</span> maxCalories
 gotTheStar
-nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;part2&quot;&gt;Part 2&lt;/a&gt;
+nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;part2&quot; href=&quot;part2&quot;&gt;Part 2&lt;/a&gt;
 Easiest (not most performant) to get top three is to sort:
 &quot;&quot;&quot;</span>
 nbCode:
@@ -2629,7 +2629,7 @@ nbCode:
 
   <span class="hljs-keyword">echo</span> sum elfs[<span class="hljs-number">0.</span>.<span class="hljs-number">2</span>].mapIt(sum it)
 gotTheStar
-nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;around&quot;&gt;Seen around&lt;/a&gt;
+nbText: <span class="hljs-string">&quot;&quot;&quot;### &lt;a name=&quot;around&quot; href=&quot;#around&quot;&gt;Seen around&lt;/a&gt;
 Section &quot;seen around&quot; is where I gather interesting stuff seen around about advent of code for today:
 
 - [daily solution megathread](https://www.reddit.com/r/adventofcode/comments/z9ezjb/2022_day_1_solutions/) to post your solution (I did!).
