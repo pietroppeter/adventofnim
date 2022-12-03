@@ -26,11 +26,26 @@ func score1(game: (int, int)): int =
 func part1(games:seq[(int, int)]): int =
   sum games.mapIt(score1 it)
 
+# 1 mistake (-1 mod 3 -> -1)
 echo part1 games
 
 #example 1
 echo "A Y\nB X\nC Z".split("\n").toGames.part1 # ok 15
 echo "A Y\nB X\nC Z".split("\n").toGames.mapIt(score1 it) # ok 8, 1, 6
 # new example
-echo "A Z\nB Y\nC X".split("\n").toGames.part1 # ok 15
-echo "A Z\nB Y\nC X".split("\n").toGames.mapIt(score1 it) # ok 8, 1, 6
+echo "A Z\nB Y\nC X".split("\n").toGames.part1 
+echo "A Z\nB Y\nC X".split("\n").toGames.mapIt(score1 it)
+
+func score2(game: (int, int)): int =
+  let you = (game[1] - 1 + game[0] + 3) mod 3
+  # Y draw 1: same as game[0]
+  # X lose 0: 1 less than game0
+  #debugEcho (you, game[0]), score1 (game[0], you)
+  score1 (game[0], you)
+# 2 mistakes (inverted tuple + forgot parenthesis)
+
+func part2(games: seq[(int, int)]): int = sum games.mapIt(score2 it)
+
+#example 1
+echo "A Y\nB X\nC Z".split("\n").toGames.part2 # ok 12
+echo part2 games
