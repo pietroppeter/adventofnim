@@ -63,12 +63,10 @@ nbCode:
     toHashSet(sack[0]) + toHashSet(sack[1])
 
   func groupMatch(sacks: seq[(string, string)]): char =
-    var matches: HashSet[char]
-    for sackSet in sacks.mapIt(toSet it):
-      if matches.len == 0:
-        matches = sackSet
-      else:
-        matches = matches * sackSet
+    var matches = sacks[0].toSet
+    for i in 1 .. sacks.high:
+        matches = matches * sacks[i].toSet
+    assert len(matches) == 1
     for c in matches:
       return c
 

@@ -130,12 +130,10 @@ CrZsJsPPZsGzwwsLwLmpwMDw&quot;&quot;&quot;</span>
   toHashSet(sack[<span class="hljs-number">0</span>]) + toHashSet(sack[<span class="hljs-number">1</span>])
 
 <span class="hljs-keyword">func</span> groupMatch(sacks: <span class="hljs-built_in">seq</span>[(<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>)]): <span class="hljs-built_in">char</span> =
-  <span class="hljs-keyword">var</span> matches: <span class="hljs-type">HashSet</span>[<span class="hljs-built_in">char</span>]
-  <span class="hljs-keyword">for</span> sackSet <span class="hljs-keyword">in</span> sacks.mapIt(toSet it):
-    <span class="hljs-keyword">if</span> matches.len == <span class="hljs-number">0</span>:
-      matches = sackSet
-    <span class="hljs-keyword">else</span>:
-      matches = matches * sackSet
+  <span class="hljs-keyword">var</span> matches = sacks[<span class="hljs-number">0</span>].toSet
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. sacks.<span class="hljs-keyword">high</span>:
+      matches = matches * sacks[i].toSet
+  <span class="hljs-keyword">assert</span> len(matches) == <span class="hljs-number">1</span>
   <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> matches:
     <span class="hljs-keyword">return</span> c
 
@@ -403,12 +401,10 @@ nbCode:
     toHashSet(sack[<span class="hljs-number">0</span>]) + toHashSet(sack[<span class="hljs-number">1</span>])
 
   <span class="hljs-keyword">func</span> groupMatch(sacks: <span class="hljs-built_in">seq</span>[(<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>)]): <span class="hljs-built_in">char</span> =
-    <span class="hljs-keyword">var</span> matches: <span class="hljs-type">HashSet</span>[<span class="hljs-built_in">char</span>]
-    <span class="hljs-keyword">for</span> sackSet <span class="hljs-keyword">in</span> sacks.mapIt(toSet it):
-      <span class="hljs-keyword">if</span> matches.len == <span class="hljs-number">0</span>:
-        matches = sackSet
-      <span class="hljs-keyword">else</span>:
-        matches = matches * sackSet
+    <span class="hljs-keyword">var</span> matches = sacks[<span class="hljs-number">0</span>].toSet
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">1</span> .. sacks.<span class="hljs-keyword">high</span>:
+        matches = matches * sacks[i].toSet
+    <span class="hljs-keyword">assert</span> len(matches) == <span class="hljs-number">1</span>
     <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> matches:
       <span class="hljs-keyword">return</span> c
 
