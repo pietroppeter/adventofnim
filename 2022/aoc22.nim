@@ -6,10 +6,6 @@ type
     title*: string
     summary*: string
 
-func mdTitle*(d: Day): string =
-  fmt"## [Day {d.num}](https://adventofcode.com/2022/day/{d.num}): " & d.title
-
-
 func filename*(d: Day): string =
   fmt"2022/day{d.num:02}.txt"
 
@@ -26,3 +22,23 @@ let mdRefs* = """
 [nimble]: https://github.com/nim-lang/nimble
 """
 
+func mdTitle*(d: Day): string =
+  fmt"## --- [Day {d.num}: {d.title}](https://adventofcode.com/2022/day/{d.num}) --- "
+
+func anchor*(text: string, id: string): string =
+  &"<a name=\"{id}\" href=\"#{id}\">{text}</a>"
+
+func aocTitle(content: string): string =
+  &"""### --- {content} ---"""
+
+template nbPart1* =
+  nbText: aocTitle anchor("Part 1", "part1")
+
+template nbPart2* =
+  nbText: aocTitle anchor("Part 2", "part2")
+
+template nbAround* =
+  nbText: aocTitle anchor("Seen Around", "around")
+
+template nbViz* =
+  nbText: aocTitle anchor("Visualization", "viz")
