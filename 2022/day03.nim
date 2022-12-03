@@ -10,6 +10,8 @@ nbJsFromCode:
   import p5aoc
 nb.darkMode
 nbText: day.mdTitle
+
+nbPart1
 nbText: "parsing input"
 nbCode:
   proc parse(text: string): seq[(string, string)] =
@@ -57,6 +59,8 @@ nbCode:
   echo part1 exampleSacks # expect 157
   echo part1 sacks
 gotTheStar
+
+nbPart2
 nbText: "group match"
 nbCode:
   func toSet(sack: (string, string)): HashSet[char] =
@@ -82,4 +86,12 @@ nbCode:
 
   echo part2 exampleSacks # 70
   echo part2 sacks
+gotTheStar
+
+nbViz
+nbJsFromCode:
+  setup:
+    createCanvas(300, 100)
+  draw:
+    ellipse(0, 0, 10, 10)
 nbSave
