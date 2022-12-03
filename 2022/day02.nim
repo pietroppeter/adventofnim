@@ -10,6 +10,8 @@ nbJsFromCode:
   import p5aoc
 nb.darkMode
 nbText: day.mdTitle
+
+nbPart1
 nbText: "parsing input"
 nbCode:
   func toGames(inp: seq[string]): seq[(int, int)] =
@@ -48,7 +50,8 @@ nbCode:
   # new example
   echo "A Z\nB Y\nC X".split("\n").toGames.part1 
   echo "A Z\nB Y\nC X".split("\n").toGames.mapIt(score1 it)
-nbText: "solving part2"
+
+nbPart2
 nbCode:
   func score2(game: (int, int)): int =
     let you = (game[1] - 1 + game[0] + 3) mod 3
@@ -66,4 +69,10 @@ nbText: """Notes:
 - first mistake I had to debug, I inverted you and game[0] when computing score
 - second mistake: I initially forgot parentheses in you expression
 """
+
+nbAround
+nbText: """
+- awesome [visualization by hugo using p5nim](https://hugogranstrom.com/AdventOfNim/2022/day2/)
+"""
+
 nbSave
