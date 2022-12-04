@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2022/day04.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script><body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2022/day04.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+
+
+<h2>--- <a href="https://adventofcode.com/2022/day/4">Day 4: Camp Cleanup</a> ---</h2>
+<h3>--- <a name="part1" href="#part1">Part 1</a> ---</h3>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Section</span> = <span class="hljs-keyword">tuple</span>[a, b: <span class="hljs-built_in">int</span>]
+  <span class="hljs-type">SectionPairs</span> = (<span class="hljs-type">Section</span>, <span class="hljs-type">Section</span>)
+
+<span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>] =
+  <span class="hljs-keyword">var</span> sp: <span class="hljs-type">SectionPairs</span>
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;$i-$i,$i-$i&quot;</span>, sp[<span class="hljs-number">0</span>].a, sp[<span class="hljs-number">0</span>].b, sp[<span class="hljs-number">1</span>].a, sp[<span class="hljs-number">1</span>].b):
+      debugEcho <span class="hljs-string">&quot;ERROR, line: '&quot;</span>, line, <span class="hljs-string">&quot;'&quot;</span>
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-literal">result</span>.add sp
+
+<span class="hljs-keyword">let</span> assignmentList = parse day.filename.readFile
+<span class="hljs-keyword">echo</span> assignmentList[<span class="hljs-number">0.</span>.<span class="hljs-number">1</span>]
+<span class="hljs-keyword">echo</span> len assignmentList</code></pre><pre class="nb-output"><samp>@[((a: 2, b: 9), (a: 9, b: 51)), ((a: 33, b: 51), (a: 45, b: 73))]
+1000</samp></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> `&lt;`(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+  (s1.a &lt;= s2.a <span class="hljs-keyword">and</span> s1.b &gt;= s2.b)
+
+<span class="hljs-keyword">func</span> oneInTheOther(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+  s1 &lt; s2 <span class="hljs-keyword">or</span> s2 &lt; s1
+
+<span class="hljs-keyword">func</span> part1(inp: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>]): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> sp <span class="hljs-keyword">in</span> inp:
+    <span class="hljs-keyword">if</span> oneInTheOther(sp[<span class="hljs-number">0</span>], sp[<span class="hljs-number">1</span>]):
+      inc <span class="hljs-literal">result</span>
+
+<span class="hljs-keyword">echo</span> part1 assignmentList</code></pre><pre class="nb-output"><samp>450</samp></pre>
+<p>debugging with example</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8&quot;&quot;&quot;</span>
+<span class="hljs-keyword">echo</span> part1 parse example <span class="hljs-comment"># expect 2</span></code></pre><pre class="nb-output"><samp>2</samp></pre>
+<p>had a wrong sign</p>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
+</blockquote>
+<h3>--- <a name="part2" href="#part2">Part 2</a> ---</h3>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> `&lt;:`(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+  (s1.a &lt;= s2.a <span class="hljs-keyword">and</span> s1.b &gt;= s2.a)
+
+<span class="hljs-keyword">func</span> overlap(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+  s1 &lt;: s2 <span class="hljs-keyword">or</span> s2 &lt;: s1    
+
+<span class="hljs-keyword">func</span> part2(inp: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>]): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">for</span> sp <span class="hljs-keyword">in</span> inp:
+    <span class="hljs-keyword">if</span> overlap(sp[<span class="hljs-number">0</span>], sp[<span class="hljs-number">1</span>]):
+      inc <span class="hljs-literal">result</span>
+
+<span class="hljs-keyword">echo</span> part2 parse example <span class="hljs-comment"># expect 4</span>
+<span class="hljs-keyword">echo</span> part2 assignmentList</code></pre><pre class="nb-output"><samp>4
+837</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
+</blockquote>
+<h3>--- <a name="around" href="#around">Seen Around</a> ---</h3>
+<h3>--- <a name="viz" href="#viz">Visualization</a> ---</h3>
+<script defer>/* Generated by the Nim Compiler v1.6.10 */
+var framePtr = null;
+var excHandler = 0;
+var lastJSError = null;
+var NTI33554439 = {size: 0,kind: 28,base: null,node: null,finalizer: null};
+var NTI1275068425 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+NTI1275068425.base = NTI33554439;
+
+function makeNimstrLit(c_33556801) {
+      var result = [];
+  for (var i = 0; i < c_33556801.length; ++i) {
+    result[i] = c_33556801.charCodeAt(i);
+  }
+  return result;
+  
+
+  
+}
+
+function setConstr() {
+        var result = {};
+    for (var i = 0; i < arguments.length; ++i) {
+      var x = arguments[i];
+      if (typeof(x) == "object") {
+        for (var j = x[0]; j <= x[1]; ++j) {
+          result[j] = true;
+        }
+      } else {
+        result[x] = true;
+      }
+    }
+    return result;
+  
+
+  
+}
+var ConstSet1 = setConstr(17, 16, 4, 18, 27, 19, 23, 22, 21);
+
+function nimCopy(dest_33557140, src_33557141, ti_33557142) {
+  var result_33557151 = null;
+
+    switch (ti_33557142.kind) {
+    case 21:
+    case 22:
+    case 23:
+    case 5:
+      if (!(isFatPointer_33557131(ti_33557142))) {
+      result_33557151 = src_33557141;
+      }
+      else {
+        result_33557151 = [src_33557141[0], src_33557141[1]];
+      }
+      
+      break;
+    case 19:
+            if (dest_33557140 === null || dest_33557140 === undefined) {
+        dest_33557140 = {};
+      }
+      else {
+        for (var key in dest_33557140) { delete dest_33557140[key]; }
+      }
+      for (var key in src_33557141) { dest_33557140[key] = src_33557141[key]; }
+      result_33557151 = dest_33557140;
+    
+      break;
+    case 18:
+    case 17:
+      if (!((ti_33557142.base == null))) {
+      result_33557151 = nimCopy(dest_33557140, src_33557141, ti_33557142.base);
+      }
+      else {
+      if ((ti_33557142.kind == 17)) {
+      result_33557151 = (dest_33557140 === null || dest_33557140 === undefined) ? {m_type: ti_33557142} : dest_33557140;
+      }
+      else {
+        result_33557151 = (dest_33557140 === null || dest_33557140 === undefined) ? {} : dest_33557140;
+      }
+      }
+      nimCopyAux(result_33557151, src_33557141, ti_33557142.node);
+      break;
+    case 24:
+    case 4:
+    case 27:
+    case 16:
+            if (src_33557141 === null) {
+        result_33557151 = null;
+      }
+      else {
+        if (dest_33557140 === null || dest_33557140 === undefined || dest_33557140.length != src_33557141.length) {
+          dest_33557140 = new Array(src_33557141.length);
+        }
+        result_33557151 = dest_33557140;
+        for (var i = 0; i < src_33557141.length; ++i) {
+          result_33557151[i] = nimCopy(result_33557151[i], src_33557141[i], ti_33557142.base);
+        }
+      }
+    
+      break;
+    case 28:
+            if (src_33557141 !== null) {
+        result_33557151 = src_33557141.slice(0);
+      }
+    
+      break;
+    default: 
+      result_33557151 = src_33557141;
+      break;
+    }
+
+  return result_33557151;
+
+}
+if (!Math.trunc) {
+  Math.trunc = function(v) {
+    v = +v;
+    if (!isFinite(v)) return v;
+    return (v - v % 1) || (v < 0 ? -0 : v === 0 ? v : 0);
+  };
+}
+
+var objectID_637534370 = [0];
+
+function isFatPointer_33557131(ti_33557132) {
+  var result_33557133 = false;
+
+  BeforeRet: do {
+    result_33557133 = !((ConstSet1[ti_33557132.base.kind] != undefined));
+    break BeforeRet;
+  } while (false);
+
+  return result_33557133;
+
+}
+
+function nimCopyAux(dest_33557144, src_33557145, n_33557146) {
+    switch (n_33557146.kind) {
+    case 0:
+      break;
+    case 1:
+            dest_33557144[n_33557146.offset] = nimCopy(dest_33557144[n_33557146.offset], src_33557145[n_33557146.offset], n_33557146.typ);
+    
+      break;
+    case 2:
+          for (var i = 0; i < n_33557146.sons.length; i++) {
+      nimCopyAux(dest_33557144, src_33557145, n_33557146.sons[i]);
+    }
+    
+      break;
+    case 3:
+            dest_33557144[n_33557146.offset] = nimCopy(dest_33557144[n_33557146.offset], src_33557145[n_33557146.offset], n_33557146.typ);
+      for (var i = 0; i < n_33557146.sons.length; ++i) {
+        nimCopyAux(dest_33557144, src_33557145, n_33557146.sons[i][1]);
+      }
+    
+      break;
+    }
+
+  
+}
+var colDark_1275068417 = makeNimstrLit("#0f0f23");
+var palBenedictus_1275068422 = [makeNimstrLit("#F27EA9"), makeNimstrLit("#366CD9"), makeNimstrLit("#5EADF2"), makeNimstrLit("#636E73"), makeNimstrLit("#F2E6D8")];
+var palCross_1275068427 = [makeNimstrLit("#D962AF"), makeNimstrLit("#58A6A6"), makeNimstrLit("#8AA66F"), makeNimstrLit("#F29F05"), makeNimstrLit("#F26D6D")];
+var palDemuth_1275068432 = [makeNimstrLit("#222940"), makeNimstrLit("#D98E04"), makeNimstrLit("#F2A950"), makeNimstrLit("#BF3E21"), makeNimstrLit("#F2F2F2")];
+var palHiroshige_1275068437 = [makeNimstrLit("#1B618C"), makeNimstrLit("#55CCD9"), makeNimstrLit("#F2BC57"), makeNimstrLit("#F2DAAC"), makeNimstrLit("#F24949")];
+var palHokusai_1275068442 = [makeNimstrLit("#074A59"), makeNimstrLit("#F2C166"), makeNimstrLit("#F28241"), makeNimstrLit("#F26B5E"), makeNimstrLit("#F2F2F2")];
+var palHokusaiBlue_1275068447 = [makeNimstrLit("#023059"), makeNimstrLit("#459DBF"), makeNimstrLit("#87BF60"), makeNimstrLit("#D9D16A"), makeNimstrLit("#F2F2F2")];
+var palJava_1275068452 = [makeNimstrLit("#632973"), makeNimstrLit("#02734A"), makeNimstrLit("#F25C05"), makeNimstrLit("#F29188"), makeNimstrLit("#F2E0DF")];
+var palKandinsky_1275068457 = [makeNimstrLit("#8D95A6"), makeNimstrLit("#0A7360"), makeNimstrLit("#F28705"), makeNimstrLit("#D98825"), makeNimstrLit("#F2F2F2")];
+var palMonet_1275068462 = [makeNimstrLit("#4146A6"), makeNimstrLit("#063573"), makeNimstrLit("#5EC8F2"), makeNimstrLit("#8C4E03"), makeNimstrLit("#D98A29")];
+var palNizami_1275068467 = [makeNimstrLit("#034AA6"), makeNimstrLit("#72B6F2"), makeNimstrLit("#73BFB1"), makeNimstrLit("#F2A30F"), makeNimstrLit("#F26F63")];
+var palRenoir_1275068472 = [makeNimstrLit("#303E8C"), makeNimstrLit("#F2AE2E"), makeNimstrLit("#F28705"), makeNimstrLit("#D91414"), makeNimstrLit("#F2F2F2")];
+var palVanGogh_1275068477 = [makeNimstrLit("#424D8C"), makeNimstrLit("#84A9BF"), makeNimstrLit("#C1D9CE"), makeNimstrLit("#F2B705"), makeNimstrLit("#F25C05")];
+var palMono_1275068482 = [makeNimstrLit("#D9D7D8"), makeNimstrLit("#3B5159"), makeNimstrLit("#5D848C"), makeNimstrLit("#7CA2A6"), makeNimstrLit("#262321")];
+var palRiverside_1275068487 = [makeNimstrLit("#906FA6"), makeNimstrLit("#025951"), makeNimstrLit("#252625"), makeNimstrLit("#D99191"), makeNimstrLit("#F2F2F2")];
+var palettes_1275068488 = [nimCopy(null, palBenedictus_1275068422, NTI1275068425), nimCopy(null, palCross_1275068427, NTI1275068425), nimCopy(null, palDemuth_1275068432, NTI1275068425), nimCopy(null, palHiroshige_1275068437, NTI1275068425), nimCopy(null, palHokusai_1275068442, NTI1275068425), nimCopy(null, palHokusaiBlue_1275068447, NTI1275068425), nimCopy(null, palJava_1275068452, NTI1275068425), nimCopy(null, palKandinsky_1275068457, NTI1275068425), nimCopy(null, palMonet_1275068462, NTI1275068425), nimCopy(null, palNizami_1275068467, NTI1275068425), nimCopy(null, palRenoir_1275068472, NTI1275068425), nimCopy(null, palVanGogh_1275068477, NTI1275068425), nimCopy(null, palMono_1275068482, NTI1275068425), nimCopy(null, palRenoir_1275068472, NTI1275068425)];
+</script>
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> batteries, aoc22, nimib, p5
+<span class="hljs-keyword">let</span> day = <span class="hljs-type">Day</span>(
+  num: <span class="hljs-number">4</span>,
+  title: <span class="hljs-string">&quot;Camp Cleanup&quot;</span>,
+  summary: <span class="hljs-string">&quot;&quot;</span>
+)
+nbInit
+nbUseP5
+nbJsFromCode:
+  <span class="hljs-keyword">import</span> p5aoc
+nb.darkMode
+nbText: day.mdTitle
+
+nbPart1
+
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Section</span> = <span class="hljs-keyword">tuple</span>[a, b: <span class="hljs-built_in">int</span>]
+    <span class="hljs-type">SectionPairs</span> = (<span class="hljs-type">Section</span>, <span class="hljs-type">Section</span>)
+
+  <span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>] =
+    <span class="hljs-keyword">var</span> sp: <span class="hljs-type">SectionPairs</span>
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> scanf(line, <span class="hljs-string">&quot;$i-$i,$i-$i&quot;</span>, sp[<span class="hljs-number">0</span>].a, sp[<span class="hljs-number">0</span>].b, sp[<span class="hljs-number">1</span>].a, sp[<span class="hljs-number">1</span>].b):
+        debugEcho <span class="hljs-string">&quot;ERROR, line: '&quot;</span>, line, <span class="hljs-string">&quot;'&quot;</span>
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-literal">result</span>.add sp
+
+  <span class="hljs-keyword">let</span> assignmentList = parse day.filename.readFile
+  <span class="hljs-keyword">echo</span> assignmentList[<span class="hljs-number">0.</span>.<span class="hljs-number">1</span>]
+  <span class="hljs-keyword">echo</span> len assignmentList
+
+nbCode:
+  <span class="hljs-keyword">func</span> `&lt;`(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+    (s1.a &lt;= s2.a <span class="hljs-keyword">and</span> s1.b &gt;= s2.b)
+  
+  <span class="hljs-keyword">func</span> oneInTheOther(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+    s1 &lt; s2 <span class="hljs-keyword">or</span> s2 &lt; s1
+
+  <span class="hljs-keyword">func</span> part1(inp: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>]): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> sp <span class="hljs-keyword">in</span> inp:
+      <span class="hljs-keyword">if</span> oneInTheOther(sp[<span class="hljs-number">0</span>], sp[<span class="hljs-number">1</span>]):
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">echo</span> part1 assignmentList
+<span class="hljs-comment"># 803 too high</span>
+nbText: <span class="hljs-string">&quot;debugging with example&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8&quot;&quot;&quot;</span>
+  <span class="hljs-keyword">echo</span> part1 parse example <span class="hljs-comment"># expect 2</span>
+nbText: <span class="hljs-string">&quot;had a wrong sign&quot;</span>
+gotTheStar
+nbPart2
+nbCode:
+  <span class="hljs-keyword">func</span> `&lt;:`(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+    (s1.a &lt;= s2.a <span class="hljs-keyword">and</span> s1.b &gt;= s2.a)
+
+  <span class="hljs-keyword">func</span> overlap(s1, s2: <span class="hljs-type">Section</span>): <span class="hljs-built_in">bool</span> =
+    s1 &lt;: s2 <span class="hljs-keyword">or</span> s2 &lt;: s1    
+
+  <span class="hljs-keyword">func</span> part2(inp: <span class="hljs-built_in">seq</span>[<span class="hljs-type">SectionPairs</span>]): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">for</span> sp <span class="hljs-keyword">in</span> inp:
+      <span class="hljs-keyword">if</span> overlap(sp[<span class="hljs-number">0</span>], sp[<span class="hljs-number">1</span>]):
+        inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">echo</span> part2 parse example <span class="hljs-comment"># expect 4</span>
+  <span class="hljs-keyword">echo</span> part2 assignmentList
+gotTheStar
+nbAround
+
+
+nbViz
+
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>
