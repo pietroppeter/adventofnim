@@ -1,6 +1,14 @@
 # palettes from https://openprocessing.org/sketch/1751402
 let
+  colBackground* = "#324759"
+  colTransparent* = "#ffffff00"
   colDark* = "#0f0f23"
+  colGold* = "#ffff66"
+  colGreen* = "#009900"
+  colBrightGreen* = "#99ff99"
+  colRed* = "#B5453A"
+  colRust* = "#DEA584"
+  palAoc* = [colGreen, colBrightGreen, colGold, colRust, colRed]
   palBenedictus* = @["#F27EA9", "#366CD9", "#5EADF2", "#636E73", "#F2E6D8"]
   palCross* = @["#D962AF", "#58A6A6", "#8AA66F", "#F29F05", "#F26D6D"]
   palDemuth* = @["#222940", "#D98E04", "#F2A950", "#BF3E21", "#F2F2F2"]
@@ -16,3 +24,14 @@ let
   palMono* = @["#D9D7D8", "#3B5159", "#5D848C", "#7CA2A6", "#262321"]
   palRiverside* = @["#906FA6", "#025951", "#252625", "#D99191", "#F2F2F2"]
   palettes* = [palBenedictus, palCross, palDemuth, palHiroshige, palHokusai, palHokusaiBlue, palJava, palKandinsky, palMonet, palNizami, palRenoir, palVanGogh, palMono, palRenoir]
+  palNames* = ["Benedictus", "Cross", "Demuth", "Hiroshige", "Hokusai", "HokusaiBlue", "Java", "Kandinisky", "Monet", "Nizami", "Renoir", "VanGogh", "Mono", "Renoir"]
+
+when isMainModule:
+  import nimib, p5
+  nbInit
+  nbUseP5
+  nb.darkMode
+  nbJsFromCode(palettes, palNames, palAoc, colDark):
+    setup:
+      drawCanvas(200, 20*(len(palettes) + 1))
+      background(colDark)
