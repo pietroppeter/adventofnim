@@ -41,4 +41,7 @@ template nbAround* =
   nbText: aocTitle anchor("Seen Around", "around")
 
 template nbViz* =
-  nbText: aocTitle anchor("Visualization", "viz")
+  nbText: aocTitle anchor("Visualization", "vizSection")
+
+template nbVizHere* =
+  nbRawHtml: anchor("", "viz")
