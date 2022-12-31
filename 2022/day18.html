@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>2022/day18.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel='stylesheet' href='https://unpkg.com/normalize.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kognise/water.css@latest/dist/dark.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/androidstudio.css'>
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+  <script async defer data-domain="pietroppeter.github.io/adventofnim" src="https://plausible.io/js/plausible.js"></script>
+  <style>
+    a {
+        text-decoration: none;
+        color: #009900;
+    }
+  
+    a:hover {
+        color: #99ff99;
+    }
+  
+    em {
+        color: #ffffff;
+        font-style: normal;
+        text-shadow: 0 0 5px #ffffff;
+    }
+  
+    em.star {
+      font-style: normal;
+      color: #ffff66;
+      text-shadow: 0 0 5px #ffff66;
+    }
+  </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script><body>
+<header>
+<div class="nb-box">
+  <span><a href="..">🏡</a></span>
+  <span><code>2022/day18.nim</code></span>
+  <span><a href="https://github.com/pietroppeter/adventofnim"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle; fill: #fff" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+
+
+<h2>--- <a href="https://adventofcode.com/2022/day/18">Day 18: Boiling Boulders</a> ---</h2>
+<h3>--- <a name="part1" href="#part1">Part 1</a> ---</h3>
+<p>The strategy I will use to solve part1 is simple:</p>
+<ul>
+<li>put cubes in a HashSet of tuples</li>
+<li>for every cube, count how many neighbours are not in the the HashSet</li>
+</ul>
+<p>I need to define the types:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  <span class="hljs-type">Vec3</span> = <span class="hljs-keyword">tuple</span>[x, y, z: <span class="hljs-built_in">int</span>]
+  <span class="hljs-type">Vec3Set</span> = <span class="hljs-type">HashSet</span>[<span class="hljs-type">Vec3</span>]</code></pre>
+<p>parsing input</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Vec3Set</span> =
+  <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+    <span class="hljs-keyword">let</span> ints = line.split(<span class="hljs-string">&quot;,&quot;</span>).mapIt(parseInt it)
+    <span class="hljs-keyword">assert</span> len(ints) == <span class="hljs-number">3</span>
+    <span class="hljs-literal">result</span>.incl (ints[<span class="hljs-number">0</span>], ints[<span class="hljs-number">1</span>], ints[<span class="hljs-number">2</span>])
+
+<span class="hljs-keyword">let</span> cubes = parse dayInput
+<span class="hljs-keyword">echo</span> len cubes
+<span class="hljs-keyword">for</span> i, cube <span class="hljs-keyword">in</span> enumerate(cubes):
+  <span class="hljs-keyword">echo</span> cube
+  <span class="hljs-keyword">if</span> i == <span class="hljs-number">3</span>:
+    <span class="hljs-keyword">break</span></code></pre><pre class="nb-output"><samp>2736
+(x: 12, y: 16, z: 17)
+(x: 18, y: 5, z: 8)
+(x: 10, y: 9, z: 1)
+(x: 8, y: 3, z: 6)</samp></pre>
+<p>I redo this kind of stuff every year, but I am too lazy to put them in a library:</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> `+`(v, w: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+  (v.x + w.x, v.y + w.y, v.z + w.z)
+
+<span class="hljs-keyword">func</span> `-`(v, w: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+  (v.x - w.x, v.y - w.y, v.z - w.z)
+
+<span class="hljs-keyword">iterator</span> neighbours(v: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+  <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)]:
+    <span class="hljs-keyword">yield</span> v + w
+    <span class="hljs-keyword">yield</span> v - w
+
+<span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> neighbours((<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)):
+  <span class="hljs-keyword">echo</span> v</code></pre><pre class="nb-output"><samp>(x: 1, y: 0, z: 0)
+(x: -1, y: 0, z: 0)
+(x: 0, y: 1, z: 0)
+(x: 0, y: -1, z: 0)
+(x: 0, y: 0, z: 1)
+(x: 0, y: 0, z: -1)</samp></pre>
+<p>now let's count</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;
+2,2,2
+1,2,2
+3,2,2
+2,1,2
+2,3,2
+2,2,1
+2,2,3
+2,2,4
+2,2,6
+1,2,5
+3,2,5
+2,1,5
+2,3,5&quot;&quot;&quot;</span>
+
+<span class="hljs-keyword">func</span> part1(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">let</span> cubes = parse text
+  <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+    <span class="hljs-keyword">for</span> neighbour <span class="hljs-keyword">in</span> cube.neighbours:
+      <span class="hljs-keyword">if</span> neighbour <span class="hljs-keyword">not_in</span> cubes:
+        inc <span class="hljs-literal">result</span>
+
+<span class="hljs-keyword">echo</span> part1 example <span class="hljs-comment"># expect 64</span>
+<span class="hljs-keyword">echo</span> part1 dayInput</code></pre><pre class="nb-output"><samp>64
+4400</samp></pre>
+<blockquote>
+<p>That's the right answer! You are <em class="star">one gold star</em> closer to collecting enough star fruit.</p>
+</blockquote>
+<h3>--- <a name="part2" href="#part2">Part 2</a> ---</h3>
+<p>The idea for part2 is to build a set of cubes that
+represents the exterior shell of the lava droplet and count them.</p>
+<ul>
+<li>start from a cube that I know that is part of exterior shell</li>
+<li>build shell by iterating over neighbours (that are not already in shell)</li>
+</ul>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> startingPoint(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3</span> =
+  <span class="hljs-keyword">var</span> minXcube: <span class="hljs-type">Vec3</span> = (<span class="hljs-number">1000</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>) <span class="hljs-comment"># conveniently high number</span>
+  <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+    <span class="hljs-keyword">if</span> cube.x &lt; minXcube.x:
+      minXcube = cube
+  <span class="hljs-keyword">return</span> minXcube - (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+
+<span class="hljs-keyword">func</span> pick(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3</span> =
+  <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+    <span class="hljs-keyword">return</span> cube
+
+<span class="hljs-keyword">iterator</span> neighboursAll(cube: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+  <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cube.neighbours:
+    <span class="hljs-keyword">yield</span> v
+  <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)]:
+    <span class="hljs-keyword">yield</span> cube + w
+    <span class="hljs-keyword">yield</span> cube - w
+
+<span class="hljs-keyword">func</span> isAdjacentTo(cube: <span class="hljs-type">Vec3</span>, cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">if</span> cube <span class="hljs-keyword">in</span> cubes:
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+  <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cube.neighbours:
+    <span class="hljs-keyword">if</span> v <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-keyword">func</span> shell(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3Set</span> =
+  <span class="hljs-keyword">var</span> border = initHashSet[<span class="hljs-type">Vec3</span>]()
+  border.incl cubes.startingPoint
+  <span class="hljs-keyword">var</span> currentCube: <span class="hljs-type">Vec3</span>
+  <span class="hljs-keyword">while</span> len(border) &gt; <span class="hljs-number">0</span>:
+    currentCube = pick border
+    <span class="hljs-keyword">for</span> candidate <span class="hljs-keyword">in</span> currentCube.neighboursAll:
+      <span class="hljs-keyword">if</span> candidate.isAdjacentTo(cubes) <span class="hljs-keyword">and</span> candidate <span class="hljs-keyword">notIn</span> <span class="hljs-literal">result</span>:
+        border.incl candidate
+    <span class="hljs-literal">result</span>.incl currentCube
+    border.excl currentCube</code></pre>
+<pre><code class="nim hljs"><span class="hljs-keyword">func</span> part2(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">let</span> cubes = parse text
+  <span class="hljs-keyword">let</span> shell = shell(cubes)
+  len shell
+
+<span class="hljs-keyword">echo</span> part2 example
+<span class="hljs-keyword">echo</span> part2 dayInput</code></pre><pre class="nb-output"><samp>35
+2033</samp></pre>
+<p>part2 is not correct for the example and I suspect this is due to the fact
+that I found a shell from part of the lava but there might be other pieces
+of lava not inside my shell.</p>
+<p>In order to fix this I could iterate my shell finding by removing all cubes
+inside my first shell and add further shells.</p>
+<p>To find whether a cube is inside my shell is a bit tricky but I can
+use a consequence of <a href="https://en.wikipedia.org/wiki/Jordan_curve_theorem">Jordan curve theorem</a>.
+If I take a semi infinite line from the cube towards infinity and
+count the times it intersects my shell, an even number (including 0) would mean
+that I am on the exterior.</p>
+<p>I do need to be careful that I have to pick a line that is not &quot;tangent&quot; to my shell
+(i.e. all intersections should not be adjacent), but hopefully
+at least one of the 6 semilines parallel to x, y, z axis does the trick.</p>
+<pre><code class="nim hljs"><span class="hljs-keyword">type</span>
+  🤷 = <span class="hljs-keyword">object</span> <span class="hljs-keyword">of</span> <span class="hljs-type">CatchableError</span>
+  <span class="hljs-type">BoundedVec3Set</span> = <span class="hljs-keyword">object</span>
+    data: <span class="hljs-type">Vec3Set</span>
+    xMin, xMax, yMin, yMax, zMin, zMax: <span class="hljs-built_in">int</span>
+
+<span class="hljs-keyword">func</span> bound(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">BoundedVec3Set</span> =
+  <span class="hljs-literal">result</span>.data = cubes
+  <span class="hljs-keyword">assert</span> len(cubes) &gt; <span class="hljs-number">0</span>
+  <span class="hljs-comment"># initialize bounds using one cube</span>
+  <span class="hljs-keyword">let</span> one = pick cubes
+  <span class="hljs-literal">result</span>.xMin = one.x
+  <span class="hljs-literal">result</span>.xMax = one.x
+  <span class="hljs-literal">result</span>.yMin = one.y
+  <span class="hljs-literal">result</span>.yMax = one.y
+  <span class="hljs-literal">result</span>.zMin = one.z
+  <span class="hljs-literal">result</span>.zMax = one.z
+  <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+    <span class="hljs-keyword">if</span> cube.x &lt; <span class="hljs-literal">result</span>.xMin:
+      <span class="hljs-literal">result</span>.xMin = cube.x
+    <span class="hljs-keyword">if</span> cube.y &lt; <span class="hljs-literal">result</span>.yMin:
+      <span class="hljs-literal">result</span>.yMin = cube.y
+    <span class="hljs-keyword">if</span> cube.z &lt; <span class="hljs-literal">result</span>.zMin:
+      <span class="hljs-literal">result</span>.zMin = cube.z
+    <span class="hljs-keyword">if</span> cube.x &gt; <span class="hljs-literal">result</span>.xMax:
+      <span class="hljs-literal">result</span>.xMax = cube.x
+    <span class="hljs-keyword">if</span> cube.y &gt; <span class="hljs-literal">result</span>.yMax:
+      <span class="hljs-literal">result</span>.yMax = cube.y
+    <span class="hljs-keyword">if</span> cube.z &gt; <span class="hljs-literal">result</span>.zMax:
+      <span class="hljs-literal">result</span>.zMax = cube.z
+
+<span class="hljs-keyword">func</span> isWithinBounds(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>): <span class="hljs-built_in">bool</span> =
+  cube.x &gt;= shell.xMin <span class="hljs-keyword">and</span> cube.x &lt;= shell.xMax <span class="hljs-keyword">and</span> cube.y &gt;= shell.yMin <span class="hljs-keyword">and</span> cube.y &lt;= shell.yMax <span class="hljs-keyword">and</span> cube.z &gt;= shell.zMin <span class="hljs-keyword">and</span> cube.z &lt;= shell.zMax
+
+<span class="hljs-keyword">func</span> isInside(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>, dir: <span class="hljs-type">Vec3</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">var</span>
+    intersections = <span class="hljs-number">0</span>
+    justIntersected = <span class="hljs-literal">false</span>
+    cube = cube
+  <span class="hljs-keyword">while</span> cube.isWithinBounds(shell):
+    cube = cube + dir
+    <span class="hljs-keyword">if</span> cube <span class="hljs-keyword">in</span> shell.data:
+      inc intersections
+      <span class="hljs-keyword">if</span> justIntersected:
+        <span class="hljs-keyword">raise</span> newException(🤷, <span class="hljs-string">&quot;Cannot tell (tangent line)&quot;</span>)
+      justIntersected = <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">else</span>:
+      justIntersected = <span class="hljs-literal">false</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">not</span>(intersections <span class="hljs-keyword">mod</span> <span class="hljs-number">2</span> == <span class="hljs-number">0</span>)
+
+<span class="hljs-keyword">func</span> isInside(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>): <span class="hljs-built_in">bool</span> =
+  <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), (-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)]:
+    <span class="hljs-keyword">try</span>:
+      <span class="hljs-keyword">return</span> cube.isInside(shell, dir)
+    <span class="hljs-keyword">except</span> 🤷:
+      debugEcho <span class="hljs-string">&quot;CannotTell in direction: &quot;</span>, dir
+  <span class="hljs-keyword">raise</span> newException(🤷, <span class="hljs-string">&quot;Cannot tell (all lines tested are tangent)&quot;</span>)
+
+<span class="hljs-keyword">func</span> part2(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+  <span class="hljs-keyword">var</span> cubes = parse text
+  <span class="hljs-keyword">while</span> len(cubes) &gt; <span class="hljs-number">0</span>:
+    <span class="hljs-keyword">let</span> boundedShell = bound shell(cubes)
+    <span class="hljs-literal">result</span>.inc len(boundedShell.data)
+    <span class="hljs-keyword">var</span> cubesToRemove = initHashSet[<span class="hljs-type">Vec3</span>]()
+    <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">if</span> cube.isInside(boundedShell):
+        cubesToRemove.incl cube
+    cubes = cubes - cubesToRemove
+
+<span class="hljs-keyword">echo</span> part2 example
+<span class="hljs-comment">#echo part2 dayInput</span></code></pre><pre class="nb-output"><samp>41</samp></pre>
+<p>Notes:</p>
+<ul>
+<li>I am wrapping my Shell into a bounded shell, so that I do not actually have to go to infinity</li>
+<li>I am using exceptions instead of a ternary type: True, False, can't tell (🤷).</li>
+<li>yes, you can use emoji for identifiers in Nim!</li>
+<li>inheriting directly from <code>Exception</code> is now deprecated (warning is &quot;inherit from a more precise exception type like ValueError, IOError or OSError. If these don't suit, inherit from CatchableError or Defect. [InheritFromException]&quot;);
+the <a href="https://nim-lang.org/docs/manual.html#exception-handling-custom-exceptions">manual section on custom exceptions</a> should be updated!</li>
+</ul>
+<script defer>/* Generated by the Nim Compiler v1.6.10 */
+var framePtr = null;
+var excHandler = 0;
+var lastJSError = null;
+var NTI1275068427 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI33554439 = {size: 0,kind: 28,base: null,node: null,finalizer: null};
+NTI1275068427.base = NTI33554439;
+
+function makeNimstrLit(c_33556801) {
+      var result = [];
+  for (var i = 0; i < c_33556801.length; ++i) {
+    result[i] = c_33556801.charCodeAt(i);
+  }
+  return result;
+  
+
+  
+}
+
+function setConstr() {
+        var result = {};
+    for (var i = 0; i < arguments.length; ++i) {
+      var x = arguments[i];
+      if (typeof(x) == "object") {
+        for (var j = x[0]; j <= x[1]; ++j) {
+          result[j] = true;
+        }
+      } else {
+        result[x] = true;
+      }
+    }
+    return result;
+  
+
+  
+}
+var ConstSet1 = setConstr(17, 16, 4, 18, 27, 19, 23, 22, 21);
+
+function nimCopy(dest_33557140, src_33557141, ti_33557142) {
+  var result_33557151 = null;
+
+    switch (ti_33557142.kind) {
+    case 21:
+    case 22:
+    case 23:
+    case 5:
+      if (!(isFatPointer_33557131(ti_33557142))) {
+      result_33557151 = src_33557141;
+      }
+      else {
+        result_33557151 = [src_33557141[0], src_33557141[1]];
+      }
+      
+      break;
+    case 19:
+            if (dest_33557140 === null || dest_33557140 === undefined) {
+        dest_33557140 = {};
+      }
+      else {
+        for (var key in dest_33557140) { delete dest_33557140[key]; }
+      }
+      for (var key in src_33557141) { dest_33557140[key] = src_33557141[key]; }
+      result_33557151 = dest_33557140;
+    
+      break;
+    case 18:
+    case 17:
+      if (!((ti_33557142.base == null))) {
+      result_33557151 = nimCopy(dest_33557140, src_33557141, ti_33557142.base);
+      }
+      else {
+      if ((ti_33557142.kind == 17)) {
+      result_33557151 = (dest_33557140 === null || dest_33557140 === undefined) ? {m_type: ti_33557142} : dest_33557140;
+      }
+      else {
+        result_33557151 = (dest_33557140 === null || dest_33557140 === undefined) ? {} : dest_33557140;
+      }
+      }
+      nimCopyAux(result_33557151, src_33557141, ti_33557142.node);
+      break;
+    case 24:
+    case 4:
+    case 27:
+    case 16:
+            if (src_33557141 === null) {
+        result_33557151 = null;
+      }
+      else {
+        if (dest_33557140 === null || dest_33557140 === undefined || dest_33557140.length != src_33557141.length) {
+          dest_33557140 = new Array(src_33557141.length);
+        }
+        result_33557151 = dest_33557140;
+        for (var i = 0; i < src_33557141.length; ++i) {
+          result_33557151[i] = nimCopy(result_33557151[i], src_33557141[i], ti_33557142.base);
+        }
+      }
+    
+      break;
+    case 28:
+            if (src_33557141 !== null) {
+        result_33557151 = src_33557141.slice(0);
+      }
+    
+      break;
+    default: 
+      result_33557151 = src_33557141;
+      break;
+    }
+
+  return result_33557151;
+
+}
+if (!Math.trunc) {
+  Math.trunc = function(v) {
+    v = +v;
+    if (!isFinite(v)) return v;
+    return (v - v % 1) || (v < 0 ? -0 : v === 0 ? v : 0);
+  };
+}
+
+var objectID_637534370 = [0];
+
+function isFatPointer_33557131(ti_33557132) {
+  var result_33557133 = false;
+
+  BeforeRet: do {
+    result_33557133 = !((ConstSet1[ti_33557132.base.kind] != undefined));
+    break BeforeRet;
+  } while (false);
+
+  return result_33557133;
+
+}
+
+function nimCopyAux(dest_33557144, src_33557145, n_33557146) {
+    switch (n_33557146.kind) {
+    case 0:
+      break;
+    case 1:
+            dest_33557144[n_33557146.offset] = nimCopy(dest_33557144[n_33557146.offset], src_33557145[n_33557146.offset], n_33557146.typ);
+    
+      break;
+    case 2:
+          for (var i = 0; i < n_33557146.sons.length; i++) {
+      nimCopyAux(dest_33557144, src_33557145, n_33557146.sons[i]);
+    }
+    
+      break;
+    case 3:
+            dest_33557144[n_33557146.offset] = nimCopy(dest_33557144[n_33557146.offset], src_33557145[n_33557146.offset], n_33557146.typ);
+      for (var i = 0; i < n_33557146.sons.length; ++i) {
+        nimCopyAux(dest_33557144, src_33557145, n_33557146.sons[i][1]);
+      }
+    
+      break;
+    }
+
+  
+}
+var colBackground_1275068417 = makeNimstrLit("#324759");
+var colTransparent_1275068418 = makeNimstrLit("#ffffff00");
+var colDark_1275068419 = makeNimstrLit("#0f0f23");
+var colGold_1275068420 = makeNimstrLit("#ffff66");
+var colGreen_1275068421 = makeNimstrLit("#009900");
+var colBrightGreen_1275068422 = makeNimstrLit("#99ff99");
+var colRed_1275068423 = makeNimstrLit("#B5453A");
+var colRust_1275068424 = makeNimstrLit("#DEA584");
+var palAoc_1275068425 = [nimCopy(null, colGreen_1275068421, NTI33554439), nimCopy(null, colBrightGreen_1275068422, NTI33554439), nimCopy(null, colGold_1275068420, NTI33554439), nimCopy(null, colRust_1275068424, NTI33554439), nimCopy(null, colRed_1275068423, NTI33554439)];
+var palBenedictus_1275068430 = [makeNimstrLit("#F27EA9"), makeNimstrLit("#366CD9"), makeNimstrLit("#5EADF2"), makeNimstrLit("#636E73"), makeNimstrLit("#F2E6D8")];
+var palCross_1275068435 = [makeNimstrLit("#D962AF"), makeNimstrLit("#58A6A6"), makeNimstrLit("#8AA66F"), makeNimstrLit("#F29F05"), makeNimstrLit("#F26D6D")];
+var palDemuth_1275068440 = [makeNimstrLit("#222940"), makeNimstrLit("#D98E04"), makeNimstrLit("#F2A950"), makeNimstrLit("#BF3E21"), makeNimstrLit("#F2F2F2")];
+var palHiroshige_1275068445 = [makeNimstrLit("#1B618C"), makeNimstrLit("#55CCD9"), makeNimstrLit("#F2BC57"), makeNimstrLit("#F2DAAC"), makeNimstrLit("#F24949")];
+var palHokusai_1275068450 = [makeNimstrLit("#074A59"), makeNimstrLit("#F2C166"), makeNimstrLit("#F28241"), makeNimstrLit("#F26B5E"), makeNimstrLit("#F2F2F2")];
+var palHokusaiBlue_1275068455 = [makeNimstrLit("#023059"), makeNimstrLit("#459DBF"), makeNimstrLit("#87BF60"), makeNimstrLit("#D9D16A"), makeNimstrLit("#F2F2F2")];
+var palJava_1275068460 = [makeNimstrLit("#632973"), makeNimstrLit("#02734A"), makeNimstrLit("#F25C05"), makeNimstrLit("#F29188"), makeNimstrLit("#F2E0DF")];
+var palKandinsky_1275068465 = [makeNimstrLit("#8D95A6"), makeNimstrLit("#0A7360"), makeNimstrLit("#F28705"), makeNimstrLit("#D98825"), makeNimstrLit("#F2F2F2")];
+var palMonet_1275068470 = [makeNimstrLit("#4146A6"), makeNimstrLit("#063573"), makeNimstrLit("#5EC8F2"), makeNimstrLit("#8C4E03"), makeNimstrLit("#D98A29")];
+var palNizami_1275068475 = [makeNimstrLit("#034AA6"), makeNimstrLit("#72B6F2"), makeNimstrLit("#73BFB1"), makeNimstrLit("#F2A30F"), makeNimstrLit("#F26F63")];
+var palRenoir_1275068480 = [makeNimstrLit("#303E8C"), makeNimstrLit("#F2AE2E"), makeNimstrLit("#F28705"), makeNimstrLit("#D91414"), makeNimstrLit("#F2F2F2")];
+var palVanGogh_1275068485 = [makeNimstrLit("#424D8C"), makeNimstrLit("#84A9BF"), makeNimstrLit("#C1D9CE"), makeNimstrLit("#F2B705"), makeNimstrLit("#F25C05")];
+var palMono_1275068490 = [makeNimstrLit("#D9D7D8"), makeNimstrLit("#3B5159"), makeNimstrLit("#5D848C"), makeNimstrLit("#7CA2A6"), makeNimstrLit("#262321")];
+var palRiverside_1275068495 = [makeNimstrLit("#906FA6"), makeNimstrLit("#025951"), makeNimstrLit("#252625"), makeNimstrLit("#D99191"), makeNimstrLit("#F2F2F2")];
+var palettes_1275068496 = [nimCopy(null, palBenedictus_1275068430, NTI1275068427), nimCopy(null, palCross_1275068435, NTI1275068427), nimCopy(null, palDemuth_1275068440, NTI1275068427), nimCopy(null, palHiroshige_1275068445, NTI1275068427), nimCopy(null, palHokusai_1275068450, NTI1275068427), nimCopy(null, palHokusaiBlue_1275068455, NTI1275068427), nimCopy(null, palJava_1275068460, NTI1275068427), nimCopy(null, palKandinsky_1275068465, NTI1275068427), nimCopy(null, palMonet_1275068470, NTI1275068427), nimCopy(null, palNizami_1275068475, NTI1275068427), nimCopy(null, palRenoir_1275068480, NTI1275068427), nimCopy(null, palVanGogh_1275068485, NTI1275068427), nimCopy(null, palMono_1275068490, NTI1275068427), nimCopy(null, palRenoir_1275068480, NTI1275068427)];
+var palNames_1275068497 = [makeNimstrLit("Benedictus"), makeNimstrLit("Cross"), makeNimstrLit("Demuth"), makeNimstrLit("Hiroshige"), makeNimstrLit("Hokusai"), makeNimstrLit("HokusaiBlue"), makeNimstrLit("Java"), makeNimstrLit("Kandinisky"), makeNimstrLit("Monet"), makeNimstrLit("Nizami"), makeNimstrLit("Renoir"), makeNimstrLit("VanGogh"), makeNimstrLit("Mono"), makeNimstrLit("Renoir")];
+</script>
+</main>
+<footer>
+<hr>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nim hljs"><span class="hljs-keyword">import</span> batteries, aoc22, nimib, p5
+<span class="hljs-keyword">let</span> day = <span class="hljs-type">Day</span>(
+  num: <span class="hljs-number">18</span>,
+  title: <span class="hljs-string">&quot;Boiling Boulders&quot;</span>,
+  summary: <span class="hljs-string">&quot;&quot;</span>
+)
+nbInit
+nbUseP5
+nbJsFromCode:
+  <span class="hljs-keyword">import</span> p5aoc
+nb.darkMode
+nbText: day.mdTitle
+
+nbPart1
+
+<span class="hljs-keyword">let</span> dayInput = day.filename.readFile
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+The strategy I will use to solve part1 is simple:
+  - put cubes in a HashSet of tuples
+  - for every cube, count how many neighbours are not in the the HashSet
+
+I need to define the types:
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    <span class="hljs-type">Vec3</span> = <span class="hljs-keyword">tuple</span>[x, y, z: <span class="hljs-built_in">int</span>]
+    <span class="hljs-type">Vec3Set</span> = <span class="hljs-type">HashSet</span>[<span class="hljs-type">Vec3</span>]
+
+nbText: <span class="hljs-string">&quot;parsing input&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> parse(text: <span class="hljs-built_in">string</span>): <span class="hljs-type">Vec3Set</span> =
+    <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> text.splitLines:
+      <span class="hljs-keyword">let</span> ints = line.split(<span class="hljs-string">&quot;,&quot;</span>).mapIt(parseInt it)
+      <span class="hljs-keyword">assert</span> len(ints) == <span class="hljs-number">3</span>
+      <span class="hljs-literal">result</span>.incl (ints[<span class="hljs-number">0</span>], ints[<span class="hljs-number">1</span>], ints[<span class="hljs-number">2</span>])
+  
+  <span class="hljs-keyword">let</span> cubes = parse dayInput
+  <span class="hljs-keyword">echo</span> len cubes
+  <span class="hljs-keyword">for</span> i, cube <span class="hljs-keyword">in</span> enumerate(cubes):
+    <span class="hljs-keyword">echo</span> cube
+    <span class="hljs-keyword">if</span> i == <span class="hljs-number">3</span>:
+      <span class="hljs-keyword">break</span>
+nbText: <span class="hljs-string">&quot;I redo this kind of stuff every year, but I am too lazy to put them in a library:&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> `+`(v, w: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+    (v.x + w.x, v.y + w.y, v.z + w.z)
+
+  <span class="hljs-keyword">func</span> `-`(v, w: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+    (v.x - w.x, v.y - w.y, v.z - w.z)
+
+  <span class="hljs-keyword">iterator</span> neighbours(v: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+    <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)]:
+      <span class="hljs-keyword">yield</span> v + w
+      <span class="hljs-keyword">yield</span> v - w
+
+  <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> neighbours((<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)):
+    <span class="hljs-keyword">echo</span> v
+nbText: <span class="hljs-string">&quot;now let's count&quot;</span>
+nbCode:
+  <span class="hljs-keyword">let</span> example = <span class="hljs-string">&quot;&quot;&quot;
+2,2,2
+1,2,2
+3,2,2
+2,1,2
+2,3,2
+2,2,1
+2,2,3
+2,2,4
+2,2,6
+1,2,5
+3,2,5
+2,1,5
+2,3,5&quot;&quot;&quot;</span>
+
+  <span class="hljs-keyword">func</span> part1(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">let</span> cubes = parse text
+    <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">for</span> neighbour <span class="hljs-keyword">in</span> cube.neighbours:
+        <span class="hljs-keyword">if</span> neighbour <span class="hljs-keyword">not_in</span> cubes:
+          inc <span class="hljs-literal">result</span>
+
+  <span class="hljs-keyword">echo</span> part1 example <span class="hljs-comment"># expect 64</span>
+  <span class="hljs-keyword">echo</span> part1 dayInput
+gotTheStar
+
+nbPart2
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+The idea for part2 is to build a set of cubes that
+represents the exterior shell of the lava droplet and count them.
+
+- start from a cube that I know that is part of exterior shell
+- build shell by iterating over neighbours (that are not already in shell)
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">func</span> startingPoint(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3</span> =
+    <span class="hljs-keyword">var</span> minXcube: <span class="hljs-type">Vec3</span> = (<span class="hljs-number">1000</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>) <span class="hljs-comment"># conveniently high number</span>
+    <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">if</span> cube.x &lt; minXcube.x:
+        minXcube = cube
+    <span class="hljs-keyword">return</span> minXcube - (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+
+  <span class="hljs-keyword">func</span> pick(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3</span> =
+    <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">return</span> cube
+
+  <span class="hljs-keyword">iterator</span> neighboursAll(cube: <span class="hljs-type">Vec3</span>): <span class="hljs-type">Vec3</span> =
+    <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cube.neighbours:
+      <span class="hljs-keyword">yield</span> v
+    <span class="hljs-keyword">for</span> w <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)]:
+      <span class="hljs-keyword">yield</span> cube + w
+      <span class="hljs-keyword">yield</span> cube - w
+
+  <span class="hljs-keyword">func</span> isAdjacentTo(cube: <span class="hljs-type">Vec3</span>, cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">if</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+    <span class="hljs-keyword">for</span> v <span class="hljs-keyword">in</span> cube.neighbours:
+      <span class="hljs-keyword">if</span> v <span class="hljs-keyword">in</span> cubes:
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+
+  <span class="hljs-keyword">func</span> shell(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">Vec3Set</span> =
+    <span class="hljs-keyword">var</span> border = initHashSet[<span class="hljs-type">Vec3</span>]()
+    border.incl cubes.startingPoint
+    <span class="hljs-keyword">var</span> currentCube: <span class="hljs-type">Vec3</span>
+    <span class="hljs-keyword">while</span> len(border) &gt; <span class="hljs-number">0</span>:
+      currentCube = pick border
+      <span class="hljs-keyword">for</span> candidate <span class="hljs-keyword">in</span> currentCube.neighboursAll:
+        <span class="hljs-keyword">if</span> candidate.isAdjacentTo(cubes) <span class="hljs-keyword">and</span> candidate <span class="hljs-keyword">notIn</span> <span class="hljs-literal">result</span>:
+          border.incl candidate
+      <span class="hljs-literal">result</span>.incl currentCube
+      border.excl currentCube    
+nbCodeInBlock:
+  <span class="hljs-keyword">func</span> part2(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">let</span> cubes = parse text
+    <span class="hljs-keyword">let</span> shell = shell(cubes)
+    len shell
+
+  <span class="hljs-keyword">echo</span> part2 example
+  <span class="hljs-keyword">echo</span> part2 dayInput
+nbText: <span class="hljs-string">&quot;&quot;&quot;
+part2 is not correct for the example and I suspect this is due to the fact
+that I found a shell from part of the lava but there might be other pieces
+of lava not inside my shell.
+
+In order to fix this I could iterate my shell finding by removing all cubes
+inside my first shell and add further shells.
+
+To find whether a cube is inside my shell is a bit tricky but I can
+use a consequence of [Jordan curve theorem](https://en.wikipedia.org/wiki/Jordan_curve_theorem).
+If I take a semi infinite line from the cube towards infinity and
+count the times it intersects my shell, an even number (including 0) would mean
+that I am on the exterior.
+
+I do need to be careful that I have to pick a line that is not &quot;tangent&quot; to my shell
+(i.e. all intersections should not be adjacent), but hopefully
+at least one of the 6 semilines parallel to x, y, z axis does the trick.
+&quot;&quot;&quot;</span>
+nbCode:
+  <span class="hljs-keyword">type</span>
+    🤷 = <span class="hljs-keyword">object</span> <span class="hljs-keyword">of</span> <span class="hljs-type">CatchableError</span>
+    <span class="hljs-type">BoundedVec3Set</span> = <span class="hljs-keyword">object</span>
+      data: <span class="hljs-type">Vec3Set</span>
+      xMin, xMax, yMin, yMax, zMin, zMax: <span class="hljs-built_in">int</span>
+  
+  <span class="hljs-keyword">func</span> bound(cubes: <span class="hljs-type">Vec3Set</span>): <span class="hljs-type">BoundedVec3Set</span> =
+    <span class="hljs-literal">result</span>.data = cubes
+    <span class="hljs-keyword">assert</span> len(cubes) &gt; <span class="hljs-number">0</span>
+    <span class="hljs-comment"># initialize bounds using one cube</span>
+    <span class="hljs-keyword">let</span> one = pick cubes
+    <span class="hljs-literal">result</span>.xMin = one.x
+    <span class="hljs-literal">result</span>.xMax = one.x
+    <span class="hljs-literal">result</span>.yMin = one.y
+    <span class="hljs-literal">result</span>.yMax = one.y
+    <span class="hljs-literal">result</span>.zMin = one.z
+    <span class="hljs-literal">result</span>.zMax = one.z
+    <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+      <span class="hljs-keyword">if</span> cube.x &lt; <span class="hljs-literal">result</span>.xMin:
+        <span class="hljs-literal">result</span>.xMin = cube.x
+      <span class="hljs-keyword">if</span> cube.y &lt; <span class="hljs-literal">result</span>.yMin:
+        <span class="hljs-literal">result</span>.yMin = cube.y
+      <span class="hljs-keyword">if</span> cube.z &lt; <span class="hljs-literal">result</span>.zMin:
+        <span class="hljs-literal">result</span>.zMin = cube.z
+      <span class="hljs-keyword">if</span> cube.x &gt; <span class="hljs-literal">result</span>.xMax:
+        <span class="hljs-literal">result</span>.xMax = cube.x
+      <span class="hljs-keyword">if</span> cube.y &gt; <span class="hljs-literal">result</span>.yMax:
+        <span class="hljs-literal">result</span>.yMax = cube.y
+      <span class="hljs-keyword">if</span> cube.z &gt; <span class="hljs-literal">result</span>.zMax:
+        <span class="hljs-literal">result</span>.zMax = cube.z
+
+  <span class="hljs-keyword">func</span> isWithinBounds(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>): <span class="hljs-built_in">bool</span> =
+    cube.x &gt;= shell.xMin <span class="hljs-keyword">and</span> cube.x &lt;= shell.xMax <span class="hljs-keyword">and</span> cube.y &gt;= shell.yMin <span class="hljs-keyword">and</span> cube.y &lt;= shell.yMax <span class="hljs-keyword">and</span> cube.z &gt;= shell.zMin <span class="hljs-keyword">and</span> cube.z &lt;= shell.zMax
+
+  <span class="hljs-keyword">func</span> isInside(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>, dir: <span class="hljs-type">Vec3</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">var</span>
+      intersections = <span class="hljs-number">0</span>
+      justIntersected = <span class="hljs-literal">false</span>
+      cube = cube
+    <span class="hljs-keyword">while</span> cube.isWithinBounds(shell):
+      cube = cube + dir
+      <span class="hljs-keyword">if</span> cube <span class="hljs-keyword">in</span> shell.data:
+        inc intersections
+        <span class="hljs-keyword">if</span> justIntersected:
+          <span class="hljs-keyword">raise</span> newException(🤷, <span class="hljs-string">&quot;Cannot tell (tangent line)&quot;</span>)
+        justIntersected = <span class="hljs-literal">true</span>
+      <span class="hljs-keyword">else</span>:
+        justIntersected = <span class="hljs-literal">false</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">not</span>(intersections <span class="hljs-keyword">mod</span> <span class="hljs-number">2</span> == <span class="hljs-number">0</span>)
+
+  <span class="hljs-keyword">func</span> isInside(cube: <span class="hljs-type">Vec3</span>, shell: <span class="hljs-type">BoundedVec3Set</span>): <span class="hljs-built_in">bool</span> =
+    <span class="hljs-keyword">for</span> dir <span class="hljs-keyword">in</span> [(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), (-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, -<span class="hljs-number">1</span>)]:
+      <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">return</span> cube.isInside(shell, dir)
+      <span class="hljs-keyword">except</span> 🤷:
+        debugEcho <span class="hljs-string">&quot;CannotTell in direction: &quot;</span>, dir
+    <span class="hljs-keyword">raise</span> newException(🤷, <span class="hljs-string">&quot;Cannot tell (all lines tested are tangent)&quot;</span>)
+
+  <span class="hljs-keyword">func</span> part2(text: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">int</span> =
+    <span class="hljs-keyword">var</span> cubes = parse text
+    <span class="hljs-keyword">while</span> len(cubes) &gt; <span class="hljs-number">0</span>:
+      <span class="hljs-keyword">let</span> boundedShell = bound shell(cubes)
+      <span class="hljs-literal">result</span>.inc len(boundedShell.data)
+      <span class="hljs-keyword">var</span> cubesToRemove = initHashSet[<span class="hljs-type">Vec3</span>]()
+      <span class="hljs-keyword">for</span> cube <span class="hljs-keyword">in</span> cubes:
+        <span class="hljs-keyword">if</span> cube.isInside(boundedShell):
+          cubesToRemove.incl cube
+      cubes = cubes - cubesToRemove
+
+  <span class="hljs-keyword">echo</span> part2 example
+  <span class="hljs-comment">#echo part2 dayInput</span>
+
+nbText: <span class="hljs-string">&quot;&quot;&quot;Notes:
+- I am wrapping my Shell into a bounded shell, so that I do not actually have to go to infinity
+- I am using exceptions instead of a ternary type: True, False, can't tell (🤷).
+- yes, you can use emoji for identifiers in Nim!
+- inheriting directly from `Exception` is now deprecated (warning is &quot;inherit from a more precise exception type like ValueError, IOError or OSError. If these don't suit, inherit from CatchableError or Defect. [InheritFromException]&quot;);
+  the [manual section on custom exceptions](https://nim-lang.org/docs/manual.html#exception-handling-custom-exceptions) should be updated!
+&quot;&quot;&quot;</span>
+<span class="hljs-comment"># inheriting from exception is now deprecated (error message says:)</span>
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>

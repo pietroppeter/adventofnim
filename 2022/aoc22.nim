@@ -1,5 +1,6 @@
 import batteries
-
+import std/enumerate
+export enumerate # should it be added in batteries?
 type
   Day* = object
     num*: int
